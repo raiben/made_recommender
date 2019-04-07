@@ -34,13 +34,13 @@ class DatabaseBuilder(BaseScript):
                          'SELECT trope.name, count(*) '
                          'FROM trope,trope_by_film '
                          'where trope.name=trope_by_film.trope and trope.is_genre = "1" '
-                         'group by trope')
+                         'group by trope', (), 0, 1000)
 
         self._show_query('Tropes by year:', ['year', '#tropes found'],
                          'SELECT year, count(*) '
                          'FROM film, trope, trope_by_film '
                          'where trope.name=trope_by_film.trope and film.name_tvtropes=trope_by_film.film '
-                         'group by year')
+                         'group by year', (), 0, 1000)
 
     def _write_database_content(self):
         with open(self.extended_information_csv_file) as file:
@@ -128,13 +128,6 @@ class DatabaseBuilder(BaseScript):
             self.connection.commit()
         except sqlite3.Error as exception:
             self._track_error(exception)
-
-    def _show_query(self, title, headers, query):
-        if title:
-            print('\n{}'.format(title))
-        values = list(self.connection.execute(query))
-        table = tabulate(values, headers=headers)
-        print(table)
 
 
 if __name__ == "__main__":
