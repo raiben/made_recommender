@@ -238,7 +238,7 @@ class FilmFeaturesGenerator(object):
     def get_header(self, tropes, genres):
         row = ['Id', 'NameTvTropes', 'NameIMDB', 'Rating', 'Votes', 'Year']
         row.extend([trope for trope in tropes])
-        row.extend([genre for genre in genres])
+        row.extend(['genre_' + genre for genre in genres])
         return row
 
 
