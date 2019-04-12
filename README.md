@@ -72,17 +72,15 @@ invoke scrap-tvtropes --cache-directory "datasets/scrapper_cache"
 ```
 
 ```console
-Building directory: datasets/scrapper_cache/20190412_104715
-Retrieving URL from tvtropes: https://tvtropes.org/pmwiki/pmwiki.php/Main/Film
-Retrieving URL from tvtropes: https://tvtropes.org/pmwiki/pmwiki.php/Main/Tropes
-Retrieving URL from tvtropes: https://tvtropes.org/pmwiki/pmwiki.php/Main/Media
-Retrieving URL from tvtropes: https://tvtropes.org/pmwiki/pmwiki.php/Main/BewareTheSillyOnes
-Retrieving URL from cache: https://tvtropes.org/pmwiki/pmwiki.php/Main/Tropes
-Retrieving URL from cache: https://tvtropes.org/pmwiki/pmwiki.php/Main/Media
-Retrieving URL from cache: https://tvtropes.org/pmwiki/pmwiki.php/Main/Film
-Retrieving URL from tvtropes: https://tvtropes.org/pmwiki/pmwiki.php/Main/SpinOff
-Retrieving URL from tvtropes: https://tvtropes.org/pmwiki/pmwiki.php/Main/TheMovie
-Retrieving URL from tvtropes: https://tvtropes.org/pmwiki/pmwiki.php/Main/CameraTricks
+04-12 17:04:04 common.base_script INFO     Step 1.- Building directory: datasets/scrapper_cache/20190412_170435
+04-12 17:04:04 common.base_script INFO     Retrieving URL from TVTropes: https://tvtropes.org/pmwiki/pmwiki.php/Main/Film
+04-12 17:04:04 common.base_script INFO     Retrieving URL from TVTropes: https://tvtropes.org/pmwiki/pmwiki.php/Main/Tropes
+04-12 17:04:04 common.base_script INFO     Retrieving URL from TVTropes: https://tvtropes.org/pmwiki/pmwiki.php/Main/Media
+04-12 17:04:04 common.base_script INFO     Retrieving URL from TVTropes: https://tvtropes.org/pmwiki/pmwiki.php/Main/BewareTheSillyOnes
+04-12 17:04:04 common.base_script INFO     Retrieving URL from cache: https://tvtropes.org/pmwiki/pmwiki.php/Main/Tropes
+04-12 17:04:04 common.base_script INFO     Retrieving URL from cache: https://tvtropes.org/pmwiki/pmwiki.php/Main/Media
+04-12 17:04:04 common.base_script INFO     Retrieving URL from cache: https://tvtropes.org/pmwiki/pmwiki.php/Main/Film
+04-12 17:04:04 common.base_script INFO     Retrieving URL from TVTropes: https://tvtropes.org/pmwiki/pmwiki.php/Main/SpinOff
 ...
 ```
 

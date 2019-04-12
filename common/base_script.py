@@ -6,7 +6,7 @@ from tabulate import tabulate
 
 class BaseScript(object):
     _logger = logging.getLogger(__name__)
-    logging.basicConfig(level=logging.DEBUG, format='%(asctime)s %(name)-12s %(levelname)-8s %(message)s',
+    logging.basicConfig(level=logging.INFO, format='%(asctime)s %(name)-12s %(levelname)-8s %(message)s',
                         datefmt='%m-%d %H:%M:%m', )
 
     def _track_step(self, message):
@@ -21,7 +21,7 @@ class BaseScript(object):
         self._logger.error(message)
 
     def _track_message(self, message):
-        self._logger.debug(message)
+        self._logger.info(message)
 
     def _show_query(self, title, headers, query, parameters=(), page=0, page_size=100):
         offset = page * page_size
@@ -48,16 +48,11 @@ class BaseScript(object):
             self._track_message('\n{}\n'.format(table))
 
     def wrap(self, text, width):
-        """
-        A word-wrap function that preserves existing line breaks
-        and most spaces in the text. Expects that existing line
-        breaks are posix newlines (\n).
-        """
-        return reduce(lambda line, word, width=width: '%s%s%s' %
-                                                      (line,
-                                                       ' \n'[(len(line) - line.rfind('\n') - 1
-                                                              + len(word.split('\n', 1)[0]
-                                                                    ) >= width)],
-                                                       word),
+        return reduce(lambda line, word, width=width:
+                      '%s%s%s' % (line,
+                                  ' \n'[(len(line) - line.rfind('\n') - 1
+                                         + len(word.split('\n', 1)[0]
+                                               ) >= width)],
+                                  word),
                       text.split(' ')
                       )
