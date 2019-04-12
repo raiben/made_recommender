@@ -32,20 +32,77 @@ pip3 install pipreqs
 pipreqs . --force
 ```
 
-You are ready to reproduce my science...
+You are ready to reproduce science. The different scripts and
+classes can be run from the command line through ```ìnvoke```.
+
+To get a list of commands and 
+```console
+invoke --list
+```
 
 # Content
 
-## tvtropes_scrapper
+## TVTropes scrapper
 
-Scripts to download all the films
-information from TVTropes and extract the tropes inside them.  
+**Module**: [tvtropes_scrapper](tvtropes_scrapper)
+
+Script to download all the films information from TVTropes and 
+extract the tropes inside them:
+
+```console
+invoke scrap-tvtropes --help
+```
+```console
+Usage: inv[oke] [--core-opts] scrap-tvtropes [--options] [other tasks here ...]
+
+Docstring:
+  Scrap tropes by film in TvTropes.org
+
+  :param cache_directory: The folder that all the downloaded pages are going to be written into.
+  :param session: (Optional) Name of the cache folder. If not provided, then it will use the current date/time.
+
+Options:
+  -c STRING, --cache-directory=STRING
+  -s STRING, --session=STRING
+```
+
+Example:
+```console
+invoke scrap-tvtropes --cache-directory "datasets/scrapper_cache"
+```
+
+```console
+Building directory: datasets/scrapper_cache/20190412_104715
+Retrieving URL from tvtropes: https://tvtropes.org/pmwiki/pmwiki.php/Main/Film
+Retrieving URL from tvtropes: https://tvtropes.org/pmwiki/pmwiki.php/Main/Tropes
+Retrieving URL from tvtropes: https://tvtropes.org/pmwiki/pmwiki.php/Main/Media
+Retrieving URL from tvtropes: https://tvtropes.org/pmwiki/pmwiki.php/Main/BewareTheSillyOnes
+Retrieving URL from cache: https://tvtropes.org/pmwiki/pmwiki.php/Main/Tropes
+Retrieving URL from cache: https://tvtropes.org/pmwiki/pmwiki.php/Main/Media
+Retrieving URL from cache: https://tvtropes.org/pmwiki/pmwiki.php/Main/Film
+Retrieving URL from tvtropes: https://tvtropes.org/pmwiki/pmwiki.php/Main/SpinOff
+Retrieving URL from tvtropes: https://tvtropes.org/pmwiki/pmwiki.php/Main/TheMovie
+Retrieving URL from tvtropes: https://tvtropes.org/pmwiki/pmwiki.php/Main/CameraTricks
+...
+```
+
+The output file ```all_films_and_their_tropes_{self.session}.json```
+will be available in the ```cache-directory``` provided
 
 ## imdb_matcher
 
 Scripts to merge information from the
 scrapped data (from TVTropes) and IMDB databases, by name 
 of the film and year.
+
+## dataset_displayers
+
+Scripts to:
+
+1. convert the generated file into a database that you
+can query
+2. search for films and get their information.
+3. search for tropes and get their information.
 
 ## rating_evaluator
 
