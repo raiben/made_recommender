@@ -9,7 +9,7 @@ and IMDB.
 The project uses **python3** compliant code and the libraries
 listed in the [requirements.txt](requirements.txt) file.
 
-Are you using python3? You can run this command and check:
+Are you using python3? You can run this command and check it:
 ```console
 python3 --version
 ```
