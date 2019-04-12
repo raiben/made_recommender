@@ -42,7 +42,7 @@ class Displayer(BaseScript):
 
         query = '''
         -- filter tropes by name and sort by number of films and avg_rating
-        SELECT trope_by_film.film, film.name_imdb, count(trope_by_film.trope) AS n_tropes, 
+        SELECT trope_by_film.film, film.name_imdb, film.rating, count(trope_by_film.trope) AS n_tropes, 
                group_concat(trope_by_film.trope, ', ')
         FROM trope_by_film,
              trope,
@@ -53,9 +53,15 @@ class Displayer(BaseScript):
         GROUP BY trope_by_film.film
         ORDER BY n_tropes DESC'''
 
-        self._show_query('', ['Short name', 'Long Name', '# tropes', 'tropes'],
+        self._show_query('', ['Short name', 'Long Name', 'Rating', '# tropes', 'tropes'],
                          query, (search_query,search_query,), page, results)
 
+    def list_tropes_by_movie_name(self, film_name):
+        query = 'SELECT trope_by_film.trope FROM trope_by_film WHERE trope_by_film.film = ?'
+        values = list(self.connection.execute(query, [film_name]))
+        values_to_print = ','.join([value[0] for value in values])
+
+        print(values_to_print)
 
 if __name__ == "__main__":
     displayer = Displayer(
@@ -63,3 +69,8 @@ if __name__ == "__main__":
     displayer.search_genres(search_query='', page=0, results=50)
     displayer.search_tropes(search_query='AdaptationDistillation', page=0, results=7)
     displayer.search_movies(search_query='avengers', page=0, results=7)
+    displayer.list_tropes_by_movie_name(film_name='TheAvengers2012')
+    displayer.search_movies(search_query='pulpfiction', page=0, results=7)
+    displayer.list_tropes_by_movie_name(film_name='PulpFiction')
+    displayer.search_movies(search_query='alone in the dark', page=0, results=7)
+    displayer.list_tropes_by_movie_name(film_name='AloneInTheDark2005')
