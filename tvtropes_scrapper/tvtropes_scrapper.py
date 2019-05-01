@@ -1,4 +1,5 @@
 import base64
+import bz2
 import datetime
 import json
 import os
@@ -15,7 +16,7 @@ class TVTropesScrapper(BaseScript):
     MAIN_SEARCH = 'https://tvtropes.org/pmwiki/pmwiki.php/Main/Film'
     BASE_FILM_URL = 'https://tvtropes.org/pmwiki/pmwiki.php/Film/'
     BASE_MAIN_URL = 'https://tvtropes.org/pmwiki/pmwiki.php/Main/'
-    TARGET_RESULT_FILE_TEMPLATE = 'all_films_and_their_tropes_{}.json'
+    TARGET_RESULT_FILE_TEMPLATE = 'films_tropes_{}.json'
 
     WAIT_TIME_BETWEEN_CALLS_IN_SECONDS = 0.5
     SESSION_DATETIME_FORMAT = '%Y%m%d_%H%M%S'
@@ -26,6 +27,7 @@ class TVTropesScrapper(BaseScript):
     LINK_SELECTOR_INSIDE_ARTICLE = '#main-article ul li a'
     LINK_ADDRESS_SELECTOR = 'href'
     EXTENSION = '.html'
+    COMPRESSED_EXTENSION = '.bz2'
     DEFAULT_ENCODING = 'utf-8'
 
     def __init__(self, directory, session):
@@ -38,16 +40,16 @@ class TVTropesScrapper(BaseScript):
         self.tropes = None
         self.tropes_by_film = OrderedDict()
 
-    def _build_required_directories(self):
-        whole_path = os.path.join(self.directory_name, self.session)
-        if not os.path.isdir(whole_path):
-            self._track_step(f'Building directory: {whole_path}')
-            os.makedirs(whole_path)
-
     def _set_default_session_value_if_empty(self):
         if not self.session:
             now = datetime.datetime.now()
             self.session = now.strftime(self.SESSION_DATETIME_FORMAT)
+
+    def _build_required_directories(self):
+        whole_path = os.path.join(self.directory_name, self.session)
+        if not os.path.isdir(whole_path):
+            self._step(f'Building directory: {whole_path}')
+            os.makedirs(whole_path)
 
     def run(self):
         self._extract_film_ids()
@@ -57,11 +59,11 @@ class TVTropesScrapper(BaseScript):
     def _extract_film_ids(self):
         self.films = set()
         main_url = self.MAIN_SEARCH
-        category_ids = self.get_links_from_url(main_url, self.MAIN_RESOURCE)
+        category_ids = self._get_links_from_url(main_url, self.MAIN_RESOURCE)
 
         for category_id in category_ids:
             url = self.BASE_MAIN_URL + category_id
-            film_ids = self.get_links_from_url(url, self.FILM_RESOURCE)
+            film_ids = self._get_links_from_url(url, self.FILM_RESOURCE)
             self.films.update(film_ids)
 
     def _extract_tropes(self):
@@ -69,50 +71,65 @@ class TVTropesScrapper(BaseScript):
         self.tropes_by_film = OrderedDict()
         sorted_films = sorted(list(self.films))
 
-        self._track_step('Found {} films'.format(len(sorted_films)))
+        self._step(f'Found {len(sorted_films)} films')
 
         for counter, film in enumerate(sorted_films):
-            self._track_message('Status: {}/{} films'.format(counter, len(sorted_films)))
+            self._info(f'Status: {counter}/{len(sorted_films)} films')
             self._get_tropes_by_film(film)
 
     def _get_tropes_by_film(self, film):
         url = self.BASE_FILM_URL + film
-        trope_ids = self.get_links_from_url(url, self.MAIN_RESOURCE, only_article=True)
-        self._track_message("Summary for film: {}".format(film))
-        self._track_message("Tropes: {} items: {}".format(len(trope_ids), trope_ids))
+        trope_ids = self._get_links_from_url(url, self.MAIN_RESOURCE, only_article=True)
+
+        self._info(f'Film {film} ({len(trope_ids)} tropes): {trope_ids}')
+
         self.tropes.update(trope_ids)
         self.tropes_by_film[film] = sorted(trope_ids)
 
-    def get_links_from_url(self, url, type, only_article=False):
+    def _get_links_from_url(self, url, link_type, only_article=False):
         page = self._get_content_from_url(url)
         tree = html.fromstring(page)
         selector = self.LINK_SELECTOR_INSIDE_ARTICLE if only_article else self.LINK_SELECTOR
-        links = [element.get(self.LINK_ADDRESS_SELECTOR) for element in tree.cssselect(self.LINK_SELECTOR)
+        links = [element.get(self.LINK_ADDRESS_SELECTOR) for element in tree.cssselect(selector)
                  if element.get(self.LINK_ADDRESS_SELECTOR)]
-        return [link.split('/')[-1] for link in links if type in link and 'action' not in link]
+        return [link.split('/')[-1] for link in links if link_type in link and 'action' not in link]
 
     def _get_content_from_url(self, url):
         encoded_url = self._build_encoded_url(url)
         file_path = os.path.join(self.directory_name, self.session, encoded_url)
 
         if os.path.isfile(file_path):
-            self._track_message('Retrieving URL from cache: {}'.format(url))
-            with open(file_path, 'rb') as file:
-                content = file.read()
-                return content.decode('utf-8', errors='ignore')
+            self._info(f'Retrieving URL from cache: {url}')
+            content = self._read_file(file_path)
+            self._read_content_safely(content)
 
-        self._track_message('Retrieving URL from TVTropes: {}'.format(url))
+        self._info(f'Retrieving URL from TVTropes and storing in cache: {url}')
         self._wait_between_calls_to_avoid_attacking()
         page = requests.get(url)
         content = page.content
-        with open(file_path, 'wb') as file:
-            file.write(content)
-            return content.decode(self.DEFAULT_ENCODING, errors='ignore')
+        self._write_file(content, file_path)
+        return self._read_content_safely(content)
+
+    @classmethod
+    def _read_file(cls, file_path):
+        compressed_path = f'{file_path}{cls.COMPRESSED_EXTENSION}'
+        with open(compressed_path, 'rb') as file:
+            content = file.read()
+        return bz2.decompress(content)
+
+    @classmethod
+    def _write_file(cls, content, file_path):
+        compressed_path = f'{file_path}{cls.COMPRESSED_EXTENSION}'
+        compressed_content = bz2.compress(content)
+        with open(compressed_path, 'wb') as file:
+            file.write(compressed_content)
+
+    def _read_content_safely(self, content):
+        return content.decode(self.DEFAULT_ENCODING, errors='ignore')
 
     def _build_encoded_url(self, url):
         encoded_url = base64.b64encode(url.encode(self.DEFAULT_ENCODING)).decode(self.DEFAULT_ENCODING) + self.EXTENSION
-        encoded_url = encoded_url.replace('/', '_')
-        return encoded_url
+        return encoded_url.replace('/', '_')
 
     def _wait_between_calls_to_avoid_attacking(self):
         sleep(self.WAIT_TIME_BETWEEN_CALLS_IN_SECONDS)
@@ -121,8 +138,7 @@ class TVTropesScrapper(BaseScript):
         target_file_name = self.TARGET_RESULT_FILE_TEMPLATE.format(self.session)
         file_path = os.path.join(self.directory_name, self.session, target_file_name)
         content = json.dumps(self.tropes_by_film, indent=2, sort_keys=True)
-        with open(file_path, 'w') as file:
-            file.write(content)
+        self._write_file(content, file_path)
 
 
 if __name__ == "__main__":

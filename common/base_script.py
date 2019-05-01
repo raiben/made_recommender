@@ -17,11 +17,17 @@ class BaseScript(object):
 
         self._logger.info(u'Step {}.- {}'.format(self.counter, message))
 
+    def _step(self, message):
+        self._track_step(message)
+
     def _track_error(self, message):
         self._logger.error(message)
 
     def _track_message(self, message):
         self._logger.info(message)
+
+    def _info(self, message):
+        self._track_message(message)
 
     def _show_query(self, title, headers, query, parameters=(), page=0, page_size=100):
         offset = page * page_size
