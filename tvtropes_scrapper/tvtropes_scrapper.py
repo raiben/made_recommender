@@ -98,10 +98,10 @@ class TVTropesScrapper(BaseScript):
         encoded_url = self._build_encoded_url(url)
         file_path = os.path.join(self.directory_name, self.session, encoded_url)
 
-        if os.path.isfile(file_path):
+        if self._file_exists(file_path):
             self._info(f'Retrieving URL from cache: {url}')
             content = self._read_file(file_path)
-            self._read_content_safely(content)
+            return self._read_content_safely(content)
 
         self._info(f'Retrieving URL from TVTropes and storing in cache: {url}')
         self._wait_between_calls_to_avoid_attacking()
@@ -109,6 +109,11 @@ class TVTropesScrapper(BaseScript):
         content = page.content
         self._write_file(content, file_path)
         return self._read_content_safely(content)
+
+    @classmethod
+    def _file_exists(cls, file_path):
+        compressed_path = f'{file_path}{cls.COMPRESSED_EXTENSION}'
+        return os.path.isfile(compressed_path)
 
     @classmethod
     def _read_file(cls, file_path):

@@ -1,4 +1,5 @@
 import logging
+from datetime import datetime
 from functools import reduce
 
 from tabulate import tabulate
@@ -8,6 +9,15 @@ class BaseScript(object):
     _logger = logging.getLogger(__name__)
     logging.basicConfig(level=logging.INFO, format='%(asctime)s %(name)-12s %(levelname)-8s %(message)s',
                         datefmt='%m-%d %H:%M:%m', )
+
+    @staticmethod
+    def set_logger_file_id(*args):
+        parameters_as_list = "_".join([str(parameter) for parameter in args])
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        file_name = f'./logs/{parameters_as_list}_{timestamp}.log'
+
+        file_logger = logging.FileHandler(file_name)
+        logging.getLogger('').addHandler(file_logger)
 
     def _track_step(self, message):
         try:

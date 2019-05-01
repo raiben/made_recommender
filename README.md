@@ -40,6 +40,11 @@ To get a list of commands and
 invoke --list
 ```
 
+# Logging
+
+All the executions are logged in the console and in different files under ```./logs/<identifier>_<timestamp>.log```.
+That will make it easier to trace the different experiments and executions.  
+
 # Content
 
 ## TVTropes scrapper
@@ -60,7 +65,7 @@ As result, it builds a **dictionary of films and tropes**.
 are permanently stored in the local cache, so it will continue from the last page processed.
 - The files in cache and the final output file are **compressed using bzip2** with a block size of 900k 
 (the highest compression available).
-- The file names are **encoded in base64** to avoid special characters.
+- The file names are **encoded in base64** to avoid using special characters.
 The character '-' is replaced by '_'.
 - The code avoids slowing down TVTropes servers by **waiting between each download**.
 
@@ -96,19 +101,22 @@ will be available in the ```<cache-directory>``` provided.
 
 Example:
 ```console
-invoke scrap-tvtropes --cache-directory "datasets/scrapper_cache"
+invoke scrap-tvtropes --cache-directory ./datasets/scrapper/cache/ --session 20190501
 ```
 
 ```console
-04-12 17:04:04 common.base_script INFO     Step 1.- Building directory: datasets/scrapper_cache/20190412_170435
-04-12 17:04:04 common.base_script INFO     Retrieving URL from TVTropes: https://tvtropes.org/pmwiki/pmwiki.php/Main/Film
-04-12 17:04:04 common.base_script INFO     Retrieving URL from TVTropes: https://tvtropes.org/pmwiki/pmwiki.php/Main/Tropes
-04-12 17:04:04 common.base_script INFO     Retrieving URL from TVTropes: https://tvtropes.org/pmwiki/pmwiki.php/Main/Media
-04-12 17:04:04 common.base_script INFO     Retrieving URL from TVTropes: https://tvtropes.org/pmwiki/pmwiki.php/Main/BewareTheSillyOnes
-04-12 17:04:04 common.base_script INFO     Retrieving URL from cache: https://tvtropes.org/pmwiki/pmwiki.php/Main/Tropes
-04-12 17:04:04 common.base_script INFO     Retrieving URL from cache: https://tvtropes.org/pmwiki/pmwiki.php/Main/Media
-04-12 17:04:04 common.base_script INFO     Retrieving URL from cache: https://tvtropes.org/pmwiki/pmwiki.php/Main/Film
-04-12 17:04:04 common.base_script INFO     Retrieving URL from TVTropes: https://tvtropes.org/pmwiki/pmwiki.php/Main/SpinOff
+05-01 22:56:05 common.base_script INFO     Retrieving URL from TVTropes and storing in cache: https://tvtropes.org/pmwiki/pmwiki.php/Main/Tropes
+05-01 22:56:05 common.base_script INFO     Retrieving URL from TVTropes and storing in cache: https://tvtropes.org/pmwiki/pmwiki.php/Main/Media
+05-01 22:56:05 common.base_script INFO     Retrieving URL from TVTropes and storing in cache: https://tvtropes.org/pmwiki/pmwiki.php/Main/FatGirl
+05-01 22:56:05 common.base_script INFO     Retrieving URL from TVTropes and storing in cache: https://tvtropes.org/pmwiki/pmwiki.php/Main/Tropes
+05-01 22:56:05 common.base_script INFO     Retrieving URL from TVTropes and storing in cache: https://tvtropes.org/pmwiki/pmwiki.php/Main/Media
+...
+05-01 23:02:05 common.base_script INFO     Retrieving URL from TVTropes and storing in cache: https://tvtropes.org/pmwiki/pmwiki.php/Film/Absurd
+05-01 23:02:05 common.base_script INFO     Film Absurd (41 tropes): ['AnAxeToGrind', 'AsLongAsItSoundsForeign', 'BigBad', 'ImplacableMan', 'BigDamnHeroes', 'CarFu', 'ChekhovsGun', 'DecapitationPresentation', 'DolledUpInstallment', 'Eagleland', 'EyeScream', 'FacialHorror', 'Gorn', 'GrossUpCloseUp', 'HealingFactor', 'HorrorDoesntSettleForSimpleTuesday', 'ImpaledWithExtremePrejudice', 'ImpromptuTracheotomy', 'ImprovisedWeapon', 'MyCarHatesMe', 'NeverFoundTheBody', 'NoNameGiven', 'NoodleIncident', 'HealingFactor', 'OffWithHisHead', 'OneWordTitle', 'PeekABooCorpse', 'PowerfulPick', 'RagTagBunchOfMisfits', 'RedShirt', 'RemovingTheHeadOrDestroyingTheBrain', 'ShirtlessScene', 'SlasherSmile', 'SpiritualSuccessor', 'TheStoic', 'ThingsThatGoBumpInTheNight', 'ThrowingOffTheDisability', 'ThisIsADrill', 'TitleDrop', 'WithGreatPowerComesGreatInsanity', 'ZombieGait']
+05-01 23:02:05 common.base_script INFO     Status: 222/11846 films
+05-01 23:02:05 common.base_script INFO     Retrieving URL from TVTropes and storing in cache: https://tvtropes.org/pmwiki/pmwiki.php/Film/Accepted
+05-01 23:02:05 common.base_script INFO     Film Accepted (82 tropes): ['AbandonedHospital', 'AloneInACrowd', 'ArtisticLicenseUniversityAdmissions', 'ReadingsAreOffTheScale', 'ArtisticLicenseEngineering', 'AttentionDeficitOohShiny', 'AnnoyingYoungerSibling', 'BecomingTheMask', 'BigStore', 'BookDumb', 'BrickJoke', 'PsychicPowers', 'BrilliantButLazy', 'ButtMonkey', 'CalvinBall', 'TheCon', 'BigStore', 'ClusterFBomb', 'CoolLoser', 'CoolUncle', 'CripplingOverspecialization', 'DeadpanSnarker', 'DeanBitterman', 'DumbassHasAPoint', 'StrawmanHasAPoint', 'TroublingUnchildlikeBehaviour', 'EpicFail', 'FakeRealTurn', 'ForTheEvulz', 'FunWithAcronyms', 'LampshadeHanging', 'BringMyBrownPants', 'GeniusDitz', 'HighSchoolHustler', 'ImpossiblyDeliciousFood', 'MessOnAPlate', 'IndyPloy', 'OhCrap', 'OhCrap', 'InitiationCeremony', 'IvyLeagueForEveryone', 'KavorkaMan', 'KickTheDog', 'LargeHam', 'MadeOfExplodium', 'MessOnAPlate', 'MostWritersAreWriters', 'StrawmanPolitical', 'JustifiedTrope', 'NeverRecycleABuilding', 'NoodleIncident', 'OnlySaneMan', 'OddFriendship', 'CloudCuckoolander', 'PeekABooCorpse', 'HilarityEnsues', 'PrecisionFStrike', 'AluminumChristmasTrees', 'BleepDammit', 'PrisonRape', 'ProfessionalSlacker', 'ProperlyParanoid', 'PsychicPowers', 'ReadingsAreOffTheScale', 'ScreamsLikeALittleGirl', 'SettingUpdate', 'ShoutOut', 'ActorAllusion', 'SlobsVersusSnobs', 'SmugSnake', 'SoundEffectBleep', 'StartMyOwn', 'StealthPun', 'SupremeChef', 'MessOnAPlate', 'TelepathicSprinklers', 'TheDogBitesBack', 'ThisIsWhatTheBuildingWillLookLike', 'TruthInTelevision', 'ParanoiaFuel', 'VerbedTitle', 'WillingSuspensionOfDisbelief']
+05-01 23:02:05 common.base_script INFO     Status: 223/11846 films
 ...
 ```
 
