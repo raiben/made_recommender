@@ -49,6 +49,24 @@ invoke --list
 Script to download all the films information from TVTropes and 
 extract the tropes inside them:
 
+### Features
+
+- The scrapper **extracts all the categories** from the main categories page: 
+https://tvtropes.org/pmwiki/pmwiki.php/Main/Film . 
+Then, for each category page, it extracts **all the film identifiers** assigned to it. 
+Finally, for every film page, it extracts **all the trope identifiers**. 
+As result, it builds a **dictionary of films and tropes**.
+- The process **can be stopped and re-launched at any moment** because the pages.
+are permanently stored in the local cache, so it will continue from the last page processed.
+- The files in cache and the final output file are **compressed using bzip2** with a block size of 900k 
+(the highest compression available).
+- The file names are **encoded in base64** to avoid special characters.
+The character '-' is replaced by '_'.
+- The code avoids slowing down TVTropes servers by **waiting between each download**.
+
+
+### Usage
+
 ```console
 invoke scrap-tvtropes --help
 ```
@@ -65,6 +83,16 @@ Options:
   -c STRING, --cache-directory=STRING
   -s STRING, --session=STRING
 ```
+
+### Output
+
+The task generates a file called ```film_tropes_<session>.json.bz2```
+will be available in the ```<cache-directory>``` provided.
+
+**Format**:
+<TODO>
+
+### Example
 
 Example:
 ```console
@@ -84,8 +112,11 @@ invoke scrap-tvtropes --cache-directory "datasets/scrapper_cache"
 ...
 ```
 
-The output file ```all_films_and_their_tropes_{self.session}.json```
-will be available in the ```cache-directory``` provided
+### Troubleshooting
+
+- **To re-cache**, please remove the cache folder. The class will auto generate it again in the next execution, 
+re-downloading the pages.
+
 
 ## imdb_matcher
 
