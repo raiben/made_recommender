@@ -144,11 +144,3 @@ class TVTropesScrapper(BaseScript):
         file_path = os.path.join(self.directory_name, self.session, target_file_name)
         content = json.dumps(self.tropes_by_film, indent=2, sort_keys=True)
         self._write_file(content, file_path)
-
-
-if __name__ == "__main__":
-    sample_directory = '/Users/phd/workspace/made/made_tropes/scripts/scrapping_cache'
-    sample_session = '1'
-
-    scrapper = TVTropesScrapper(directory=sample_directory, session=sample_session)
-    scrapper.run()
