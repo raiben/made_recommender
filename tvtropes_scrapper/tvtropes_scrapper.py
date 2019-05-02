@@ -142,5 +142,7 @@ class TVTropesScrapper(BaseScript):
     def _write_result(self):
         target_file_name = self.TARGET_RESULT_FILE_TEMPLATE.format(self.session)
         file_path = os.path.join(self.directory_name, self.session, target_file_name)
+        self.step(f'Saving tropes by film into {file_path}')
         content = json.dumps(self.tropes_by_film, indent=2, sort_keys=True)
-        self._write_file(content, file_path)
+        byte_content = content.encode(self.DEFAULT_ENCODING)
+        self._write_file(byte_content, file_path)
