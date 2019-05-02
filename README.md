@@ -157,7 +157,8 @@ can be found in the datasets folder of the project.
 
 ### Troubleshooting
 
-- **To re-cache**, please remove the cache folder. The class will auto generate it again in the next execution, 
+- **To re-cache**, please remove the cache folder or use another session. 
+The class will auto generate it again in the next execution, 
 re-downloading the pages.
 
 
