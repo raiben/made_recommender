@@ -68,7 +68,8 @@ are permanently stored in the local cache, so it will continue from the last pag
 - The file names are **encoded in base64** to avoid using special characters.
 The character '-' is replaced by '_'.
 - The code avoids slowing down TVTropes servers by **waiting between each download**.
-
+- The execution when no page is cached takes around 3~4 hours. When pages are cached it takes ~2 minutes.
+It can retrieve around 12K pages. 
 
 ### Usage
 
@@ -95,7 +96,25 @@ The task generates a file called ```film_tropes_<session>.json.bz2```
 will be available in the ```<cache-directory>``` provided.
 
 **Format**:
-<TODO>
+```json
+{
+  "ABCsOfDeath2": [
+    "AbusiveParents",
+    "AirVentPassageway",
+    ...
+  ],
+  "ABeautifulDayInTheNeighborhood": [
+    "IncorruptiblePurePureness",
+    "LooselyBasedOnATrueStory"
+  ],
+  "ABeautifulMind": [
+    "AdultFear",
+    "AllThereIsToKnowAboutTheCryingGame",
+    ...
+  ],
+  ...
+}
+```
 
 ### Example
 
