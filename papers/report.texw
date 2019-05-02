@@ -16,6 +16,47 @@
 \affil[3]{Universidad de C\'adiz and CITIC-UGR, Spain}
 \renewcommand\Authands{ and }
 
+% Commands from pandoc
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{0}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+\newenvironment{Shaded}{}{}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.00,0.44,0.13}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.56,0.13,0.00}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.25,0.63,0.44}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.25,0.63,0.44}{#1}}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.25,0.63,0.44}{#1}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.53,0.00,0.00}{#1}}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.25,0.44,0.63}{#1}}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.25,0.44,0.63}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.25,0.44,0.63}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.25,0.44,0.63}{#1}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.73,0.40,0.53}{#1}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.38,0.63,0.69}{\textit{#1}}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.73,0.13,0.13}{\textit{#1}}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.38,0.63,0.69}{\textbf{\textit{#1}}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.38,0.63,0.69}{\textbf{\textit{#1}}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.00,0.44,0.13}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.02,0.16,0.49}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.10,0.09,0.49}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.00,0.44,0.13}{\textbf{#1}}}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.40,0.40,0.40}{#1}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.74,0.48,0.00}{#1}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.49,0.56,0.16}{#1}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.38,0.63,0.69}{\textbf{\textit{#1}}}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.38,0.63,0.69}{\textbf{\textit{#1}}}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{1.00,0.00,0.00}{\textbf{#1}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{1.00,0.00,0.00}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+% end of commands from pandoc
+
 \hypersetup
 {
   pdfauthor = {Rub\'en H. Garc\'ia-Ortega},
@@ -108,8 +149,149 @@ their data to a database so-called \textit{DBTropes.org}.\\
 % ¿Que es tvtropes y qué es pictropes? Citar el otro paper.
 % Alguien ha usado esos términos?
 
-\subsection{Extracting the tropes from TVTropes}
 
+\subsection{Extracting the tropes from TVTropes: TVTropes scrapper}\label{tvtropes-scrapper}
+
+\textbf{Module}: \url{tvtropes_scrapper}
+
+Script to download all the films information from TVTropes and extract
+the tropes inside them:
+
+\subsubsection{Features}\label{features}
+
+\begin{itemize}
+\tightlist
+\item
+  The scrapper \textbf{extracts all the categories} from the main
+  categories page: https://tvtropes.org/pmwiki/pmwiki.php/Main/Film .
+  Then, for each category page, it extracts \textbf{all the film
+  identifiers} assigned to it. Finally, for every film page, it extracts
+  \textbf{all the trope identifiers}. As result, it builds a
+  \textbf{dictionary of films and tropes}.
+\item
+  The process \textbf{can be stopped and re-launched at any moment}
+  because the pages. are permanently stored in the local cache, so it
+  will continue from the last page processed.
+\item
+  The files in cache and the final output file are \textbf{compressed
+  using bzip2} with a block size of 900k (the highest compression
+  available).
+\item
+  The file names are \textbf{encoded in base64} to avoid using special
+  characters. The character `-' is replaced by '\_'.
+\item
+  The code avoids slowing down TVTropes servers by \textbf{waiting
+  between each download}.
+\item
+  The execution when no page is cached takes around 3\textasciitilde{}4
+  hours. When pages are cached it takes \textasciitilde{}2 minutes. It
+  can retrieve around 12K pages.
+\end{itemize}
+
+\subsubsection{Usage}\label{usage}
+
+\begin{verbatim}
+invoke scrap-tvtropes --help
+\end{verbatim}
+
+\begin{verbatim}
+Usage: inv[oke] [--core-opts] scrap-tvtropes [--options] [other tasks here ...]
+
+Docstring:
+  Scrap tropes by film in TvTropes.org
+
+  :param cache_directory: The folder that all the downloaded pages are going to be written into.
+  :param session: (Optional) Name of the cache folder. If not provided, then it will use the current date/time.
+
+Options:
+  -c STRING, --cache-directory=STRING
+  -s STRING, --session=STRING
+\end{verbatim}
+
+\subsubsection{Output}\label{output}
+
+The task generates a file called
+\texttt{film\_tropes\_\textless{}session\textgreater{}.json.bz2} will be
+available in the \texttt{\textless{}cache-directory\textgreater{}}
+provided.
+
+\textbf{Format}:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{\{}
+  \DataTypeTok{"<film_identifier>"}\FunctionTok{:} \OtherTok{[}
+    \StringTok{"<trope_identifier>"}\OtherTok{,}
+    \StringTok{"..."}
+  \OtherTok{]}\FunctionTok{,}
+  \DataTypeTok{"..."}\FunctionTok{:} \OtherTok{[}
+    \StringTok{"..."}
+  \OtherTok{]}
+\FunctionTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+\subsubsection{Example}\label{example}
+
+Example:
+
+\begin{verbatim}
+invoke scrap-tvtropes --cache-directory ./datasets/scrapper/cache/ --session 20190501
+\end{verbatim}
+
+\begin{verbatim}
+05-01 22:56:05 common.base_script INFO     Retrieving URL from TVTropes and storing in cache: https://tvtropes.org/pmwiki/pmwiki.php/Main/Tropes
+05-01 22:56:05 common.base_script INFO     Retrieving URL from TVTropes and storing in cache: https://tvtropes.org/pmwiki/pmwiki.php/Main/Media
+05-01 22:56:05 common.base_script INFO     Retrieving URL from TVTropes and storing in cache: https://tvtropes.org/pmwiki/pmwiki.php/Main/FatGirl
+05-01 22:56:05 common.base_script INFO     Retrieving URL from TVTropes and storing in cache: https://tvtropes.org/pmwiki/pmwiki.php/Main/Tropes
+05-01 22:56:05 common.base_script INFO     Retrieving URL from TVTropes and storing in cache: https://tvtropes.org/pmwiki/pmwiki.php/Main/Media
+...
+05-01 23:02:05 common.base_script INFO     Retrieving URL from TVTropes and storing in cache: https://tvtropes.org/pmwiki/pmwiki.php/Film/Absurd
+05-01 23:02:05 common.base_script INFO     Film Absurd (41 tropes): ['AnAxeToGrind', 'AsLongAsItSoundsForeign', 'BigBad', 'ImplacableMan', 'BigDamnHeroes', 'CarFu', 'ChekhovsGun', 'DecapitationPresentation', 'DolledUpInstallment', 'Eagleland', 'EyeScream', 'FacialHorror', 'Gorn', 'GrossUpCloseUp', 'HealingFactor', 'HorrorDoesntSettleForSimpleTuesday', 'ImpaledWithExtremePrejudice', 'ImpromptuTracheotomy', 'ImprovisedWeapon', 'MyCarHatesMe', 'NeverFoundTheBody', 'NoNameGiven', 'NoodleIncident', 'HealingFactor', 'OffWithHisHead', 'OneWordTitle', 'PeekABooCorpse', 'PowerfulPick', 'RagTagBunchOfMisfits', 'RedShirt', 'RemovingTheHeadOrDestroyingTheBrain', 'ShirtlessScene', 'SlasherSmile', 'SpiritualSuccessor', 'TheStoic', 'ThingsThatGoBumpInTheNight', 'ThrowingOffTheDisability', 'ThisIsADrill', 'TitleDrop', 'WithGreatPowerComesGreatInsanity', 'ZombieGait']
+05-01 23:02:05 common.base_script INFO     Status: 222/11846 films
+05-01 23:02:05 common.base_script INFO     Retrieving URL from TVTropes and storing in cache: https://tvtropes.org/pmwiki/pmwiki.php/Film/Accepted
+05-01 23:02:05 common.base_script INFO     Film Accepted (82 tropes): ['AbandonedHospital', 'AloneInACrowd', 'ArtisticLicenseUniversityAdmissions', 'ReadingsAreOffTheScale', 'ArtisticLicenseEngineering', 'AttentionDeficitOohShiny', 'AnnoyingYoungerSibling', 'BecomingTheMask', 'BigStore', 'BookDumb', 'BrickJoke', 'PsychicPowers', 'BrilliantButLazy', 'ButtMonkey', 'CalvinBall', 'TheCon', 'BigStore', 'ClusterFBomb', 'CoolLoser', 'CoolUncle', 'CripplingOverspecialization', 'DeadpanSnarker', 'DeanBitterman', 'DumbassHasAPoint', 'StrawmanHasAPoint', 'TroublingUnchildlikeBehaviour', 'EpicFail', 'FakeRealTurn', 'ForTheEvulz', 'FunWithAcronyms', 'LampshadeHanging', 'BringMyBrownPants', 'GeniusDitz', 'HighSchoolHustler', 'ImpossiblyDeliciousFood', 'MessOnAPlate', 'IndyPloy', 'OhCrap', 'OhCrap', 'InitiationCeremony', 'IvyLeagueForEveryone', 'KavorkaMan', 'KickTheDog', 'LargeHam', 'MadeOfExplodium', 'MessOnAPlate', 'MostWritersAreWriters', 'StrawmanPolitical', 'JustifiedTrope', 'NeverRecycleABuilding', 'NoodleIncident', 'OnlySaneMan', 'OddFriendship', 'CloudCuckoolander', 'PeekABooCorpse', 'HilarityEnsues', 'PrecisionFStrike', 'AluminumChristmasTrees', 'BleepDammit', 'PrisonRape', 'ProfessionalSlacker', 'ProperlyParanoid', 'PsychicPowers', 'ReadingsAreOffTheScale', 'ScreamsLikeALittleGirl', 'SettingUpdate', 'ShoutOut', 'ActorAllusion', 'SlobsVersusSnobs', 'SmugSnake', 'SoundEffectBleep', 'StartMyOwn', 'StealthPun', 'SupremeChef', 'MessOnAPlate', 'TelepathicSprinklers', 'TheDogBitesBack', 'ThisIsWhatTheBuildingWillLookLike', 'TruthInTelevision', 'ParanoiaFuel', 'VerbedTitle', 'WillingSuspensionOfDisbelief']
+05-01 23:02:05 common.base_script INFO     Status: 223/11846 films
+...
+\end{verbatim}
+
+Output file content:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{\{}
+  \DataTypeTok{"ABCsOfDeath2"}\FunctionTok{:} \OtherTok{[}
+    \StringTok{"AbusiveParents"}\OtherTok{,}
+    \StringTok{"AirVentPassageway"}\OtherTok{,}
+    \ErrorTok{...}
+  \OtherTok{]}\FunctionTok{,}
+  \DataTypeTok{"ABeautifulDayInTheNeighborhood"}\FunctionTok{:} \OtherTok{[}
+    \StringTok{"IncorruptiblePurePureness"}\OtherTok{,}
+    \StringTok{"LooselyBasedOnATrueStory"}
+  \OtherTok{]}\FunctionTok{,}
+  \DataTypeTok{"ABeautifulMind"}\FunctionTok{:} \OtherTok{[}
+    \StringTok{"AdultFear"}\OtherTok{,}
+    \StringTok{"AllThereIsToKnowAboutTheCryingGame"}\OtherTok{,}
+    \ErrorTok{...}
+  \OtherTok{]}\FunctionTok{,}
+  \ErrorTok{...}
+\FunctionTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+A valid compressed sample file
+\href{https://github.com/raiben/made_recommender/blob/master/datasets/scrapper/cache/20190501/films_tropes_20190501.json.bz2}{films\_tropes\_20190501.json.bz2}
+can be found in the datasets folder of the project.
+
+\subsubsection{Troubleshooting}\label{troubleshooting}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{To re-cache}, please remove the cache folder or use another
+  session. The class will auto generate it again in the next execution,
+  re-downloading the pages.
+\end{itemize}
 
 \subsection{Extracting rating, genre and popularity from IMDB}
 
