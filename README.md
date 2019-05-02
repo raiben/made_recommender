@@ -98,21 +98,13 @@ will be available in the ```<cache-directory>``` provided.
 **Format**:
 ```json
 {
-  "ABCsOfDeath2": [
-    "AbusiveParents",
-    "AirVentPassageway",
-    ...
+  "<film_identifier>": [
+    "<trope_identifier>", 
+    "..."
   ],
-  "ABeautifulDayInTheNeighborhood": [
-    "IncorruptiblePurePureness",
-    "LooselyBasedOnATrueStory"
-  ],
-  "ABeautifulMind": [
-    "AdultFear",
-    "AllThereIsToKnowAboutTheCryingGame",
-    ...
-  ],
-  ...
+  "...": [
+    "..." 
+  ]
 }
 ```
 
@@ -138,6 +130,30 @@ invoke scrap-tvtropes --cache-directory ./datasets/scrapper/cache/ --session 201
 05-01 23:02:05 common.base_script INFO     Status: 223/11846 films
 ...
 ```
+
+Output file content:
+```json
+{
+  "ABCsOfDeath2": [
+    "AbusiveParents",
+    "AirVentPassageway",
+    ...
+  ],
+  "ABeautifulDayInTheNeighborhood": [
+    "IncorruptiblePurePureness",
+    "LooselyBasedOnATrueStory"
+  ],
+  "ABeautifulMind": [
+    "AdultFear",
+    "AllThereIsToKnowAboutTheCryingGame",
+    ...
+  ],
+  ...
+}
+```
+
+A valid compressed sample file [films_tropes_20190501.json.bz2](https://github.com/raiben/made_recommender/blob/master/datasets/scrapper/cache/20190501/films_tropes_20190501.json.bz2) 
+can be found in the datasets folder of the project.
 
 ### Troubleshooting
 
