@@ -1,0 +1,153 @@
+\documentclass[11pt,final]{article}
+\usepackage{fancyvrb, color, graphicx, hyperref, amsmath, url}
+\usepackage{minted}
+\usepackage{palatino}
+\usepackage[a4paper,text={16.5cm,25.2cm},centering]{geometry}
+\usepackage{booktabs}
+\usepackage{float}
+\restylefloat{table}
+\usepackage{authblk}
+
+\author[1]{Rub\'en H. Garc\'ia-Ortega}
+\author[2]{Juan J. Merelo Guerv\'os}
+\author[3]{Pablo Garc\'ia S\'anchez}
+\affil[1]{Badger Maps, San Francisco, CA, USA}
+\affil[2]{Universidad de Granada and CITIC-UGR, Spain}
+\affil[3]{Universidad de C\'adiz and CITIC-UGR, Spain}
+\renewcommand\Authands{ and }
+
+\hypersetup
+{
+  pdfauthor = {Rub\'en H. Garc\'ia-Ortega},
+  pdftitle={MADE Recommender},
+  colorlinks=TRUE,
+  linkcolor=black,
+  citecolor=blue,
+  urlcolor=blue
+}
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{1.2ex}
+
+<<echo=False>>=
+import os
+import sys
+sys.path.append(os.getcwd())
+@
+
+\title{MADE Recommender}
+\date{23rd June 2018}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+  The purpose of this document is to show the progress of the current research and
+  the different approaches and experiments designed, executed and interpreted,
+  regarding a system to recommend tropes for a film.
+  Later on, the different sections can be extracted and use for different articles.
+  This document is internal and in continuous progress, so it may change profoundly
+  from its creation.
+\end{abstract}
+
+
+\section{Tropes and the formula of a story}
+
+\subsection{The meaning of Trope}
+
+A trope can be defined as a recurring narrative device~\cite{baldick2015oxford};
+it can be a technique, a motif, an archetype or a \textit{clich\'e},
+used by the authors to achieve specific effects that might vary from increasing
+the interest, surprising, recall familiarity,
+entertaining, etc, in their creative works, such as books, films, comics or videogames.
+Some tropes are broadly adopted, academically studied and promoted, such as
+the \textit{Three-act Structure} formulated by Syd Field~\cite{field1982screenplay},
+the \textit{Hero's Journey} studied by Vogler~\cite{vogler2007writer},
+the \textit{McGuffin} popularized by Hitchcock~\cite{truffaut1985hitchcock} and
+the \textit{Chekhov's Gun} developed by the Russian writer with the eponymous
+name~\cite{bitsilli1983chekhov},
+but there are thousands of not-so-widely used tropes as well, discovered and
+catalogued everyday by professionals
+and enthusiastic of the storytelling;
+their study is organic, dynamic and extensive.
+
+\subsection{The DNA analogy}
+
+Just as the DNA is a molecule that contains nitrogenous bases whose combination defines the growth,
+development, functioning, and reproduction of a living organism, we can think of a Story DNA
+as the set of tropes contained in a story that defines the nature of a story: how it is
+structured, the characters, the events, the mood, the settings, the narration, etc.
+Different combinations of tropes generate different stories.
+As the tropes are living concepts, which grow as they are discovered as common
+patterns in other stories, the Trope DNA is, by definition, incomplete and evolving,
+yet it is still interesting as an authoring tool.
+
+The Story DNA is a profound way to describe a story from many different perspectives,
+but, following the analogy of the DNA, there are environmental factors that could deeply affect the
+performance of the story as well. What do two stories with the same Story DNA have in common?
+
+\subsection{Hypothesis}
+
+Our hypothesis is that there is a correlation between the combination of tropes and the quality of the story.
+If the hypothesis is true, it could indeed be a very important device to synthesise Story DNAs that fulfils requirements
+in terms of tropes present while maximizing the quality, that is ultimately the goal of the research:
+auto-generate interesting stories.
+
+\section{Tropes Dataset}
+
+\subsection{State of the art}
+
+All of these tropes are described in a live wiki called \textit{TVTropes.org~}\cite{tvtropes}, that is being
+collecting thousand of descriptions and examples of tropes from 2014 until now. As the data is fed by a community
+of users, we could find the bias that popular films are better described and analysed in terms of the tropes than independent
+films, and that popular tropes are more recognised than very specific ones.
+The semantic network of knowledge behind \textit{TVTropes.org} is huge and complex; it massively links hierarchies of tropes
+to their usage in creations for digital entertainment. The data, however, is only available through its web interface,
+which is why, in order to make it usable by the scientific community, Kiesel~\cite{maltekiesel} extracted all
+their data to a database so-called \textit{DBTropes.org}.\\
+% ¿Que es tvtropes y qué es pictropes? Citar el otro paper.
+% Alguien ha usado esos términos?
+
+\subsection{Extracting the tropes from TVTropes}
+
+
+\subsection{Extracting rating, genre and popularity from IMDB}
+
+
+\subsection{Matching TVTropes and IMDB identifiers}
+
+
+\section{Deep larning to predict the quality based on the tropes}
+
+
+\section{On generating the DNA of a film}
+
+% Quiero generar mi DNA, qué puedo hacer? Qué ha usado la gente?
+% Un GA para evolucionar un DNA.
+% Funcionamiento del GA
+
+% Qué fitnes usar? Las reglas asociativas
+% Generación de reglas asciativas
+% Ejecución del GA y resultados
+%
+
+% Use a genetic algorithm that uses the associative rules to get the quintassence of the films
+
+% Add new information to PicTropes from IMDB
+
+% Train <something> to predict the rating / Box Office
+
+% Use a genetic algorithm that uses the <something> to get good tropes DNA
+
+
+\subsection{Extending PicTropes with IMDB information}
+
+
+\section{Conclusions} \label{sec:conclusions}
+
+TODO
+
+\bibliographystyle{ieeetr}
+\bibliography{report}
+
+\end{document}

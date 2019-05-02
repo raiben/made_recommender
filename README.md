@@ -187,3 +187,27 @@ evalate a set of tropes and return a predicted rating.
 Scripts to generate a set of tropes constrained by the user
 that maximize the predicted rating.
 
+# Report generation
+
+The directory ```/papers``` contains latex reports in Pweave language.
+Pweave is a scientific report generator and a literate programming tool for Python. 
+For more information, please visit the website of the 
+[project](http://mpastell.com/pweave/).
+
+### Usage
+
+```console
+invoke build-paper --help
+```
+
+```console
+Usage: inv[oke] [--core-opts] build-paper [other tasks here ...]
+
+Docstring:
+  Cleans and build the paper using pweave, pdflatex and bibtex.
+  Output file: report.pdf
+
+Options:
+  none
+```
+
