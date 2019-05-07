@@ -1,0 +1,8 @@
+_minted-report
+*.aux
+*.bbl
+*.blg
+*.log
+*.out
+*.pdf
+*.tex
