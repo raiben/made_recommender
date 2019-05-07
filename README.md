@@ -21,7 +21,7 @@ If you don't, please follow the tutorial form realpython:
 
 To install the requirements, please use:
 ```console
-pip intall -r requirements.txt
+pip install -r requirements.txt
 ``` 
 
 If you make changes and need to rebuild the requirements.txt, 
