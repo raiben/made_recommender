@@ -7,6 +7,31 @@
 \usepackage{float}
 \restylefloat{table}
 \usepackage{authblk}
+\usepackage{listings}
+\usepackage{color}
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\footnotesize,
+    breakatwhitespace=false,
+    breaklines=true,
+    captionpos=b,
+    keepspaces=true,
+    numbers=left,
+    numbersep=5pt,
+    showspaces=false,
+    showstringspaces=false,
+    showtabs=false,
+    tabsize=2
+}
+\lstset{style=mystyle}
 
 \author[1]{Rub\'en H. Garc\'ia-Ortega}
 \author[2]{Juan J. Merelo Guerv\'os}
@@ -92,7 +117,7 @@ sys.path.append(os.getcwd())
 \end{abstract}
 
 
-\section{Tropes and the formula of a story}
+\section{Tropes as the DNA os a story}
 
 \subsection{The meaning of Trope}
 
@@ -149,21 +174,21 @@ their data to a database so-called \textit{DBTropes.org}.\\
 % ¿Que es tvtropes y qué es pictropes? Citar el otro paper.
 % Alguien ha usado esos términos?
 
+As the base of the research on automatic trope generation, we begun with a dataset based in the
+latest version of DBTropes, called PicTropes \cite{garcia2018overview} that included 5,925 films with 18,270 tropes.
+However, the last version of BDTropes is from 2016, and the community of users of TVTropes has triplicated the size
+of the database since then; If we work with the latest data from TVTropes our machine learning algorithms
+would benefit from having much entries and hence, provide better results. That's why our first step is to
+extract the data directly from TVTropes, as discussed in next section.
 
 \subsection{Extracting the tropes from TVTropes: TVTropes scrapper}\label{tvtropes-scrapper}
 
-\textbf{Module}: \url{tvtropes_scrapper}
-
-Script to download all the films information from TVTropes and extract
-the tropes inside them:
-
-\subsubsection{Features}\label{features}
+We built a crawler that extracts the tropes from TVtropes:
 
 \begin{itemize}
-\tightlist
 \item
   The scrapper \textbf{extracts all the categories} from the main
-  categories page: https://tvtropes.org/pmwiki/pmwiki.php/Main/Film .
+  categories page: \\ \href{https://tvtropes.org/pmwiki/pmwiki.php/Main/Film}{https://tvtropes.org/pmwiki/pmwiki.php/Main/Film}.
   Then, for each category page, it extracts \textbf{all the film
   identifiers} assigned to it. Finally, for every film page, it extracts
   \textbf{all the trope identifiers}. As result, it builds a
@@ -190,11 +215,11 @@ the tropes inside them:
 
 \subsubsection{Usage}\label{usage}
 
-\begin{verbatim}
+\begin{lstlisting}[basicstyle=\small]
 invoke scrap-tvtropes --help
-\end{verbatim}
+\end{lstlisting}
 
-\begin{verbatim}
+\begin{lstlisting}[basicstyle=\small]
 Usage: inv[oke] [--core-opts] scrap-tvtropes [--options] [other tasks here ...]
 
 Docstring:
@@ -206,7 +231,7 @@ Docstring:
 Options:
   -c STRING, --cache-directory=STRING
   -s STRING, --session=STRING
-\end{verbatim}
+\end{lstlisting}
 
 \subsubsection{Output}\label{output}
 
@@ -235,11 +260,11 @@ provided.
 
 Example:
 
-\begin{verbatim}
+\begin{lstlisting}[basicstyle=\small]
 invoke scrap-tvtropes --cache-directory ./datasets/scrapper/cache/ --session 20190501
-\end{verbatim}
+\end{lstlisting}
 
-\begin{verbatim}
+\begin{lstlisting}[basicstyle=\small]
 05-01 22:56:05 common.base_script INFO     Retrieving URL from TVTropes and storing in cache: https://tvtropes.org/pmwiki/pmwiki.php/Main/Tropes
 05-01 22:56:05 common.base_script INFO     Retrieving URL from TVTropes and storing in cache: https://tvtropes.org/pmwiki/pmwiki.php/Main/Media
 05-01 22:56:05 common.base_script INFO     Retrieving URL from TVTropes and storing in cache: https://tvtropes.org/pmwiki/pmwiki.php/Main/FatGirl
@@ -253,7 +278,7 @@ invoke scrap-tvtropes --cache-directory ./datasets/scrapper/cache/ --session 201
 05-01 23:02:05 common.base_script INFO     Film Accepted (82 tropes): ['AbandonedHospital', 'AloneInACrowd', 'ArtisticLicenseUniversityAdmissions', 'ReadingsAreOffTheScale', 'ArtisticLicenseEngineering', 'AttentionDeficitOohShiny', 'AnnoyingYoungerSibling', 'BecomingTheMask', 'BigStore', 'BookDumb', 'BrickJoke', 'PsychicPowers', 'BrilliantButLazy', 'ButtMonkey', 'CalvinBall', 'TheCon', 'BigStore', 'ClusterFBomb', 'CoolLoser', 'CoolUncle', 'CripplingOverspecialization', 'DeadpanSnarker', 'DeanBitterman', 'DumbassHasAPoint', 'StrawmanHasAPoint', 'TroublingUnchildlikeBehaviour', 'EpicFail', 'FakeRealTurn', 'ForTheEvulz', 'FunWithAcronyms', 'LampshadeHanging', 'BringMyBrownPants', 'GeniusDitz', 'HighSchoolHustler', 'ImpossiblyDeliciousFood', 'MessOnAPlate', 'IndyPloy', 'OhCrap', 'OhCrap', 'InitiationCeremony', 'IvyLeagueForEveryone', 'KavorkaMan', 'KickTheDog', 'LargeHam', 'MadeOfExplodium', 'MessOnAPlate', 'MostWritersAreWriters', 'StrawmanPolitical', 'JustifiedTrope', 'NeverRecycleABuilding', 'NoodleIncident', 'OnlySaneMan', 'OddFriendship', 'CloudCuckoolander', 'PeekABooCorpse', 'HilarityEnsues', 'PrecisionFStrike', 'AluminumChristmasTrees', 'BleepDammit', 'PrisonRape', 'ProfessionalSlacker', 'ProperlyParanoid', 'PsychicPowers', 'ReadingsAreOffTheScale', 'ScreamsLikeALittleGirl', 'SettingUpdate', 'ShoutOut', 'ActorAllusion', 'SlobsVersusSnobs', 'SmugSnake', 'SoundEffectBleep', 'StartMyOwn', 'StealthPun', 'SupremeChef', 'MessOnAPlate', 'TelepathicSprinklers', 'TheDogBitesBack', 'ThisIsWhatTheBuildingWillLookLike', 'TruthInTelevision', 'ParanoiaFuel', 'VerbedTitle', 'WillingSuspensionOfDisbelief']
 05-01 23:02:05 common.base_script INFO     Status: 223/11846 films
 ...
-\end{verbatim}
+\end{lstlisting}
 
 Output file content:
 
@@ -292,6 +317,47 @@ can be found in the datasets folder of the project.
   session. The class will auto generate it again in the next execution,
   re-downloading the pages.
 \end{itemize}
+
+\subsection{Nature of the data extracted}
+
+<<>>=
+import bz2
+import json
+
+
+def read_compressed_json(file_path):
+    with open(file_path, 'rb') as file:
+        compressed_content = file.read()
+    content = bz2.decompress(compressed_content)
+    return json.loads(content)
+
+
+def reverse_dictionary(original_dictionary):
+    reversed_dictionary = {}
+    for key, value in original_dictionary.items():
+        for element in value:
+            if element not in reversed_dictionary:
+                reversed_dictionary[element] = []
+            reversed_dictionary[element].append(key)
+    return reversed_dictionary
+@
+
+Reading the content of the dataset:
+<<term=True>>=
+films_dictionary = read_compressed_json('../datasets/scrapper/cache/20190501/films_tropes_20190501.json.bz2')
+tropes_dictionary = reverse_dictionary(films_dictionary)
+@
+
+Number of films:
+<<term=True>>=
+len(films_dictionary.keys())
+@
+
+Number of tropes:
+<<term=True>>=
+len(tropes_dictionary.keys())
+@
+
 
 \subsection{Extracting rating, genre and popularity from IMDB}
 
