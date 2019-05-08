@@ -12,7 +12,7 @@ from lxml import html
 from common.base_script import BaseScript
 
 
-class TVTropesScrapper(BaseScript):
+class TVTropesScraper(BaseScript):
     MAIN_SEARCH = 'https://tvtropes.org/pmwiki/pmwiki.php/Main/Film'
     BASE_FILM_URL = 'https://tvtropes.org/pmwiki/pmwiki.php/Film/'
     BASE_MAIN_URL = 'https://tvtropes.org/pmwiki/pmwiki.php/Main/'

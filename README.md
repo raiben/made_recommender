@@ -47,16 +47,16 @@ That will make it easier to trace the different experiments and executions.
 
 # Content
 
-## TVTropes scrapper
+## TVTropes scraper
 
-**Module**: [tvtropes_scrapper](tvtropes_scrapper)
+**Module**: [tvtropes_scraper](tvtropes_scraper)
 
 Script to download all the films information from TVTropes and 
 extract the tropes inside them:
 
 ### Features
 
-- The scrapper **extracts all the categories** from the main categories page: 
+- The scraper **extracts all the categories** from the main categories page: 
 https://tvtropes.org/pmwiki/pmwiki.php/Main/Film . 
 Then, for each category page, it extracts **all the film identifiers** assigned to it. 
 Finally, for every film page, it extracts **all the trope identifiers**. 
@@ -74,13 +74,13 @@ It can retrieve around 12K pages.
 ### Usage
 
 ```console
-invoke scrap-tvtropes --help
+invoke scrape-tvtropes --help
 ```
 ```console
-Usage: inv[oke] [--core-opts] scrap-tvtropes [--options] [other tasks here ...]
+Usage: inv[oke] [--core-opts] scrape-tvtropes [--options] [other tasks here ...]
 
 Docstring:
-  Scrap tropes by film in TvTropes.org
+  Scrape tropes by film in TvTropes.org
 
   :param cache_directory: The folder that all the downloaded pages are going to be written into.
   :param session: (Optional) Name of the cache folder. If not provided, then it will use the current date/time.
@@ -112,7 +112,7 @@ will be available in the ```<cache-directory>``` provided.
 
 Example:
 ```console
-invoke scrap-tvtropes --cache-directory ./datasets/scrapper/cache/ --session 20190501
+invoke scrape-tvtropes --cache-directory ./datasets/scraper/cache/ --session 20190501
 ```
 
 ```console
@@ -152,7 +152,7 @@ Output file content:
 }
 ```
 
-A valid compressed sample file [films_tropes_20190501.json.bz2](https://github.com/raiben/made_recommender/blob/master/datasets/scrapper/cache/20190501/films_tropes_20190501.json.bz2) 
+A valid compressed sample file [films_tropes_20190501.json.bz2](https://github.com/raiben/made_recommender/blob/master/datasets/scraper/cache/20190501/films_tropes_20190501.json.bz2) 
 can be found in the datasets folder of the project.
 
 ### Troubleshooting

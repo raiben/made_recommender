@@ -1,13 +1,13 @@
 from invoke import task, run
 
 from common.base_script import BaseScript
-from tvtropes_scrapper.tvtropes_scrapper import TVTropesScrapper
+from tvtropes_scraper.tvtropes_scraper import TVTropesScraper
 
 
 @task
-def scrap_tvtropes(context, cache_directory=None, session=None):
+def scrape_tvtropes(context, cache_directory=None, session=None):
     """
-    Scrap tropes by film in TvTropes.org
+    Scrape tropes by film in TvTropes.org
 
     :param cache_directory: The folder that all the downloaded pages are going to be written into.
     :param session: (Optional) Name of the cache folder. If not provided, then it will use the current date/time.
@@ -16,8 +16,8 @@ def scrap_tvtropes(context, cache_directory=None, session=None):
         print('Please, add the missing parameters!!')
 
     BaseScript.set_logger_file_id('scrap_tvtropes', session)
-    scrapper = TVTropesScrapper(directory=cache_directory, session=session)
-    scrapper.run()
+    scraper = TVTropesScraper(directory=cache_directory, session=session)
+    scraper.run()
 
 
 @task

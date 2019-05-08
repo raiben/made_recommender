@@ -43,7 +43,7 @@
 
 % Commands from pandoc
 \providecommand{\tightlist}{%
-  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
 \setcounter{secnumdepth}{0}
 \newcommand{\VerbBar}{|}
 \newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
@@ -159,6 +159,63 @@ If the hypothesis is true, it could indeed be a very important device to synthes
 in terms of tropes present while maximizing the quality, that is ultimately the goal of the research:
 auto-generate interesting stories.
 
+\section{Steps}
+
+<<echo=False>>=
+import pygraphviz as pgv
+import os
+
+def draw_graphviz(dot, filename):
+    new_dot = dot.replace('type="database"', 'shape="cylinder" margin="0.2"')
+    new_dot = new_dot.replace('type="process"', 'shape="box3d" margin="0.2" style="filled" fillcolor="gray91"')
+    new_dot = new_dot.replace('type="data"', 'shape="parallelogram" margin="0"')
+
+    G = pgv.AGraph(string=new_dot)
+    G.layout(prog='dot')
+    if not os.path.isdir('figures'):
+        os.makedirs('figures')
+    G.draw(os.path.join('figures', filename))
+
+@
+
+<<echo=False>>=
+workflow = '''
+digraph {
+    rankdir=LR
+    margin=0;
+    graph [ resolution=128, fontsize=14 ];
+
+    tvtropes[label="TVTropes\nwebsite" type="database"];
+    scraper[label="Scraper\nprocess" type="process"];
+    dataset1[label="Dataset\nFilm->(tropes)" type="data"];
+    imdb[label="IMDB\ndatabases" type="database"];
+    matcher[label="Film\nmatcher\nprocess" type="process"];
+    dataset2[label="Dataset\nFilm->(tropes,\nrating, genres)" type="data"];
+    recommender[label="Trope\nRecommender\nprocess" type="process"];
+    user[label="User's\npre-selected\ntropes" type="data"];
+    builder[label="Trope\nbuilder\nprocess" type="process"];
+    trope_sequence[label="Optimal\ntrope\nsequence" type="data"]
+
+    tvtropes -> scraper;
+    scraper -> dataset1;
+    dataset1 -> matcher;
+    imdb -> matcher;
+    matcher -> dataset2;
+    dataset2 -> recommender;
+    recommender -> builder
+    user -> builder
+    builder -> trope_sequence
+}'''
+
+draw_graphviz(workflow, "main_workflow.pdf")
+@
+\begin{figure}[h]
+\includegraphics[width=\textwidth]{figures/main_workflow.pdf}
+\centering
+\end{figure}
+
+
+
 \section{Tropes Dataset}
 
 \subsection{State of the art}
@@ -181,13 +238,13 @@ of the database since then; If we work with the latest data from TVTropes our ma
 would benefit from having much entries and hence, provide better results. That's why our first step is to
 extract the data directly from TVTropes, as discussed in next section.
 
-\subsection{Extracting the tropes from TVTropes: TVTropes scrapper}\label{tvtropes-scrapper}
+\subsection{Extracting the tropes from TVTropes: TVTropes scraper}\label{tvtropes-scraper}
 
 We built a crawler that extracts the tropes from TVtropes:
 
 \begin{itemize}
 \item
-  The scrapper \textbf{extracts all the categories} from the main
+  The scraper \textbf{extracts all the categories} from the main
   categories page: \\ \href{https://tvtropes.org/pmwiki/pmwiki.php/Main/Film}{https://tvtropes.org/pmwiki/pmwiki.php/Main/Film}.
   Then, for each category page, it extracts \textbf{all the film
   identifiers} assigned to it. Finally, for every film page, it extracts
@@ -216,14 +273,14 @@ We built a crawler that extracts the tropes from TVtropes:
 \subsubsection{Usage}\label{usage}
 
 \begin{lstlisting}[basicstyle=\small]
-invoke scrap-tvtropes --help
+invoke scrape-tvtropes --help
 \end{lstlisting}
 
 \begin{lstlisting}[basicstyle=\small]
-Usage: inv[oke] [--core-opts] scrap-tvtropes [--options] [other tasks here ...]
+Usage: inv[oke] [--core-opts] scrape-tvtropes [--options] [other tasks here ...]
 
 Docstring:
-  Scrap tropes by film in TvTropes.org
+Scrape tropes by film in TvTropes.org
 
   :param cache_directory: The folder that all the downloaded pages are going to be written into.
   :param session: (Optional) Name of the cache folder. If not provided, then it will use the current date/time.
@@ -261,7 +318,7 @@ provided.
 Example:
 
 \begin{lstlisting}[basicstyle=\small]
-invoke scrap-tvtropes --cache-directory ./datasets/scrapper/cache/ --session 20190501
+invoke scrape-tvtropes --cache-directory ./datasets/scraper/cache/ --session 20190501
 \end{lstlisting}
 
 \begin{lstlisting}[basicstyle=\small]
@@ -305,7 +362,7 @@ Output file content:
 \end{Shaded}
 
 A valid compressed sample file
-\href{https://github.com/raiben/made_recommender/blob/master/datasets/scrapper/cache/20190501/films_tropes_20190501.json.bz2}{films\_tropes\_20190501.json.bz2}
+\href{https://github.com/raiben/made_recommender/blob/master/datasets/scraper/cache/20190501/films_tropes_20190501.json.bz2}{films\_tropes\_20190501.json.bz2}
 can be found in the datasets folder of the project.
 
 \subsubsection{Troubleshooting}\label{troubleshooting}
@@ -344,7 +401,7 @@ def reverse_dictionary(original_dictionary):
 
 Reading the content of the dataset:
 <<term=True>>=
-films_dictionary = read_compressed_json('../datasets/scrapper/cache/20190501/films_tropes_20190501.json.bz2')
+films_dictionary = read_compressed_json('../datasets/scraper/cache/20190501/films_tropes_20190501.json.bz2')
 tropes_dictionary = reverse_dictionary(films_dictionary)
 @
 
