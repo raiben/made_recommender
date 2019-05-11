@@ -1,3 +1,40 @@
+<<echo=False>>=
+import bz2
+import json
+
+FILM_TROPES_JSON_BZ2_FILE = '../datasets/scraper/cache/20190501/films_tropes_20190501.json.bz2'
+
+def read_compressed_json(file_path):
+    with open(file_path, 'rb') as file:
+        compressed_content = file.read()
+    content = bz2.decompress(compressed_content)
+    return json.loads(content)
+
+
+def reverse_dictionary(original_dictionary):
+    reversed_dictionary = {}
+    for key, value in original_dictionary.items():
+        for element in value:
+            if element not in reversed_dictionary:
+                reversed_dictionary[element] = []
+            reversed_dictionary[element].append(key)
+    return reversed_dictionary
+
+import pygraphviz as pgv
+import os
+
+def draw_graphviz(dot, filename):
+    new_dot = dot.replace('type="database"', 'shape="cylinder" margin=0.2')
+    new_dot = new_dot.replace('type="process"', 'shape="box3d" margin=0.2 style="filled" fillcolor="gray91"')
+    new_dot = new_dot.replace('type="data"', 'shape="polygon" skew=.4 margin=0')
+
+    G = pgv.AGraph(string=new_dot)
+    G.layout(prog='dot')
+    if not os.path.isdir('figures'):
+        os.makedirs('figures')
+    G.draw(os.path.join('figures', filename))
+
+@
 \documentclass[11pt,final]{article}
 \usepackage{fancyvrb, color, graphicx, hyperref, amsmath, url}
 \usepackage{minted}
@@ -160,24 +197,6 @@ in terms of tropes present while maximizing the quality, that is ultimately the 
 auto-generate interesting stories.
 
 \section{Steps}
-
-<<echo=False>>=
-import pygraphviz as pgv
-import os
-
-def draw_graphviz(dot, filename):
-    new_dot = dot.replace('type="database"', 'shape="cylinder" margin="0.2"')
-    new_dot = new_dot.replace('type="process"', 'shape="box3d" margin="0.2" style="filled" fillcolor="gray91"')
-    new_dot = new_dot.replace('type="data"', 'shape="parallelogram" margin="0"')
-
-    G = pgv.AGraph(string=new_dot)
-    G.layout(prog='dot')
-    if not os.path.isdir('figures'):
-        os.makedirs('figures')
-    G.draw(os.path.join('figures', filename))
-
-@
-
 <<echo=False>>=
 workflow = '''
 digraph {
@@ -214,7 +233,49 @@ draw_graphviz(workflow, "main_workflow.pdf")
 \centering
 \end{figure}
 
+<<echo=False>>=
+films_dictionary = read_compressed_json(FILM_TROPES_JSON_BZ2_FILE)
+tropes_dictionary = reverse_dictionary(films_dictionary)
 
+n_films = len(films_dictionary.keys())
+n_tropes = len(tropes_dictionary.keys())
+
+
+workflow = f'''
+digraph {{
+    splines=polyline
+    rankdir=LR
+    margin=0;
+    graph [ resolution=128, fontsize=14];
+
+    tvtropes[label="TVTropes\nwebsite:\n\nhttps://tvtropes.org/" type="database"];
+    scraper[label="Scraper process:\n\nPython\nrequests+lxml+bz2\n~11.900 pages" type="process"];
+    dataset1[label="Dataset\n\nfilms->tropes\n({n_films}->{n_tropes})" type="data"];
+    imdb[label="IMDB\ndatasets:\n\nhttps://www.imdb.com/\ninterfaces/" type="database"];
+    matcher[label="Film\nmatcher\nprocess" type="process"];
+    dataset2[label="Dataset\nFilm->(tropes,\nrating, genres)" type="data"];
+    recommender[label="Trope\nRecommender\nprocess" type="process"];
+    user[label="User's\npre-selected\ntropes" type="data"];
+    builder[label="Trope\nbuilder\nprocess" type="process"];
+    trope_sequence[label="Optimal\ntrope\nsequence" type="data"]
+
+    tvtropes -> scraper;
+    scraper -> dataset1;
+    dataset1 -> matcher;
+    imdb -> matcher;
+    matcher -> dataset2;
+    dataset2 -> recommender;
+    recommender -> builder
+    user -> builder
+    builder -> trope_sequence
+}}'''
+
+draw_graphviz(workflow, "main_workflow_extended.pdf")
+@
+\begin{figure}[h]
+\includegraphics[width=\textwidth]{figures/main_workflow_extended.pdf}
+\centering
+\end{figure}
 
 \section{Tropes Dataset}
 
@@ -401,7 +462,7 @@ def reverse_dictionary(original_dictionary):
 
 Reading the content of the dataset:
 <<term=True>>=
-films_dictionary = read_compressed_json('../datasets/scraper/cache/20190501/films_tropes_20190501.json.bz2')
+films_dictionary = read_compressed_json(FILM_TROPES_JSON_BZ2_FILE)
 tropes_dictionary = reverse_dictionary(films_dictionary)
 @
 
