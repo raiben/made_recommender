@@ -1,8 +1,14 @@
 <<echo=False>>=
 import bz2
 import json
+import pygraphviz as pgv
+import os
+import pandas as pd
+from tabulate import tabulate
 
 FILM_TROPES_JSON_BZ2_FILE = '../datasets/scraper/cache/20190501/films_tropes_20190501.json.bz2'
+TOP_VALUES = 25
+
 
 def read_compressed_json(file_path):
     with open(file_path, 'rb') as file:
@@ -20,10 +26,9 @@ def reverse_dictionary(original_dictionary):
             reversed_dictionary[element].append(key)
     return reversed_dictionary
 
-import pygraphviz as pgv
-import os
 
 def draw_graphviz(dot, filename):
+    new_dot = dot.replace('type="start"', 'shape="ellipse" margin=0.2')
     new_dot = dot.replace('type="database"', 'shape="cylinder" margin=0.2')
     new_dot = new_dot.replace('type="process"', 'shape="box3d" margin=0.2 style="filled" fillcolor="gray91"')
     new_dot = new_dot.replace('type="data"', 'shape="polygon" skew=.4 margin=0')
@@ -33,6 +38,9 @@ def draw_graphviz(dot, filename):
     if not os.path.isdir('figures'):
         os.makedirs('figures')
     G.draw(os.path.join('figures', filename))
+
+def get_table_for_dataframe(df, **kwargs):
+    return tabulate(df, headers=df, tablefmt='latex', **kwargs)
 
 @
 \documentclass[11pt,final]{article}
@@ -301,6 +309,59 @@ extract the data directly from TVTropes, as discussed in next section.
 
 \subsection{Extracting the tropes from TVTropes: TVTropes scraper}\label{tvtropes-scraper}
 
+<<echo=False>>=
+films_dictionary = read_compressed_json(FILM_TROPES_JSON_BZ2_FILE)
+tropes_dictionary = reverse_dictionary(films_dictionary)
+
+n_films = len(films_dictionary.keys())
+n_tropes = len(tropes_dictionary.keys())
+
+
+workflow = f'''
+digraph {{
+    splines=polyline
+    rankdir=LR
+    margin=0;
+    graph [fontsize=14];
+
+    subgraph cluster_0 {{
+        style=invis
+        start [label="Start" type="start"]
+        extractcategories [label="Extract\nCategories" type="process"];
+        extractfilms [label="Extract\nFilms" type="process"];
+        extracttropes [label="Extract\nTropes" type="process"];
+        dataset1 [label="Dataset\n\nfilms->tropes\n({n_films}->{n_tropes})" type="data"];
+    }}
+    subgraph cluster_1 {{
+        style=invis
+        retrievepage[label="Retrieve\nPage" type="process"];
+    }}
+    subgraph cluster_2 {{
+        style=invis
+        filecache[label="File\nCache" type="data"];
+        tvtropes[label="TVTropes\nwebsite:\n\nhttps://tvtropes.org/" type="database"];
+    }}
+
+
+    start -> extractcategories -> extractfilms -> extracttropes -> dataset1;
+    retrievepage -> filecache;
+    retrievepage -> tvtropes;
+    extractcategories -> retrievepage[constraint=false, dir="both"];
+    extractfilms -> retrievepage[constraint=false, dir="both"];
+    extracttropes -> retrievepage[constraint=false, dir="both"];
+    fake_start -> retrievepage [style=invis];
+    fake_start[style=invis]
+}}'''
+
+draw_graphviz(workflow, "scrapper_workflow.pdf")
+@
+
+\begin{figure}[h]
+\includegraphics[width=\textwidth]{figures/scrapper_workflow.pdf}
+\centering
+\end{figure}
+
+
 We built a crawler that extracts the tropes from TVtropes:
 
 \begin{itemize}
@@ -461,20 +522,55 @@ def reverse_dictionary(original_dictionary):
 @
 
 Reading the content of the dataset:
-<<term=True>>=
+<<>>=
 films_dictionary = read_compressed_json(FILM_TROPES_JSON_BZ2_FILE)
 tropes_dictionary = reverse_dictionary(films_dictionary)
 @
 
-Number of films:
-<<term=True>>=
-len(films_dictionary.keys())
+\subsubsection{Descriptive analysis}
+
+Tropes:
+
+<<>>=
+tropes_summary_dictionary = {}
+for key in films_dictionary:
+    tropes_summary_dictionary[key] = {'tropes':len(films_dictionary[key])}
+
+tropes_summary_dataframe = pd.DataFrame(tropes_summary_dictionary).transpose()
 @
 
-Number of tropes:
-<<term=True>>=
-len(tropes_dictionary.keys())
+<%=print(get_table_for_dataframe(tropes_summary_dataframe.describe()))%>
+
+Histogram:
+
+<<fig=True, width="12cm", f_pos="h">>=
+tropes_summary_dataframe.plot.hist(log=True, color='#86bf91', zorder=2, rwidth=0.9)
 @
+
+Top Films by trope:
+
+<%=print(get_table_for_dataframe(tropes_summary_dataframe.sort_values('tropes',ascending=False).head(TOP_VALUES)))%>
+
+
+Films:
+
+<<>>=
+films_summary_dictionary = {}
+for key in tropes_dictionary:
+    films_summary_dictionary[key] = {'films':len(tropes_dictionary[key])}
+
+films_summary_dataframe = pd.DataFrame(films_summary_dictionary).transpose()
+@
+
+<%=print(get_table_for_dataframe(films_summary_dataframe.describe()))%>
+
+<<fig=True, width="12cm", f_pos="h">>=
+films_summary_dataframe.plot.hist(log=True, color='#86bf91', zorder=2, rwidth=0.9)
+@
+
+Top Tropes by film
+
+<%=print(get_table_for_dataframe(films_summary_dataframe.sort_values('films',ascending=False).head(TOP_VALUES)))%>
 
 
 \subsection{Extracting rating, genre and popularity from IMDB}

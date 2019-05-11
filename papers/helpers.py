@@ -1,5 +1,7 @@
 import bz2
 import json
+import pandas as pd
+from tabulate import tabulate
 
 
 def read_compressed_json(file_path):
@@ -33,10 +35,13 @@ def draw_graphviz(dot, filename):
     G.draw(os.path.join('figures', filename))
 
 
-if __name__ == '__main__':
+def show_dataframe(df, **kwargs):
+    print(tabulate(df, headers=df, tablefmt='latex', **kwargs))
+
+
+def draw_sample_graph():
     content = read_compressed_json('../datasets/scraper/cache/20190501/films_tropes_20190501.json.bz2')
     reversed_content = reverse_dictionary(content)
-
     workflow = '''
     digraph {
         tvtropes[label="TVTropes\nwebsite" type="database"];
@@ -60,6 +65,16 @@ if __name__ == '__main__':
         user -> builder
         builder -> trope_sequence
     }'''
-
     draw_graphviz(workflow, "main_workflow2.pdf")
 
+FILM_TROPES_JSON_BZ2_FILE = '../datasets/scraper/cache/20190501/films_tropes_20190501.json.bz2'
+
+if __name__ == '__main__':
+    films_dictionary = read_compressed_json(FILM_TROPES_JSON_BZ2_FILE)
+    tropes_dictionary = reverse_dictionary(films_dictionary)
+    films_summary_dictionary = {}
+    for key in films_dictionary:
+        films_summary_dictionary[key] = {'tropes': len(films_dictionary[key])}
+
+    films_summary_dataframe = pd.DataFrame(films_summary_dictionary)
+    pass
