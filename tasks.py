@@ -15,7 +15,7 @@ def scrape_tvtropes(context, cache_directory=None, session=None):
     if cache_directory is None:
         print('Please, add the missing parameters!!')
 
-    TVTropesScraper.set_logger_file_id('scrap_tvtropes', session)
+    TVTropesScraper.set_logger_file_id('scrape_tvtropes', session)
     scraper = TVTropesScraper(directory=cache_directory, session=session)
     scraper.run()
 
