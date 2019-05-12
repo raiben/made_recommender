@@ -31,6 +31,10 @@ class TVTropesScraper(BaseScript):
     DEFAULT_ENCODING = 'utf-8'
 
     def __init__(self, directory, session):
+        parameters = dict(directory=directory, session=session,
+                          wait_time_between_calls_in_seconds=self.WAIT_TIME_BETWEEN_CALLS_IN_SECONDS)
+        BaseScript.__init__(self, parameters)
+
         self.directory_name = directory
         self.session = session
         self._set_default_session_value_if_empty()
@@ -38,6 +42,7 @@ class TVTropesScraper(BaseScript):
 
         self.films = None
         self.tropes = None
+        self.urls = None
         self.tropes_by_film = OrderedDict()
 
     def _set_default_session_value_if_empty(self):
@@ -55,9 +60,11 @@ class TVTropesScraper(BaseScript):
         self._extract_film_ids()
         self._extract_tropes()
         self._write_result()
+        self._finish_and_summary()
 
     def _extract_film_ids(self):
         self.films = set()
+        self.urls = set()
         main_url = self.MAIN_SEARCH
         category_ids = self._get_links_from_url(main_url, self.MAIN_RESOURCE)
 
@@ -65,6 +72,8 @@ class TVTropesScraper(BaseScript):
             url = self.BASE_MAIN_URL + category_id
             film_ids = self._get_links_from_url(url, self.FILM_RESOURCE)
             self.films.update(film_ids)
+
+        self._add_to_summary("n_films", len(self.films))
 
     def _extract_tropes(self):
         self.tropes = set()
@@ -76,6 +85,9 @@ class TVTropesScraper(BaseScript):
         for counter, film in enumerate(sorted_films):
             self._info(f'Status: {counter}/{len(sorted_films)} films')
             self._get_tropes_by_film(film)
+
+        self._add_to_summary("n_tropes", len(self.tropes))
+        self._add_to_summary("n_cached_urls", len(self.urls))
 
     def _get_tropes_by_film(self, film):
         url = self.BASE_FILM_URL + film
@@ -95,6 +107,7 @@ class TVTropesScraper(BaseScript):
         return [link.split('/')[-1] for link in links if link_type in link and 'action' not in link]
 
     def _get_content_from_url(self, url):
+        self.urls.add(url)
         encoded_url = self._build_encoded_url(url)
         file_path = os.path.join(self.directory_name, self.session, encoded_url)
 
@@ -122,12 +135,14 @@ class TVTropesScraper(BaseScript):
             content = file.read()
         return bz2.decompress(content)
 
-    @classmethod
-    def _write_file(cls, content, file_path):
-        compressed_path = f'{file_path}{cls.COMPRESSED_EXTENSION}'
-        compressed_content = bz2.compress(content)
+    def _write_file(self, content, file_path):
+        compressed_path = f'{file_path}{self.COMPRESSED_EXTENSION}'
+        self.compressed_content = bz2.compress(content)
         with open(compressed_path, 'wb') as file:
-            file.write(compressed_content)
+            file.write(self.compressed_content)
+
+        self._add_to_summary('compressed_generated_file_path', compressed_path)
+        self._add_to_summary('compressed_generated_file_size_bytes', len(self.compressed_content))
 
     def _read_content_safely(self, content):
         return content.decode(self.DEFAULT_ENCODING, errors='ignore')
@@ -142,7 +157,10 @@ class TVTropesScraper(BaseScript):
     def _write_result(self):
         target_file_name = self.TARGET_RESULT_FILE_TEMPLATE.format(self.session)
         file_path = os.path.join(self.directory_name, self.session, target_file_name)
-        self.step(f'Saving tropes by film into {file_path}')
+        self._step(f'Saving tropes by film into {file_path}')
         content = json.dumps(self.tropes_by_film, indent=2, sort_keys=True)
-        byte_content = content.encode(self.DEFAULT_ENCODING)
-        self._write_file(byte_content, file_path)
+        self.byte_content = content.encode(self.DEFAULT_ENCODING)
+        self._write_file(self.byte_content, file_path)
+
+        self._add_to_summary('uncompressed_generated_file_path', file_path)
+        self._add_to_summary('uncompressed_generated_file_size_bytes', len(self.byte_content))

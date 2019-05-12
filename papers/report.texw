@@ -617,9 +617,9 @@ latex_output = get_table_for_dataframe(top_tropes_dataset)
     \end{itemize}
     \item Technical questions:
     \begin{itemize}
-        \item Why I haven't used a library to crawl.
-        \item Why I loop from film categories to films and then to tropes
-        \item How I optimised the process
+        \item Why I haven't used a specific-purpose library to crawl.
+        \item Why I loop from film categories to films and then to tropes.
+        \item How I optimised the process.
         \item Why I compress the cache and why bz2.
         \item Why I use url encoded names for the urls.
         \item Why I used waits between calls. Why I haven't used multiple workers to download the pages.
