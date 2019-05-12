@@ -73,7 +73,7 @@ class TVTropesScraper(BaseScript):
             film_ids = self._get_links_from_url(url, self.FILM_RESOURCE)
             self.films.update(film_ids)
 
-        self._add_to_summary("n_films", len(self.films))
+        self._add_to_summary('n_films', len(self.films))
 
     def _extract_tropes(self):
         self.tropes = set()
@@ -86,8 +86,8 @@ class TVTropesScraper(BaseScript):
             self._info(f'Status: {counter}/{len(sorted_films)} films')
             self._get_tropes_by_film(film)
 
-        self._add_to_summary("n_tropes", len(self.tropes))
-        self._add_to_summary("n_cached_urls", len(self.urls))
+        self._add_to_summary('n_tropes', len(self.tropes))
+        self._add_to_summary('n_cached_urls', len(self.urls))
 
     def _get_tropes_by_film(self, film):
         url = self.BASE_FILM_URL + film
