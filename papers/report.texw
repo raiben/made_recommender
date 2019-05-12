@@ -78,6 +78,9 @@ def get_table_for_dataframe(df, **kwargs):
 }
 \lstset{style=mystyle}
 
+%notes
+\usepackage{tcolorbox}
+
 \author[1]{Rub\'en H. Garc\'ia-Ortega}
 \author[2]{Juan J. Merelo Guerv\'os}
 \author[3]{Pablo Garc\'ia S\'anchez}
@@ -126,6 +129,9 @@ def get_table_for_dataframe(df, **kwargs):
 \newcommand{\ErrorTok}[1]{\textcolor[rgb]{1.00,0.00,0.00}{\textbf{#1}}}
 \newcommand{\NormalTok}[1]{#1}
 % end of commands from pandoc
+
+\newcommand{\note}[1]{\begin{tcolorbox}[colback=red!5!white,colframe=red!75!black,title=Note] #1 \end{tcolorbox}
+}
 
 \hypersetup
 {
@@ -349,8 +355,10 @@ digraph {{
     extractcategories -> retrievepage[constraint=false, dir="both"];
     extractfilms -> retrievepage[constraint=false, dir="both"];
     extracttropes -> retrievepage[constraint=false, dir="both"];
-    fake_start -> retrievepage [style=invis];
+    fake_start -> fake_1 [style=invis];
+    fake_1 -> retrievepage [style=invis];
     fake_start[style=invis]
+    fake_1[style=invis]
 }}'''
 
 draw_graphviz(workflow, "scrapper_workflow.pdf")
@@ -570,7 +578,53 @@ films_summary_dataframe.plot.hist(log=True, color='#86bf91', zorder=2, rwidth=0.
 
 Top Tropes by film
 
-<%=print(get_table_for_dataframe(films_summary_dataframe.sort_values('films',ascending=False).head(TOP_VALUES)))%>
+<<results="tex">>=
+top_tropes_dataset = films_summary_dataframe.sort_values('films',ascending=False).head(TOP_VALUES)
+latex_output = get_table_for_dataframe(top_tropes_dataset)
+@
+<%=print(latex_output)%>
+
+\subsubsection{Further questions to analyze}
+
+\note{To keep adding questions and discussing}
+
+\begin{itemize}
+    \item Compare the new dataset with PicTropes (2018) \cite{garcia2018overview}:
+    \begin{itemize}
+        \item How do this new dataset improve the old PicTropes?
+        \item Why do we care about the improvement?
+        \item How would the research benefit from having more data?
+    \end{itemize}
+    \item Regarding the histograms:
+    \begin{itemize}
+        \item why do they have this distribution?
+        \item What are the features of the films/tropes in the left/right part? Genre? Year? Popularity? Rating? Actors?
+    \end{itemize}
+    \item Regarding the semantic os the films and tropes:
+    \begin{itemize}
+        \item Why are the tropes BigBad, ShoutOut, OhCrap, ChekhovsGun and Foreshadowing so widely used?
+        \item Why are the top 9 trope movies super hero movies?
+    \end{itemize}
+    \item Can we use this dataset to build a recommending system?
+    \begin{itemize}
+        \item Basket Case Algorithm to recommend tropes that are usually found together.
+        \item Find a way to include the rating/boxoffice to recommend tropes that improve the rating/boxoffice.
+    \end{itemize}
+    \item Nature of the tropes:
+    \begin{itemize}
+        \item Can the tropes be classified.
+        \item What useful information could be extracted from TVTropes as well.
+    \end{itemize}
+    \item Technical questions:
+    \begin{itemize}
+        \item Why I haven't used a library to crawl.
+        \item Why I loop from film categories to films and then to tropes
+        \item How I optimised the process
+        \item Why I compress the cache and why bz2.
+        \item Why I use url encoded names for the urls.
+        \item Why I used waits between calls. Why I haven't used multiple workers to download the pages.
+    \end{itemize}
+\end{itemize}
 
 
 \subsection{Extracting rating, genre and popularity from IMDB}
