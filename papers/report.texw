@@ -7,6 +7,7 @@ import pandas as pd
 from tabulate import tabulate
 
 FILM_TROPES_JSON_BZ2_FILE = '../datasets/scraper/cache/20190501/films_tropes_20190501.json.bz2'
+SCRAPER_LOG_FILE = '../logs/scrape_tvtropes_20190501_20190512_191015.log'
 TOP_VALUES = 25
 
 
@@ -41,6 +42,46 @@ def draw_graphviz(dot, filename):
 
 def get_table_for_dataframe(df, **kwargs):
     return tabulate(df, headers=df, tablefmt='latex', **kwargs)
+
+import re
+
+def tex_escape(text):
+    CHARS = {
+        '&':  '\&',
+        '%':  '\%',
+        '$':  '\$',
+        '#':  '\#',
+        '_':  '\_',
+        '^':  '\^',
+    }
+
+    if isinstance(text, str):
+        return("".join([CHARS.get(char, char) for char in text]))
+
+    return text
+
+
+def get_experiment_execution_information(log_file_path):
+    with open(log_file_path, 'r') as scraper_log:
+        lines = scraper_log.readlines()
+        first_line = lines[0]
+        last_line = lines[-1]
+
+    parameters_as_text = first_line.split('Init script: ')[1]
+    input_log = json.loads(parameters_as_text)
+    keys = [tex_escape(key) for key in input_log.keys()]
+    values = [tex_escape(key) for key in input_log.values()]
+    processed_dictionary = dict(parameter=keys, value=values)
+    input_dataframe = pd.DataFrame.from_dict(processed_dictionary)
+
+    summary_as_text = last_line.split('Finish script: ')[1]
+    output_log = json.loads(summary_as_text)
+    keys = [tex_escape(key) for key in output_log.keys()]
+    values = [tex_escape(key) for key in output_log.values()]
+    processed_dictionary = dict(parameter=keys, value=values)
+    output_dataframe = pd.DataFrame(processed_dictionary)
+    return input_dataframe, output_dataframe
+
 
 @
 \documentclass[11pt,final]{article}
@@ -291,6 +332,8 @@ draw_graphviz(workflow, "main_workflow_extended.pdf")
 \centering
 \end{figure}
 
+%-----------------------------------------------------------------------------------------------------------------------
+
 \section{Tropes Dataset}
 
 \subsection{State of the art}
@@ -504,6 +547,24 @@ can be found in the datasets folder of the project.
   session. The class will auto generate it again in the next execution,
   re-downloading the pages.
 \end{itemize}
+
+\subsection{Experiments}
+
+<<results="tex">>=
+input, output = get_experiment_execution_information(SCRAPER_LOG_FILE)
+latex_input = get_table_for_dataframe(input)
+latex_output = get_table_for_dataframe(output)
+@
+
+Log processed: <%=print(tex_escape(SCRAPER_LOG_FILE))%>.
+
+Input parameters:
+
+<%=print(latex_input)%>
+
+Output values:
+
+<%=print(latex_output)%>
 
 \subsection{Nature of the data extracted}
 
