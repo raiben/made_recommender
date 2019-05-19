@@ -45,7 +45,7 @@ class FilmInIMDB(object):
 
 
 class FilmMapper(BaseScript):
-    EXCLUDED_ENTRY_TYPES = ['tvEpisode', 'video', 'tvSeries', 'tvSpecial', 'tvShort', 'videoGame', 'tvMiniSeries',
+    EXCLUDED_ENTRY_TYPES = ['tvEpisode', 'tvSeries', 'tvSpecial', 'tvShort', 'videoGame', 'tvMiniSeries',
                             'titleType']
     INCLUDE_FILMS_FROM_IMDB_WITHOUT_YEAR = False
     POPULARITY_FACTOR_TO_FILTER_ALTERNATIVES = 3
