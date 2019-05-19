@@ -1,6 +1,8 @@
+import os
+
 from invoke import task, run
 
-from common.base_script import BaseScript
+from imdb_matcher.film_mapper import FilmMapper
 from tvtropes_scraper.tvtropes_scraper import TVTropesScraper
 
 
@@ -18,6 +20,34 @@ def scrape_tvtropes(context, cache_directory=None, session=None):
     TVTropesScraper.set_logger_file_id('scrape_tvtropes', session)
     scraper = TVTropesScraper(directory=cache_directory, session=session)
     scraper.run()
+
+
+@task
+def map_films(context, tvtropes_films_file, imdb_titles_file, imdb_ratings_file,
+              target_dataset='datasets/extended_dataset.csv'):
+    """
+    Map scraped films from TvTropes.org to IMDB.com
+
+    :type tvtropes_films_file: path to the scraped file 'film_tropes_<datetime>.json.bz2'.
+    :type imdb_titles_file: path to the file 'title.basics.tsv'
+    :type imdb_ratings_file: path to the file 'title.ratings.tsv'
+    :type target_dataset: path to the target file (csv)
+    """
+
+    _check_file_exists('tvtropes_films_file', tvtropes_films_file)
+    _check_file_exists('imdb_titles_file', imdb_titles_file)
+    _check_file_exists('imdb_ratings_file', imdb_ratings_file)
+
+    FilmMapper.set_logger_file_id('map_films')
+    mapper = FilmMapper(tvtropes_films_file=tvtropes_films_file, imdb_titles_file=imdb_titles_file,
+                        imdb_ratings_file=imdb_ratings_file, target_dataset=target_dataset)
+    mapper.run()
+
+
+def _check_file_exists(parameter, file_name):
+    if not os.path.isfile(file_name):
+        print(f'Please, provide a valid path for {parameter}')
+        exit(1)
 
 
 @task
