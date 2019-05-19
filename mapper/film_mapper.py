@@ -5,14 +5,14 @@ import re
 from common.base_script import BaseScript
 
 
-class MatcherUtils(object):
+class MapperUtils(object):
     @staticmethod
     def normalize_name(name):
-        name = re.sub('&',' and ', name)
+        name = re.sub('&', ' and ', name)
         name = re.sub('(.)([A-Z][a-z]+)', r'\1 \2', name)
         name = re.sub('([a-z0-9])([A-Z])', r'\1 \2', name).lower()
         name = re.sub('[^a-z0-9 ]+', '', name)
-        name = re.sub('([^\s])([0-9]+)', r'\1 \2', name)
+        name = re.sub('([^\\s])([0-9]+)', r'\1 \2', name)
         name = re.sub(' +', ' ', name)
         return name
 
@@ -33,7 +33,9 @@ class FilmInIMDB(object):
         self.end_year = end_year
         self.minutes = minutes
         self.genres = self._split_genres(genres)
-        self.normalized_title = MatcherUtils.normalize_name(self.title)
+        self.normalized_title = MapperUtils.normalize_name(self.title)
+        self.votes = 0
+        self.rating = 0
 
     @staticmethod
     def _split_genres(genres):
@@ -46,6 +48,7 @@ class FilmMapper(BaseScript):
     EXCLUDED_ENTRY_TYPES = ['tvEpisode', 'video', 'tvSeries', 'tvSpecial', 'tvShort', 'videoGame', 'tvMiniSeries',
                             'titleType']
     INCLUDE_FILMS_FROM_IMDB_WITHOUT_YEAR = False
+    POPULARITY_FACTOR_TO_FILTER_ALTERNATIVES = 3
 
     def __init__(self, tvtropes_films_file, imdb_titles_file, imdb_ratings_file, target_dataset):
         parameters = dict(tvtropes_films_file_name=tvtropes_films_file, imdb_titles_file=imdb_titles_file,
@@ -69,6 +72,7 @@ class FilmMapper(BaseScript):
         self._load_information_from_tvtropes_dataset()
         self._map_films()
         self._finish_and_summary()
+
         pass
 
     def _load_information_from_imdb_dataset(self):
@@ -105,14 +109,13 @@ class FilmMapper(BaseScript):
                             self.films_in_imdb_by_name[name] = []
                         self.films_in_imdb_by_name[name].append(film_in_imdb)
 
-
                         if len(self.films_in_imdb) % 50000 == 0:
                             self._info(f'{len(self.films_in_imdb)} films read')
 
                 except Exception as exception:
                     self._track_error(f'Exception in line {line}. {exception}')
                 finally:
-                    imdb_lines_counter+=1
+                    imdb_lines_counter += 1
 
             self._add_to_summary('imdb_lines_counter', imdb_lines_counter)
             self._add_to_summary('imdb_films_considered', len(self.films_in_imdb))
@@ -137,7 +140,7 @@ class FilmMapper(BaseScript):
         return components[1] not in self.EXCLUDED_ENTRY_TYPES
 
     def _is_included_due_start_year(self, components):
-        return self.INCLUDE_FILMS_FROM_IMDB_WITHOUT_YEAR or len(components[5])==4
+        return self.INCLUDE_FILMS_FROM_IMDB_WITHOUT_YEAR or len(components[5]) == 4
 
     def _load_information_from_tvtropes_dataset(self):
         with open(self.tvtropes_films_file, 'r') as films_tvtropes:
@@ -151,28 +154,48 @@ class FilmMapper(BaseScript):
 
             if self._contains_year(film_name_tvtropes):
                 year = film_name_tvtropes[-4:]
-                name = MatcherUtils.normalize_name(film_name_tvtropes[:-4])
+                name = MapperUtils.normalize_name(film_name_tvtropes[:-4])
                 if year in self.films_in_imdb_by_year and name in self.films_in_imdb_by_year[year]:
                     self.tvtropes_imdb_map[film_name_tvtropes].extend(self.films_in_imdb_by_year[year][name])
             else:
-                name = MatcherUtils.normalize_name(film_name_tvtropes)
+                name = MapperUtils.normalize_name(film_name_tvtropes)
                 if name in self.films_in_imdb_by_name:
                     self.tvtropes_imdb_map[film_name_tvtropes].extend(self.films_in_imdb_by_name[name])
 
-        self._add_to_summary('Films matched times: 0', len(self._number_of_matches_equal(0)))
-        self._add_to_summary('Films matched times: 1', len(self._number_of_matches_equal(1)))
-        self._add_to_summary('Films matched times: 2', len(self._number_of_matches_equal(2)))
-        self._add_to_summary('Films matched times: 3', len(self._number_of_matches_equal(3)))
-        self._add_to_summary('Films matched times: 4+', len(self._number_of_matches_equal_or_higher(4)))
+        self.tvtropes_imdb_map_popularity = {}
+        for key in self.tvtropes_imdb_map:
+            self.tvtropes_imdb_map_popularity[key] = sorted(self.tvtropes_imdb_map[key], key=lambda x: x.votes,
+                                                            reverse=True)
+            if len(self.tvtropes_imdb_map_popularity[key]) > 1:
+                best_popularity = self.tvtropes_imdb_map_popularity[key][0].votes
+                second_best_popularity = self.tvtropes_imdb_map_popularity[key][1].votes
+                popularity_factor = self.safe_division(best_popularity, second_best_popularity)
+                if popularity_factor >= self.POPULARITY_FACTOR_TO_FILTER_ALTERNATIVES:
+                    self.tvtropes_imdb_map_popularity[key] = self.tvtropes_imdb_map_popularity[key][0:1]
 
+        self._add_to_summary('Films matched times: 0', len(self._matches_equal(0)))
+        self._add_to_summary('Films matched times: 1', len(self._matches_equal(1)))
+        self._add_to_summary('Films matched times: 2', len(self._matches_equal(2)))
+        self._add_to_summary('Films matched times: 3', len(self._matches_equal(3)))
+        self._add_to_summary('Films matched times: 4+', len(self._matches_equal_or_higher(4)))
+
+        self._add_to_summary('Films matched times: 1 (popularity heuristic)',
+                             len(self._matches_equal_filtering_popularity(1)))
+
+    def safe_division(self, x, y):
+        if y == 0:
+            return 0
+        return x / y
 
     @staticmethod
     def _contains_year(film_name):
         return re.fullmatch('^.+[1,2][0-9]{3}$', film_name)
 
-    def _number_of_matches_equal(self, occurrences):
-        return [name for name in self.tvtropes_imdb_map if len(self.tvtropes_imdb_map[name])==occurrences]
+    def _matches_equal(self, occurrences):
+        return [name for name in self.tvtropes_imdb_map if len(self.tvtropes_imdb_map[name]) == occurrences]
 
-    def _number_of_matches_equal_or_higher(self, occurrences):
-        return [name for name in self.tvtropes_imdb_map if len(self.tvtropes_imdb_map[name])>=occurrences]
+    def _matches_equal_filtering_popularity(self, occurrences):
+        return [name for name in self.tvtropes_imdb_map if len(self.tvtropes_imdb_map_popularity[name]) == occurrences]
 
+    def _matches_equal_or_higher(self, occurrences):
+        return [name for name in self.tvtropes_imdb_map if len(self.tvtropes_imdb_map[name]) >= occurrences]

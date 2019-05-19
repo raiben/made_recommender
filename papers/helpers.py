@@ -52,7 +52,7 @@ def draw_sample_graph():
         scraper[label="Scraper\nprocess" type="process"];
         dataset1[label="Dataset\nFilm->(tropes)" type="data"];
         imdb[label="IMDB\ndatabases" type="database"];
-        matcher[label="Film\nmatcher\nprocess" type="process"];
+        mapper[label="Film\nmapper\nprocess" type="process"];
         dataset2[label="Dataset\nFilm->(tropes,\nrating, genres)" type="data"];
         recommender[label="Trope\nRecommender\nprocess" type="process"];
         user[label="User's\npre-selected\ntropes" type="data"];
@@ -61,9 +61,9 @@ def draw_sample_graph():
 
         tvtropes -> scraper;
         scraper -> dataset1;
-        dataset1 -> matcher;
-        imdb -> matcher;
-        matcher -> dataset2;
+        dataset1 -> mapper;
+        imdb -> mapper;
+        mapper -> dataset2;
         dataset2 -> recommender;
         recommender -> builder
         user -> builder

@@ -263,7 +263,7 @@ digraph {
     scraper[label="Scraper\nprocess" type="process"];
     dataset1[label="Dataset\nFilm->(tropes)" type="data"];
     imdb[label="IMDB\ndatabases" type="database"];
-    matcher[label="Film\nmatcher\nprocess" type="process"];
+    mapper[label="Film\nmapper\nprocess" type="process"];
     dataset2[label="Dataset\nFilm->(tropes,\nrating, genres)" type="data"];
     recommender[label="Trope\nRecommender\nprocess" type="process"];
     user[label="User's\npre-selected\ntropes" type="data"];
@@ -272,9 +272,9 @@ digraph {
 
     tvtropes -> scraper;
     scraper -> dataset1;
-    dataset1 -> matcher;
-    imdb -> matcher;
-    matcher -> dataset2;
+    dataset1 -> mapper;
+    imdb -> mapper;
+    mapper -> dataset2;
     dataset2 -> recommender;
     recommender -> builder
     user -> builder
@@ -307,7 +307,7 @@ digraph {{
     scraper[label="Scraper process:\n\nPython\nrequests+lxml+bz2\n~11.900 pages" type="process"];
     dataset1[label="Dataset\n\nfilms->tropes\n({n_films}->{n_tropes})" type="data"];
     imdb[label="IMDB\ndatasets:\n\nhttps://www.imdb.com/\ninterfaces/" type="database"];
-    matcher[label="Film\nmatcher\nprocess" type="process"];
+    mapper[label="Film\nmapper\nprocess" type="process"];
     dataset2[label="Dataset\nFilm->(tropes,\nrating, genres)" type="data"];
     recommender[label="Trope\nRecommender\nprocess" type="process"];
     user[label="User's\npre-selected\ntropes" type="data"];
@@ -316,9 +316,9 @@ digraph {{
 
     tvtropes -> scraper;
     scraper -> dataset1;
-    dataset1 -> matcher;
-    imdb -> matcher;
-    matcher -> dataset2;
+    dataset1 -> mapper;
+    imdb -> mapper;
+    mapper -> dataset2;
     dataset2 -> recommender;
     recommender -> builder
     user -> builder

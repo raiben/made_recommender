@@ -2,7 +2,7 @@ import os
 
 from invoke import task, run
 
-from imdb_matcher.film_mapper import FilmMapper
+from mapper.film_mapper import FilmMapper
 from tvtropes_scraper.tvtropes_scraper import TVTropesScraper
 
 
