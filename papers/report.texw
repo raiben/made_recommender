@@ -1,3 +1,89 @@
+<<echo=False>>=
+import bz2
+import json
+import pygraphviz as pgv
+import os
+import pandas as pd
+from tabulate import tabulate
+
+FILM_TROPES_JSON_BZ2_FILE = '../datasets/scraper/cache/20190501/films_tropes_20190501.json.bz2'
+SCRAPER_LOG_FILE = '../logs/scrape_tvtropes_20190501_20190512_191015.log'
+TOP_VALUES = 25
+
+
+def read_compressed_json(file_path):
+    with open(file_path, 'rb') as file:
+        compressed_content = file.read()
+    content = bz2.decompress(compressed_content)
+    return json.loads(content)
+
+
+def reverse_dictionary(original_dictionary):
+    reversed_dictionary = {}
+    for key, value in original_dictionary.items():
+        for element in value:
+            if element not in reversed_dictionary:
+                reversed_dictionary[element] = []
+            reversed_dictionary[element].append(key)
+    return reversed_dictionary
+
+
+def draw_graphviz(dot, filename):
+    new_dot = dot.replace('type="start"', 'shape="ellipse" margin=0.2')
+    new_dot = dot.replace('type="database"', 'shape="cylinder" margin=0.2')
+    new_dot = new_dot.replace('type="process"', 'shape="box3d" margin=0.2 style="filled" fillcolor="gray91"')
+    new_dot = new_dot.replace('type="data"', 'shape="polygon" skew=.4 margin=0')
+
+    G = pgv.AGraph(string=new_dot)
+    G.layout(prog='dot')
+    if not os.path.isdir('figures'):
+        os.makedirs('figures')
+    G.draw(os.path.join('figures', filename))
+
+def get_table_for_dataframe(df, **kwargs):
+    return tabulate(df, headers=df, tablefmt='latex', **kwargs)
+
+import re
+
+def tex_escape(text):
+    CHARS = {
+        '&':  '\&',
+        '%':  '\%',
+        '$':  '\$',
+        '#':  '\#',
+        '_':  '\_',
+        '^':  '\^',
+    }
+
+    if isinstance(text, str):
+        return("".join([CHARS.get(char, char) for char in text]))
+
+    return text
+
+
+def get_experiment_execution_information(log_file_path):
+    with open(log_file_path, 'r') as scraper_log:
+        lines = scraper_log.readlines()
+        first_line = lines[0]
+        last_line = lines[-1]
+
+    parameters_as_text = first_line.split('Init script: ')[1]
+    input_log = json.loads(parameters_as_text)
+    keys = [tex_escape(key) for key in input_log.keys()]
+    values = [tex_escape(key) for key in input_log.values()]
+    processed_dictionary = dict(parameter=keys, value=values)
+    input_dataframe = pd.DataFrame.from_dict(processed_dictionary)
+
+    summary_as_text = last_line.split('Finish script: ')[1]
+    output_log = json.loads(summary_as_text)
+    keys = [tex_escape(key) for key in output_log.keys()]
+    values = [tex_escape(key) for key in output_log.values()]
+    processed_dictionary = dict(parameter=keys, value=values)
+    output_dataframe = pd.DataFrame(processed_dictionary)
+    return input_dataframe, output_dataframe
+
+
+@
 \documentclass[11pt,final]{article}
 \usepackage{fancyvrb, color, graphicx, hyperref, amsmath, url}
 \usepackage{minted}
@@ -33,6 +119,9 @@
 }
 \lstset{style=mystyle}
 
+%notes
+\usepackage{tcolorbox}
+
 \author[1]{Rub\'en H. Garc\'ia-Ortega}
 \author[2]{Juan J. Merelo Guerv\'os}
 \author[3]{Pablo Garc\'ia S\'anchez}
@@ -43,7 +132,7 @@
 
 % Commands from pandoc
 \providecommand{\tightlist}{%
-  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
 \setcounter{secnumdepth}{0}
 \newcommand{\VerbBar}{|}
 \newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
@@ -81,6 +170,9 @@
 \newcommand{\ErrorTok}[1]{\textcolor[rgb]{1.00,0.00,0.00}{\textbf{#1}}}
 \newcommand{\NormalTok}[1]{#1}
 % end of commands from pandoc
+
+\newcommand{\note}[1]{\begin{tcolorbox}[colback=red!5!white,colframe=red!75!black,title=Note] #1 \end{tcolorbox}
+}
 
 \hypersetup
 {
@@ -159,6 +251,89 @@ If the hypothesis is true, it could indeed be a very important device to synthes
 in terms of tropes present while maximizing the quality, that is ultimately the goal of the research:
 auto-generate interesting stories.
 
+\section{Steps}
+<<echo=False>>=
+workflow = '''
+digraph {
+    rankdir=LR
+    margin=0;
+    graph [ resolution=128, fontsize=14 ];
+
+    tvtropes[label="TVTropes\nwebsite" type="database"];
+    scraper[label="Scraper\nprocess" type="process"];
+    dataset1[label="Dataset\nFilm->(tropes)" type="data"];
+    imdb[label="IMDB\ndatabases" type="database"];
+    mapper[label="Film\nmapper\nprocess" type="process"];
+    dataset2[label="Dataset\nFilm->(tropes,\nrating, genres)" type="data"];
+    recommender[label="Trope\nRecommender\nprocess" type="process"];
+    user[label="User's\npre-selected\ntropes" type="data"];
+    builder[label="Trope\nbuilder\nprocess" type="process"];
+    trope_sequence[label="Optimal\ntrope\nsequence" type="data"]
+
+    tvtropes -> scraper;
+    scraper -> dataset1;
+    dataset1 -> mapper;
+    imdb -> mapper;
+    mapper -> dataset2;
+    dataset2 -> recommender;
+    recommender -> builder
+    user -> builder
+    builder -> trope_sequence
+}'''
+
+draw_graphviz(workflow, "main_workflow.pdf")
+@
+\begin{figure}[h]
+\includegraphics[width=\textwidth]{figures/main_workflow.pdf}
+\centering
+\end{figure}
+
+<<echo=False>>=
+films_dictionary = read_compressed_json(FILM_TROPES_JSON_BZ2_FILE)
+tropes_dictionary = reverse_dictionary(films_dictionary)
+
+n_films = len(films_dictionary.keys())
+n_tropes = len(tropes_dictionary.keys())
+
+
+workflow = f'''
+digraph {{
+    splines=polyline
+    rankdir=LR
+    margin=0;
+    graph [ resolution=128, fontsize=14];
+
+    tvtropes[label="TVTropes\nwebsite:\n\nhttps://tvtropes.org/" type="database"];
+    scraper[label="Scraper process:\n\nPython\nrequests+lxml+bz2\n~11.900 pages" type="process"];
+    dataset1[label="Dataset\n\nfilms->tropes\n({n_films}->{n_tropes})" type="data"];
+    imdb[label="IMDB\ndatasets:\n\nhttps://www.imdb.com/\ninterfaces/" type="database"];
+    mapper[label="Film\nmapper\nprocess" type="process"];
+    dataset2[label="Dataset\nFilm->(tropes,\nrating, genres)" type="data"];
+    recommender[label="Trope\nRecommender\nprocess" type="process"];
+    user[label="User's\npre-selected\ntropes" type="data"];
+    builder[label="Trope\nbuilder\nprocess" type="process"];
+    trope_sequence[label="Optimal\ntrope\nsequence" type="data"]
+
+    tvtropes -> scraper;
+    scraper -> dataset1;
+    dataset1 -> mapper;
+    imdb -> mapper;
+    mapper -> dataset2;
+    dataset2 -> recommender;
+    recommender -> builder
+    user -> builder
+    builder -> trope_sequence
+}}'''
+
+draw_graphviz(workflow, "main_workflow_extended.pdf")
+@
+\begin{figure}[h]
+\includegraphics[width=\textwidth]{figures/main_workflow_extended.pdf}
+\centering
+\end{figure}
+
+%-----------------------------------------------------------------------------------------------------------------------
+
 \section{Tropes Dataset}
 
 \subsection{State of the art}
@@ -181,13 +356,68 @@ of the database since then; If we work with the latest data from TVTropes our ma
 would benefit from having much entries and hence, provide better results. That's why our first step is to
 extract the data directly from TVTropes, as discussed in next section.
 
-\subsection{Extracting the tropes from TVTropes: TVTropes scrapper}\label{tvtropes-scrapper}
+\subsection{Extracting the tropes from TVTropes: TVTropes scraper}\label{tvtropes-scraper}
+
+<<echo=False>>=
+films_dictionary = read_compressed_json(FILM_TROPES_JSON_BZ2_FILE)
+tropes_dictionary = reverse_dictionary(films_dictionary)
+
+n_films = len(films_dictionary.keys())
+n_tropes = len(tropes_dictionary.keys())
+
+
+workflow = f'''
+digraph {{
+    splines=polyline
+    rankdir=LR
+    margin=0;
+    graph [fontsize=14];
+
+    subgraph cluster_0 {{
+        style=invis
+        start [label="Start" type="start"]
+        extractcategories [label="Extract\nCategories" type="process"];
+        extractfilms [label="Extract\nFilms" type="process"];
+        extracttropes [label="Extract\nTropes" type="process"];
+        dataset1 [label="Dataset\n\nfilms->tropes\n({n_films}->{n_tropes})" type="data"];
+    }}
+    subgraph cluster_1 {{
+        style=invis
+        retrievepage[label="Retrieve\nPage" type="process"];
+    }}
+    subgraph cluster_2 {{
+        style=invis
+        filecache[label="File\nCache" type="data"];
+        tvtropes[label="TVTropes\nwebsite:\n\nhttps://tvtropes.org/" type="database"];
+    }}
+
+
+    start -> extractcategories -> extractfilms -> extracttropes -> dataset1;
+    retrievepage -> filecache;
+    retrievepage -> tvtropes;
+    extractcategories -> retrievepage[constraint=false, dir="both"];
+    extractfilms -> retrievepage[constraint=false, dir="both"];
+    extracttropes -> retrievepage[constraint=false, dir="both"];
+    fake_start -> fake_1 [style=invis];
+    fake_1 -> retrievepage [style=invis];
+    fake_start[style=invis]
+    fake_1[style=invis]
+}}'''
+
+draw_graphviz(workflow, "scrapper_workflow.pdf")
+@
+
+\begin{figure}[h]
+\includegraphics[width=\textwidth]{figures/scrapper_workflow.pdf}
+\centering
+\end{figure}
+
 
 We built a crawler that extracts the tropes from TVtropes:
 
 \begin{itemize}
 \item
-  The scrapper \textbf{extracts all the categories} from the main
+  The scraper \textbf{extracts all the categories} from the main
   categories page: \\ \href{https://tvtropes.org/pmwiki/pmwiki.php/Main/Film}{https://tvtropes.org/pmwiki/pmwiki.php/Main/Film}.
   Then, for each category page, it extracts \textbf{all the film
   identifiers} assigned to it. Finally, for every film page, it extracts
@@ -216,14 +446,14 @@ We built a crawler that extracts the tropes from TVtropes:
 \subsubsection{Usage}\label{usage}
 
 \begin{lstlisting}[basicstyle=\small]
-invoke scrap-tvtropes --help
+invoke scrape-tvtropes --help
 \end{lstlisting}
 
 \begin{lstlisting}[basicstyle=\small]
-Usage: inv[oke] [--core-opts] scrap-tvtropes [--options] [other tasks here ...]
+Usage: inv[oke] [--core-opts] scrape-tvtropes [--options] [other tasks here ...]
 
 Docstring:
-  Scrap tropes by film in TvTropes.org
+Scrape tropes by film in TvTropes.org
 
   :param cache_directory: The folder that all the downloaded pages are going to be written into.
   :param session: (Optional) Name of the cache folder. If not provided, then it will use the current date/time.
@@ -261,7 +491,7 @@ provided.
 Example:
 
 \begin{lstlisting}[basicstyle=\small]
-invoke scrap-tvtropes --cache-directory ./datasets/scrapper/cache/ --session 20190501
+invoke scrape-tvtropes --cache-directory ./datasets/scraper/cache/ --session 20190501
 \end{lstlisting}
 
 \begin{lstlisting}[basicstyle=\small]
@@ -305,7 +535,7 @@ Output file content:
 \end{Shaded}
 
 A valid compressed sample file
-\href{https://github.com/raiben/made_recommender/blob/master/datasets/scrapper/cache/20190501/films_tropes_20190501.json.bz2}{films\_tropes\_20190501.json.bz2}
+\href{https://github.com/raiben/made_recommender/blob/master/datasets/scraper/cache/20190501/films_tropes_20190501.json.bz2}{films\_tropes\_20190501.json.bz2}
 can be found in the datasets folder of the project.
 
 \subsubsection{Troubleshooting}\label{troubleshooting}
@@ -317,6 +547,24 @@ can be found in the datasets folder of the project.
   session. The class will auto generate it again in the next execution,
   re-downloading the pages.
 \end{itemize}
+
+\subsection{Experiments}
+
+<<results="tex">>=
+input, output = get_experiment_execution_information(SCRAPER_LOG_FILE)
+latex_input = get_table_for_dataframe(input)
+latex_output = get_table_for_dataframe(output)
+@
+
+Log processed: <%=print(tex_escape(SCRAPER_LOG_FILE))%>.
+
+Input parameters:
+
+<%=print(latex_input)%>
+
+Output values:
+
+<%=print(latex_output)%>
 
 \subsection{Nature of the data extracted}
 
@@ -343,20 +591,101 @@ def reverse_dictionary(original_dictionary):
 @
 
 Reading the content of the dataset:
-<<term=True>>=
-films_dictionary = read_compressed_json('../datasets/scrapper/cache/20190501/films_tropes_20190501.json.bz2')
+<<>>=
+films_dictionary = read_compressed_json(FILM_TROPES_JSON_BZ2_FILE)
 tropes_dictionary = reverse_dictionary(films_dictionary)
 @
 
-Number of films:
-<<term=True>>=
-len(films_dictionary.keys())
+\subsubsection{Descriptive analysis}
+
+Tropes:
+
+<<>>=
+tropes_summary_dictionary = {}
+for key in films_dictionary:
+    tropes_summary_dictionary[key] = {'tropes':len(films_dictionary[key])}
+
+tropes_summary_dataframe = pd.DataFrame(tropes_summary_dictionary).transpose()
 @
 
-Number of tropes:
-<<term=True>>=
-len(tropes_dictionary.keys())
+<%=print(get_table_for_dataframe(tropes_summary_dataframe.describe()))%>
+
+Histogram:
+
+<<fig=True, width="12cm", f_pos="h">>=
+tropes_summary_dataframe.plot.hist(log=True, color='#86bf91', zorder=2, rwidth=0.9)
 @
+
+Top Films by trope:
+
+<%=print(get_table_for_dataframe(tropes_summary_dataframe.sort_values('tropes',ascending=False).head(TOP_VALUES)))%>
+
+
+Films:
+
+<<>>=
+films_summary_dictionary = {}
+for key in tropes_dictionary:
+    films_summary_dictionary[key] = {'films':len(tropes_dictionary[key])}
+
+films_summary_dataframe = pd.DataFrame(films_summary_dictionary).transpose()
+@
+
+<%=print(get_table_for_dataframe(films_summary_dataframe.describe()))%>
+
+<<fig=True, width="12cm", f_pos="h">>=
+films_summary_dataframe.plot.hist(log=True, color='#86bf91', zorder=2, rwidth=0.9)
+@
+
+Top Tropes by film
+
+<<results="tex">>=
+top_tropes_dataset = films_summary_dataframe.sort_values('films',ascending=False).head(TOP_VALUES)
+latex_output = get_table_for_dataframe(top_tropes_dataset)
+@
+<%=print(latex_output)%>
+
+\subsubsection{Further questions to analyze}
+
+\note{To keep adding questions and discussing}
+
+\begin{itemize}
+    \item Compare the new dataset with PicTropes (2018) \cite{garcia2018overview}:
+    \begin{itemize}
+        \item How do this new dataset improve the old PicTropes?
+        \item Why do we care about the improvement?
+        \item How would the research benefit from having more data?
+    \end{itemize}
+    \item Regarding the histograms:
+    \begin{itemize}
+        \item why do they have this distribution?
+        \item What are the features of the films/tropes in the left/right part? Genre? Year? Popularity? Rating? Actors?
+    \end{itemize}
+    \item Regarding the semantic os the films and tropes:
+    \begin{itemize}
+        \item Why are the tropes BigBad, ShoutOut, OhCrap, ChekhovsGun and Foreshadowing so widely used?
+        \item Why are the top 9 trope movies super hero movies?
+    \end{itemize}
+    \item Can we use this dataset to build a recommending system?
+    \begin{itemize}
+        \item Basket Case Algorithm to recommend tropes that are usually found together.
+        \item Find a way to include the rating/boxoffice to recommend tropes that improve the rating/boxoffice.
+    \end{itemize}
+    \item Nature of the tropes:
+    \begin{itemize}
+        \item Can the tropes be classified.
+        \item What useful information could be extracted from TVTropes as well.
+    \end{itemize}
+    \item Technical questions:
+    \begin{itemize}
+        \item Why I haven't used a specific-purpose library to crawl.
+        \item Why I loop from film categories to films and then to tropes.
+        \item How I optimised the process.
+        \item Why I compress the cache and why bz2.
+        \item Why I use url encoded names for the urls.
+        \item Why I used waits between calls. Why I haven't used multiple workers to download the pages.
+    \end{itemize}
+\end{itemize}
 
 
 \subsection{Extracting rating, genre and popularity from IMDB}
