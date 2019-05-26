@@ -4,6 +4,7 @@ import json
 import pygraphviz as pgv
 import os
 import pandas as pd
+import textwrap
 from tabulate import tabulate
 
 FILM_TROPES_JSON_BZ2_FILE = '../datasets/scraper/cache/20190501/films_tropes_20190501.json.bz2'
@@ -42,9 +43,20 @@ def draw_graphviz(dot, filename):
     G.draw(os.path.join('figures', filename))
 
 def get_table_for_dataframe(df, **kwargs):
-    return tabulate(df, headers=df, tablefmt='latex', **kwargs)
+    return tabulate(df, headers=df, tablefmt='latex_raw', **kwargs)
 
 import re
+
+def tex_wrap_and_escape(text, length=40):
+    if isinstance(text, str):
+        wrapped_text = textwrap.fill(text, length)
+        if '\n' in wrapped_text:
+            wrapped_text = '\makecell[tl]{' + wrapped_text.replace('\n',' \\\\ ') + '}'
+        return tex_escape(wrapped_text)
+    if isinstance(text, list):
+        text = ', '.join(text)
+        return tex_wrap_and_escape(text)
+    return text
 
 def tex_escape(text):
     CHARS = {
@@ -70,15 +82,15 @@ def get_experiment_execution_information(log_file_path):
 
     parameters_as_text = first_line.split('Init script: ')[1]
     input_log = json.loads(parameters_as_text)
-    keys = [tex_escape(key) for key in input_log.keys()]
-    values = [tex_escape(key) for key in input_log.values()]
+    keys = [tex_wrap_and_escape(key) for key in input_log.keys()]
+    values = [tex_wrap_and_escape(key) for key in input_log.values()]
     processed_dictionary = dict(parameter=keys, value=values)
     input_dataframe = pd.DataFrame.from_dict(processed_dictionary)
 
     summary_as_text = last_line.split('Finish script: ')[1]
     output_log = json.loads(summary_as_text)
-    keys = [tex_escape(key) for key in output_log.keys()]
-    values = [tex_escape(key) for key in output_log.values()]
+    keys = [tex_wrap_and_escape(key) for key in output_log.keys()]
+    values = [tex_wrap_and_escape(key) for key in output_log.values()]
     processed_dictionary = dict(parameter=keys, value=values)
     output_dataframe = pd.DataFrame(processed_dictionary)
     return input_dataframe, output_dataframe
@@ -95,6 +107,7 @@ def get_experiment_execution_information(log_file_path):
 \restylefloat{table}
 \usepackage{authblk}
 \usepackage{listings}
+\usepackage{makecell}
 \usepackage{color}
 \definecolor{codegreen}{rgb}{0,0.6,0}
 \definecolor{codegray}{rgb}{0.5,0.5,0.5}
@@ -426,7 +439,7 @@ We built a crawler that extracts the tropes from TVtropes:
   \textbf{dictionary of films and tropes}.
 \item
   The process \textbf{can be stopped and re-launched at any moment}
-  because the pages. are permanently stored in the local cache, so it
+  because the pages are permanently stored in the local cache, so it
   will continue from the last page processed.
 \item
   The files in cache and the final output file are \textbf{compressed
@@ -707,15 +720,20 @@ We built a mapper that tries to match films from TvTropes and films from IMDb:
 
 Features:
 \begin{itemize}
+    \item Items in IMDb that don't relate to films are excluded (tvEpisode, tvSeries, tvSpecial, tvShort, videoGame,
+    tvMiniSeries, titleType) because they are not in our TVTropes scraped dataset and they would only increase
+    ambiguity as more films might match the same name.
     \item Films names are normalized in both cases, TVTropes and IMDb, converting camel-case to Title case, removing
     non-alphanumerical values and extra blanks, splitting name and year when required, and converting to lowercase.
-    \item The original title are also handled so that non-English titles can be handled
-    \item Normalized names in TvTropes and IMDb are matched.
+    \item Normalized names in TvTropes and IMDb are matched, ideally \{1->1\}. In order to reduce ambiguity:
     \begin{itemize}
         \item If the year is present in TvTropes's identifier, reduce the search to the specific year in IMDb.
-        \item If there are more than one match for a tvTropes's identifier in IMDb, chose the one with the highest number of
-        votes.
+        \item If there are more than one match for a tvTropes's identifier in IMDb, chose the one with the
+        highest number of votes. This heuristic relies in the fact that both system are maintained by people, so
+        if there is a film in TVTropes and there are many films with the same name in IMDb, it will probably be
+        the one with highest popularity, that is reflected in the number of votes.
     \end{itemize}
+    \item The original title are also included so that non-English titles can be handled as well.
     \item A resulting CSV includes the identifier in IMDb, in TVTropes, the name of the film, the year, the rating,
     the number of votes, the tropes for the film (0 if not present, 1 if present) and the genre (0 if not present,
     1 if present).

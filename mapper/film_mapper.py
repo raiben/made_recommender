@@ -55,7 +55,7 @@ class FilmMapper(BaseScript):
     def __init__(self, tvtropes_films_file, imdb_titles_file, imdb_ratings_file, target_dataset, remove_ambiguities):
         parameters = dict(tvtropes_films_file_name=tvtropes_films_file, imdb_titles_file=imdb_titles_file,
                           imdb_ratings_file=imdb_ratings_file, target_dataset=target_dataset,
-                          excluded_entry_types=', '.join(self.EXCLUDED_ENTRY_TYPES),
+                          excluded_entry_types=self.EXCLUDED_ENTRY_TYPES,
                           include_films_from_imdb_without_year=self.INCLUDE_FILMS_FROM_IMDB_WITHOUT_YEAR,
                           remove_ambiguities=remove_ambiguities)
 

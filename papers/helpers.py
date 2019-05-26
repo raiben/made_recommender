@@ -4,7 +4,7 @@ import json
 import pandas as pd
 from pandas import DataFrame
 from tabulate import tabulate
-
+import textwrap
 
 def read_compressed_json(file_path):
     with open(file_path, 'rb') as file:

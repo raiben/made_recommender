@@ -46,7 +46,6 @@ def map_films(context, tvtropes_films_file, imdb_titles_file, imdb_ratings_file,
                         remove_ambiguities=remove_ambiguities)
     mapper.run()
 
-
 def _check_file_exists(parameter, file_name):
     if not os.path.isfile(file_name):
         print(f'Please, provide a valid path for {parameter}')
