@@ -20,6 +20,7 @@ class BaseScript(object):
 
     def _add_to_summary(self, key, value):
         self.summary_dictionary[key] = value
+        self._info(f'{key}: {value}')
 
     def _finish_and_summary(self):
         self.datetime_end = datetime.now()

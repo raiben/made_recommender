@@ -24,7 +24,7 @@ def scrape_tvtropes(context, cache_directory=None, session=None):
 
 @task
 def map_films(context, tvtropes_films_file, imdb_titles_file, imdb_ratings_file,
-              target_dataset='datasets/extended_dataset.csv'):
+              target_dataset='datasets/extended_dataset.csv', remove_ambiguities=False):
     """
     Map scraped films from TvTropes.org to IMDB.com
 
@@ -32,6 +32,8 @@ def map_films(context, tvtropes_films_file, imdb_titles_file, imdb_ratings_file,
     :type imdb_titles_file: path to the file 'title.basics.tsv'
     :type imdb_ratings_file: path to the file 'title.ratings.tsv'
     :type target_dataset: path to the target file (csv)
+    :type remove_ambiguities: Remove ambiguity by selecting the most popular film when different films from IMDb match
+    the film in TVTropes
     """
 
     _check_file_exists('tvtropes_films_file', tvtropes_films_file)
@@ -40,7 +42,8 @@ def map_films(context, tvtropes_films_file, imdb_titles_file, imdb_ratings_file,
 
     FilmMapper.set_logger_file_id('map_films')
     mapper = FilmMapper(tvtropes_films_file=tvtropes_films_file, imdb_titles_file=imdb_titles_file,
-                        imdb_ratings_file=imdb_ratings_file, target_dataset=target_dataset)
+                        imdb_ratings_file=imdb_ratings_file, target_dataset=target_dataset,
+                        remove_ambiguities=remove_ambiguities)
     mapper.run()
 
 

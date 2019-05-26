@@ -1,7 +1,9 @@
+import bz2
+import csv
 import difflib
+import io
 import json
 import re
-
 from common.base_script import BaseScript
 
 
@@ -34,6 +36,7 @@ class FilmInIMDB(object):
         self.minutes = minutes
         self.genres = self._split_genres(genres)
         self.normalized_title = MapperUtils.normalize_name(self.title)
+        self.normalized_original_title = MapperUtils.normalize_name(self.original_title)
         self.votes = 0
         self.rating = 0
 
@@ -48,14 +51,13 @@ class FilmMapper(BaseScript):
     EXCLUDED_ENTRY_TYPES = ['tvEpisode', 'tvSeries', 'tvSpecial', 'tvShort', 'videoGame', 'tvMiniSeries',
                             'titleType']
     INCLUDE_FILMS_FROM_IMDB_WITHOUT_YEAR = False
-    POPULARITY_FACTOR_TO_FILTER_ALTERNATIVES = 2
 
-    def __init__(self, tvtropes_films_file, imdb_titles_file, imdb_ratings_file, target_dataset):
+    def __init__(self, tvtropes_films_file, imdb_titles_file, imdb_ratings_file, target_dataset, remove_ambiguities):
         parameters = dict(tvtropes_films_file_name=tvtropes_films_file, imdb_titles_file=imdb_titles_file,
                           imdb_ratings_file=imdb_ratings_file, target_dataset=target_dataset,
                           excluded_entry_types=self.EXCLUDED_ENTRY_TYPES,
                           include_films_from_imdb_without_year=self.INCLUDE_FILMS_FROM_IMDB_WITHOUT_YEAR,
-                          popularity_factor=self.POPULARITY_FACTOR_TO_FILTER_ALTERNATIVES)
+                          remove_ambiguities=remove_ambiguities)
 
         BaseScript.__init__(self, parameters)
 
@@ -63,6 +65,7 @@ class FilmMapper(BaseScript):
         self.imdb_titles_file = imdb_titles_file
         self.imdb_ratings_file = imdb_ratings_file
         self.target_dataset = target_dataset
+        self.remove_ambiguities = remove_ambiguities
 
         self.film_list = []
         self.films_in_imdb = []
@@ -72,6 +75,7 @@ class FilmMapper(BaseScript):
         self._load_information_from_imdb_dataset()
         self._load_information_from_tvtropes_dataset()
         self._map_films()
+        self._write_dataset()
         self._finish_and_summary()
 
         pass
@@ -97,6 +101,7 @@ class FilmMapper(BaseScript):
 
                         year = film_in_imdb.start_year
                         name = film_in_imdb.normalized_title
+                        original_name = film_in_imdb.normalized_original_title
 
                         self.films_in_imdb_by_id[film_in_imdb.id] = film_in_imdb
 
@@ -105,10 +110,18 @@ class FilmMapper(BaseScript):
                         if not name in self.films_in_imdb_by_year[year]:
                             self.films_in_imdb_by_year[year][name] = []
                         self.films_in_imdb_by_year[year][name].append(film_in_imdb)
+                        if not original_name in self.films_in_imdb_by_year[year]:
+                            self.films_in_imdb_by_year[year][original_name] = []
+                        if film_in_imdb not in self.films_in_imdb_by_year[year][original_name]:
+                            self.films_in_imdb_by_year[year][original_name].append(film_in_imdb)
 
                         if not name in self.films_in_imdb_by_name:
                             self.films_in_imdb_by_name[name] = []
                         self.films_in_imdb_by_name[name].append(film_in_imdb)
+                        if not original_name in self.films_in_imdb_by_name:
+                            self.films_in_imdb_by_name[original_name] = []
+                        if film_in_imdb not in self.films_in_imdb_by_name[original_name]:
+                            self.films_in_imdb_by_name[original_name].append(film_in_imdb)
 
                         if len(self.films_in_imdb) % 50000 == 0:
                             self._info(f'{len(self.films_in_imdb)} films read')
@@ -169,35 +182,14 @@ class FilmMapper(BaseScript):
         self._add_to_summary('Films matched times: 3', len(self._matches_equal(3)))
         self._add_to_summary('Films matched times: 4+', len(self._matches_equal_or_higher(4)))
 
-        self._info(f'Reducing ambiguities by selecting films with more popularity')
-        self.tvtropes_imdb_map_popularity = {}
-        for key in self.tvtropes_imdb_map:
-            self.tvtropes_imdb_map_popularity[key] = sorted(self.tvtropes_imdb_map[key], key=lambda x: x.votes,
-                                                            reverse=True)
-            if len(self.tvtropes_imdb_map_popularity[key]) > 1:
-                best_popularity = self.tvtropes_imdb_map_popularity[key][0].votes
-                second_best_popularity = self.tvtropes_imdb_map_popularity[key][1].votes
-                popularity_factor = self.safe_division(best_popularity, second_best_popularity)
-
-                #best_candidate = self.tvtropes_imdb_map_popularity[key][0]
-                #second_best_candidate = self.tvtropes_imdb_map_popularity[key][1]
-                #self._info(f'Film {key}: best candidate {best_candidate.title} ({best_candidate.id}, '
-                #           f'{best_candidate.start_year}) is '
-                #           f'{popularity_factor} times more popular than the second candidate '
-                #           f'{second_best_candidate.title} ({second_best_candidate.id}, '
-                #           f'{second_best_candidate.start_year})')
-
-                if popularity_factor >= self.POPULARITY_FACTOR_TO_FILTER_ALTERNATIVES:
-
-                    self._info(f'Film https://tvtropes.org/pmwiki/pmwiki.php/Film/{key}')
-                    for index, film in enumerate(self.tvtropes_imdb_map_popularity[key]):
-                        selected = f'(selected with factor {popularity_factor})' if index==0 else ''
-                        self._info(f'- https://www.imdb.com/title/{film.id}/ votes={film.votes} {selected}')
-
-                    self.tvtropes_imdb_map_popularity[key] = self.tvtropes_imdb_map_popularity[key][0:1]
-
-        self._add_to_summary('Films matched times: 1 (popularity heuristic)',
-                             len(self._matches_equal_filtering_popularity(1)))
+        if self.remove_ambiguities:
+            self._info(f'Reducing ambiguities by selecting films with more popularity')
+            for key in self.tvtropes_imdb_map:
+                if len(self.tvtropes_imdb_map[key]):
+                    sorted_films_by_popularity = sorted(self.tvtropes_imdb_map[key], key=lambda x: x.votes,
+                                                        reverse=True)
+                    self.tvtropes_imdb_map[key] = sorted_films_by_popularity[0:1]
+            self._add_to_summary('Films matched times: 1 (remove ambiguity)', len(self._matches_equal(1)))
 
     def safe_division(self, x, y):
         if y == 0:
@@ -211,8 +203,52 @@ class FilmMapper(BaseScript):
     def _matches_equal(self, occurrences):
         return [name for name in self.tvtropes_imdb_map if len(self.tvtropes_imdb_map[name]) == occurrences]
 
-    def _matches_equal_filtering_popularity(self, occurrences):
-        return [name for name in self.tvtropes_imdb_map if len(self.tvtropes_imdb_map_popularity[name]) == occurrences]
-
     def _matches_equal_or_higher(self, occurrences):
         return [name for name in self.tvtropes_imdb_map if len(self.tvtropes_imdb_map[name]) >= occurrences]
+
+    def _write_dataset(self):
+        self._info('Writing to a CSV file')
+        all_tropes_in_order = sorted(set([trope for tropes in self.tropes_by_film.values() for trope in tropes]))
+        films_matched = self._matches_equal(1)
+        all_genres_in_order = sorted(set([genre for films in self.tvtropes_imdb_map.values()
+                                          if len(films) for genre in films[0].genres]))
+
+        output = io.StringIO()
+        writer = csv.writer(output)
+        header = self.get_header(all_tropes_in_order, all_genres_in_order)
+        writer.writerow(header)
+        number_of_rows = 0
+        for film in films_matched:
+            row = self.get_row_for_film(film, all_tropes_in_order, all_genres_in_order)
+            writer.writerow(row)
+            number_of_rows += 1
+            if number_of_rows % 500 == 0:
+                self._info(f'{number_of_rows} rows written')
+
+        self.uncompressed_content = output.getvalue()
+        self._add_to_summary('uncompressed_generated_file_path', self.target_dataset)
+        self._add_to_summary('uncompressed_generated_file_size_bytes', len(self.uncompressed_content))
+
+        compressed_path = f'{self.target_dataset}.bz2'
+        self.compressed_content = bz2.compress(self.uncompressed_content.encode('UTF-8'))
+        with open(compressed_path, 'wb') as compressed_file:
+            compressed_file.write(self.compressed_content)
+
+        self._add_to_summary('compressed_generated_file_path', compressed_path)
+        self._add_to_summary('compressed_generated_file_size_bytes', len(self.compressed_content))
+
+
+    def get_header(self, tropes, genres):
+        row = ['Id', 'NameTvTropes', 'NameIMDB', 'Rating', 'Votes', 'Year']
+        row.extend([trope for trope in tropes])
+        row.extend([f'[GENRE]{genre}' for genre in genres])
+        return row
+
+    def get_row_for_film(self, film_name, all_tropes, all_genres):
+        film = self.tvtropes_imdb_map[film_name][0]
+        film_tropes = self.tropes_by_film[film_name]
+
+        row = [film.id, film_name, film.title, film.rating, film.votes, film.start_year]
+        row.extend([1 if trope in film_tropes else 0 for trope in all_tropes])
+        row.extend([1 if genre in film.genres else 0 for genre in all_genres])
+        return row
