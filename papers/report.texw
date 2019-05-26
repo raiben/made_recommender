@@ -8,6 +8,7 @@ from tabulate import tabulate
 
 FILM_TROPES_JSON_BZ2_FILE = '../datasets/scraper/cache/20190501/films_tropes_20190501.json.bz2'
 SCRAPER_LOG_FILE = '../logs/scrape_tvtropes_20190501_20190512_191015.log'
+MAPPER_LOG_FILE = '../logs/map_films_20190526_164459.log'
 TOP_VALUES = 25
 
 
@@ -351,7 +352,7 @@ their data to a database so-called \textit{DBTropes.org}.\\
 
 As the base of the research on automatic trope generation, we begun with a dataset based in the
 latest version of DBTropes, called PicTropes \cite{garcia2018overview} that included 5,925 films with 18,270 tropes.
-However, the last version of BDTropes is from 2016, and the community of users of TVTropes has triplicated the size
+However, the last version of BDTropes is from 2016, and the community of users of TVTropes has tripled the size
 of the database since then; If we work with the latest data from TVTropes our machine learning algorithms
 would benefit from having much entries and hence, provide better results. That's why our first step is to
 extract the data directly from TVTropes, as discussed in next section.
@@ -690,6 +691,55 @@ latex_output = get_table_for_dataframe(top_tropes_dataset)
 
 \subsection{Extracting rating, genre and popularity from IMDB}
 
+IMDb Datasets are a compendium of information that IMDb offers for personal and
+non-commercial use. Both conditions of use and dataset descriptions are explained in
+https://www.imdb.com/interfaces/.
+Our current research will make use of these datasets to extend the film information from TVTropes, in particular,
+title.basics.tsv, which contains metadata from the films such as the title, the year, the genres
+and the duration, and title.ratings.tsv, which contains the rating and the number of votes.
+
+We built a mapper that tries to match films from TvTropes and films from IMDb:
+\begin{itemize}
+    \item In TvTropes, each film has a unique identifier that is a variation of the name of the film in CamelCase and
+    URL-compatible, that can, in case of ambiguity, include the year in the end.
+    \item In IMDb, each film has a unique identifier that is a sequence of numbers, but also a name and an original name.
+\end{itemize}
+
+Features:
+\begin{itemize}
+    \item Films names are normalized in both cases, TVTropes and IMDb, converting camel-case to Title case, removing
+    non-alphanumerical values and extra blanks, splitting name and year when required, and converting to lowercase.
+    \item The original title are also handled so that non-English titles can be handled
+    \item Normalized names in TvTropes and IMDb are matched.
+    \begin{itemize}
+        \item If the year is present in TvTropes's identifier, reduce the search to the specific year in IMDb.
+        \item If there are more than one match for a tvTropes's identifier in IMDb, chose the one with the highest number of
+        votes.
+    \end{itemize}
+    \item A resulting CSV includes the identifier in IMDb, in TVTropes, the name of the film, the year, the rating,
+    the number of votes, the tropes for the film (0 if not present, 1 if present) and the genre (0 if not present,
+    1 if present).
+    \item The output file is \textbf{compressed using bzip2} with a block size of 900k (the highest compression
+    available), because most of the cells contains a '0', and the compression has a very good rate.
+\end{itemize}
+
+\subsection{Experiments}
+
+<<results="tex">>=
+input, output = get_experiment_execution_information(MAPPER_LOG_FILE)
+latex_input = get_table_for_dataframe(input)
+latex_output = get_table_for_dataframe(output)
+@
+
+Log processed: <%=print(tex_escape(SCRAPER_LOG_FILE))%>.
+
+Input parameters:
+
+<%=print(latex_input)%>
+
+Output values:
+
+<%=print(latex_output)%>
 
 \subsection{Matching TVTropes and IMDB identifiers}
 
