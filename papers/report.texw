@@ -8,6 +8,7 @@ import textwrap
 from tabulate import tabulate
 import re
 from io import StringIO
+import scipy.stats  as stats
 
 FILM_TROPES_JSON_BZ2_FILE = '../datasets/scraper/cache/20190501/films_tropes_20190501.json.bz2'
 FILM_EXTENDED_DATASET_BZ2_FILE = '../datasets/extended_dataset.csv.bz2'
@@ -776,17 +777,38 @@ trope_names = [key for key in extended_dataframe.keys() if key not in EVERYTHING
 extended_dataframe['Number of tropes'] = sum(getattr(extended_dataframe,key) for key in trope_names)
 @
 
-Scatter plot: Rating vs Number of tropes
+\subsubsection{Rating vs Number of tropes}
+<<echo=False>>=
+coefficient, p_value = stats.pearsonr(extended_dataframe['Rating'], extended_dataframe['Number of tropes'])
+@
+
+Coefficient = <%=coefficient%> \\
+p-value: <%=p_value%>
+
 <<fig=True, width="12cm", f_pos="h">>=
 extended_dataframe.plot.scatter(x='Rating', y='Number of tropes', color='DarkBlue', label='Films')
 @
 
-Scatter plot: Votes vs Number of tropes
+\subsubsection{Votes vs Number of tropes}
+<<echo=False>>=
+coefficient, p_value = stats.pearsonr(extended_dataframe['Votes'], extended_dataframe['Number of tropes'])
+@
+
+Coefficient = <%=coefficient%> \\
+p-value: <%=p_value%>
+
 <<fig=True, width="12cm", f_pos="h">>=
 extended_dataframe.plot.scatter(x='Votes', y='Number of tropes', color='DarkGreen', label='Films')
 @
 
-Scatter plot: Year vs Number of tropes
+\subsubsection{Year vs Number of tropes}
+<<echo=False>>=
+coefficient, p_value = stats.pearsonr(extended_dataframe['Year'], extended_dataframe['Number of tropes'])
+@
+
+Coefficient = <%=coefficient%> \\
+p-value: <%=p_value%>
+
 <<fig=True, width="12cm", f_pos="h">>=
 extended_dataframe.plot.scatter(x='Year', y='Number of tropes', color='DarkRed', label='Films')
 @
