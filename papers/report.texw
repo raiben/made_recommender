@@ -6,18 +6,28 @@ import os
 import pandas as pd
 import textwrap
 from tabulate import tabulate
+import re
+from io import StringIO
 
 FILM_TROPES_JSON_BZ2_FILE = '../datasets/scraper/cache/20190501/films_tropes_20190501.json.bz2'
+FILM_EXTENDED_DATASET_BZ2_FILE = '../datasets/extended_dataset.csv.bz2'
 SCRAPER_LOG_FILE = '../logs/scrape_tvtropes_20190501_20190512_191015.log'
 MAPPER_LOG_FILE = '../logs/map_films_20190526_164459.log'
 TOP_VALUES = 25
 
+data = {}
 
 def read_compressed_json(file_path):
+    if file_path in data:
+        return data[file_path]
+
     with open(file_path, 'rb') as file:
         compressed_content = file.read()
-    content = bz2.decompress(compressed_content)
-    return json.loads(content)
+    content_bytes = bz2.decompress(compressed_content)
+    content = json.loads(content_bytes.decode('utf-8'))
+
+    data[file_path] = content
+    return content
 
 
 def reverse_dictionary(original_dictionary):
@@ -45,7 +55,6 @@ def draw_graphviz(dot, filename):
 def get_table_for_dataframe(df, **kwargs):
     return tabulate(df, headers=df, tablefmt='latex_raw', **kwargs)
 
-import re
 
 def tex_wrap_and_escape(text, length=40):
     if isinstance(text, str):
@@ -95,6 +104,26 @@ def get_experiment_execution_information(log_file_path):
     output_dataframe = pd.DataFrame(processed_dictionary)
     return input_dataframe, output_dataframe
 
+
+def read_dataframe(file_path):
+    if file_path in data:
+        return data[file_path]
+
+    if file_path.endswith('csv.bz2'):
+        content = None
+
+        file_hdf = file_path.replace('csv.bz2','h5')
+        if os.path.isfile(file_hdf):
+            content = pd.read_hdf(file_hdf)
+        else:
+            with open(file_path, 'rb') as file:
+                compressed_content = file.read()
+            csv_content = bz2.decompress(compressed_content)
+            content = pd.read_csv(StringIO(csv_content))
+            content.to_hdf(file_hdf,'tripdata')
+
+    data[file_path] = content
+    return content
 
 @
 \documentclass[11pt,final]{article}
@@ -582,28 +611,6 @@ Output values:
 
 \subsection{Nature of the data extracted}
 
-<<>>=
-import bz2
-import json
-
-
-def read_compressed_json(file_path):
-    with open(file_path, 'rb') as file:
-        compressed_content = file.read()
-    content = bz2.decompress(compressed_content)
-    return json.loads(content)
-
-
-def reverse_dictionary(original_dictionary):
-    reversed_dictionary = {}
-    for key, value in original_dictionary.items():
-        for element in value:
-            if element not in reversed_dictionary:
-                reversed_dictionary[element] = []
-            reversed_dictionary[element].append(key)
-    return reversed_dictionary
-@
-
 Reading the content of the dataset:
 <<>>=
 films_dictionary = read_compressed_json(FILM_TROPES_JSON_BZ2_FILE)
@@ -759,8 +766,30 @@ Output values:
 
 <%=print(latex_output)%>
 
-\subsection{Matching TVTropes and IMDB identifiers}
+\subsection{Data Analysis}
 
+<<echo=False>>=
+EVERYTHING_BUT_TROPES = ['Id','NameTvTropes', 'NameIMDB', 'Rating', 'Votes', 'Year']
+
+extended_dataframe = read_dataframe(FILM_EXTENDED_DATASET_BZ2_FILE)
+trope_names = [key for key in extended_dataframe.keys() if key not in EVERYTHING_BUT_TROPES and '[GENRE]' not in key]
+extended_dataframe['Number of tropes'] = sum(getattr(extended_dataframe,key) for key in trope_names)
+@
+
+Scatter plot: Rating vs Number of tropes
+<<fig=True, width="12cm", f_pos="h">>=
+extended_dataframe.plot.scatter(x='Rating', y='Number of tropes', color='DarkBlue', label='Films')
+@
+
+Scatter plot: Votes vs Number of tropes
+<<fig=True, width="12cm", f_pos="h">>=
+extended_dataframe.plot.scatter(x='Votes', y='Number of tropes', color='DarkGreen', label='Films')
+@
+
+Scatter plot: Year vs Number of tropes
+<<fig=True, width="12cm", f_pos="h">>=
+extended_dataframe.plot.scatter(x='Year', y='Number of tropes', color='DarkRed', label='Films')
+@
 
 \section{Deep larning to predict the quality based on the tropes}
 
