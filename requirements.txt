@@ -9,3 +9,4 @@ tabulate==0.8.3
 pandas==0.23.1
 requests==2.21.0
 scikit_learn==0.20.3
+matplotlib==2.2.2

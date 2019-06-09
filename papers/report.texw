@@ -9,6 +9,7 @@ from tabulate import tabulate
 import re
 from io import StringIO
 import scipy.stats  as stats
+import matplotlib.pyplot as plt
 
 FILM_TROPES_JSON_BZ2_FILE = '../datasets/scraper/cache/20190501/films_tropes_20190501.json.bz2'
 FILM_EXTENDED_DATASET_BZ2_FILE = '../datasets/extended_dataset.csv.bz2'
@@ -775,6 +776,18 @@ EVERYTHING_BUT_TROPES = ['Id','NameTvTropes', 'NameIMDB', 'Rating', 'Votes', 'Ye
 extended_dataframe = read_dataframe(FILM_EXTENDED_DATASET_BZ2_FILE)
 trope_names = [key for key in extended_dataframe.keys() if key not in EVERYTHING_BUT_TROPES and '[GENRE]' not in key]
 extended_dataframe['Number of tropes'] = sum(getattr(extended_dataframe,key) for key in trope_names)
+@
+
+\subsubsection{Rating vs Votes, coloured by Number of tropes}
+<<echo=False>>=
+coefficient, p_value = stats.pearsonr(extended_dataframe['Rating'], extended_dataframe['Votes'])
+@
+
+Coefficient = <%=coefficient%> \\
+p-value: <%=p_value%>
+
+<<fig=True, width="12cm", f_pos="h">>=
+extended_dataframe.plot.scatter(x='Rating', y='Votes', c='Number of tropes', cmap=plt.cm.winter, label='Number of tropes')
 @
 
 \subsubsection{Rating vs Number of tropes}
