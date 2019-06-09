@@ -25,7 +25,7 @@ pip install -r requirements.txt
 ``` 
 
 If you make changes and need to rebuild the requirements.txt, 
-do it  through ```pireqs```.
+do it  through ```pipreqs```.
 
 ```console
 pip3 install pipreqs
