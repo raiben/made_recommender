@@ -121,7 +121,7 @@ def read_dataframe(file_path):
             with open(file_path, 'rb') as file:
                 compressed_content = file.read()
             csv_content = bz2.decompress(compressed_content)
-            content = pd.read_csv(StringIO(csv_content))
+            content = pd.read_csv(StringIO(csv_content.decode('utf-8')))
             content.to_hdf(file_hdf,'tripdata')
 
     data[file_path] = content
