@@ -13,6 +13,7 @@ import matplotlib.pyplot as plt
 
 FILM_TROPES_JSON_BZ2_FILE = '../datasets/scraper/cache/20190501/films_tropes_20190501.json.bz2'
 FILM_EXTENDED_DATASET_BZ2_FILE = '../datasets/extended_dataset.csv.bz2'
+USE_HDF = True
 SCRAPER_LOG_FILE = '../logs/scrape_tvtropes_20190501_20190512_191015.log'
 MAPPER_LOG_FILE = '../logs/map_films_20190526_164459.log'
 TOP_VALUES = 25
@@ -122,7 +123,8 @@ def read_dataframe(file_path):
                 compressed_content = file.read()
             csv_content = bz2.decompress(compressed_content)
             content = pd.read_csv(StringIO(csv_content.decode('utf-8')))
-            content.to_hdf(file_hdf,'tripdata')
+            if USE_HDF:
+                content.to_hdf(file_hdf,'tripdata')
 
     data[file_path] = content
     return content
