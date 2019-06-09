@@ -21,7 +21,7 @@ If you don't, please follow the tutorial form realpython:
 
 To install the requirements, please use:
 ```console
-pip intall -r requirements.txt
+pip install -r requirements.txt
 ``` 
 
 If you make changes and need to rebuild the requirements.txt, 
@@ -168,7 +168,7 @@ Scripts to merge information from the
 scrapped data (from TVTropes) and IMDB databases, by name 
 of the film and year.
 
-### Before start 📎
+### Before starting 📎
 
 IMDb Datasets are a compendium of information that IMDb offers fpr personal and 
 non-commercial use. Both conditions of use and dataset descriptions are explained in
@@ -176,9 +176,9 @@ https://www.imdb.com/interfaces/.
 
 MADE Recommender makes use of these datasets to extend the film information from TVTropes.
 
-Please, **download the files** ```title.basics.tsv.gz``` and ```title.ratings.tsv.gz```
+Please, **download the files** `title.basics.tsv.gz` and `title.ratings.tsv.gz`
 from https://datasets.imdbws.com/, **unzip** them and store ths tsv files into the 
-```datasets``` folder.
+`datasets` folder.
 
 - title.basics.tsv: contains metadata from the films such as the title, the year, the genres
 and the duration.
