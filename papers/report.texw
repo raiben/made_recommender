@@ -129,6 +129,30 @@ def read_dataframe(file_path):
     data[file_path] = content
     return content
 
+def plot_regression(dataframe, x_column, y_column, color='red'):
+    Y = dataframe[y_column]
+    X = dataframe[x_column]
+
+    X=X.values.reshape(len(X),1)
+    Y=Y.values.reshape(len(Y),1)
+
+    # Split the data into training/testing sets
+    X_train = X[:-250]
+    X_test = X[-250:]
+
+    # Split the targets into training/testing sets
+    Y_train = Y[:-250]
+    Y_test = Y[-250:]
+
+    from sklearn import datasets, linear_model
+    regr = linear_model.LinearRegression()
+
+    # Train the model using the training sets
+    regr.fit(X_train, Y_train)
+
+    # Plot outputs
+    plt.plot(X_test, regr.predict(X_test), color=color, linewidth=3, )
+
 @
 \documentclass[11pt,final]{article}
 \usepackage{fancyvrb, color, graphicx, hyperref, amsmath, url}
@@ -795,6 +819,7 @@ p-value: <%=p_value%>
 
 <<fig=True, width="12cm", f_pos="h">>=
 extended_dataframe.plot.scatter(x='Rating', y='Votes', c='Number of tropes', cmap=plt.cm.winter, label='Number of tropes')
+plot_regression(extended_dataframe, 'Rating', 'Votes')
 @
 
 \subsubsection{Rating vs Number of tropes}
@@ -807,6 +832,7 @@ p-value: <%=p_value%>
 
 <<fig=True, width="12cm", f_pos="h">>=
 extended_dataframe.plot.scatter(x='Rating', y='Number of tropes', color='DarkBlue', label='Films')
+plot_regression(extended_dataframe, 'Rating', 'Number of tropes')
 @
 
 \subsubsection{Votes vs Number of tropes}
@@ -819,6 +845,7 @@ p-value: <%=p_value%>
 
 <<fig=True, width="12cm", f_pos="h">>=
 extended_dataframe.plot.scatter(x='Votes', y='Number of tropes', color='DarkGreen', label='Films')
+plot_regression(extended_dataframe, 'Votes', 'Number of tropes')
 @
 
 \subsubsection{Year vs Number of tropes}
@@ -831,6 +858,7 @@ p-value: <%=p_value%>
 
 <<fig=True, width="12cm", f_pos="h">>=
 extended_dataframe.plot.scatter(x='Year', y='Number of tropes', color='DarkRed', label='Films')
+plot_regression(extended_dataframe, 'Year', 'Number of tropes', 'blue')
 @
 
 \section{Deep larning to predict the quality based on the tropes}
