@@ -245,12 +245,17 @@ sys.path.append(os.getcwd())
 \maketitle
 
 \begin{abstract}
+% The purpose of the abstract is to show what we are doing and why, and how it  interacts with other papers.
+% Abstract can't be meta-narrative or tautological - JJ
   The purpose of this document is to show the progress of the current research and
   the different approaches and experiments designed, executed and interpreted,
   regarding a system to recommend tropes for a film.
+% Recomend tropes for a film or for a plot? Why do we want to recommend tropes?
+% Purpose is clear, but the objetive is kind of vague. Restrict yourself to what you are going to be doing in this document - JJ
   Later on, the different sections can be extracted and use for different articles.
   This document is internal and in continuous progress, so it may change profoundly
   from its creation.
+% This last sentence should be a comment (or an issue)- JJ
 \end{abstract}
 
 
