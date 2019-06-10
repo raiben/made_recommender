@@ -115,6 +115,33 @@ def build_paper(context):
     build_paper_latex(context)
     build_paper_pdf(context)
 
+@task
+def build_paper_latex_expert_systems(context):
+    print("Building latex file and figures through pweave ...")
+    command = 'cd papers && pweave -f texminted paper_expert_systems.texw'
+    run(command, hide=False, warn=True)
+
+
+@task
+def build_paper_pdf_expert_systems(context):
+    print("Building pdf through pdflatex ...")
+    command = 'cd papers ' \
+              '&& pdflatex -shell-escape paper_expert_systems.tex ' \
+              '&& bibtex paper_expert_systems.aux ' \
+              '&& pdflatex -shell-escape paper_expert_systems.tex ' \
+              '&& pdflatex -shell-escape paper_expert_systems.tex'
+    run(command, hide=False, warn=True)
+
+
+@task
+def build_paper_expert_systems(context):
+    """
+    Cleans and build the paper using pweave, pdflatex and bibtex.
+    Output file: report.pdf
+    """
+    clean_paper(context)
+    build_paper_latex_expert_systems(context)
+    build_paper_pdf_expert_systems(context)
 
 if __name__ == "__main__":
     import sys
