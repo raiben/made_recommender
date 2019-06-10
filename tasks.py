@@ -116,32 +116,32 @@ def build_paper(context):
     build_paper_pdf(context)
 
 @task
-def build_paper_latex_expert_systems(context):
+def build_paper_latex_expert_systems_2019(context):
     print("Building latex file and figures through pweave ...")
-    command = 'cd papers && pweave -f texminted paper_expert_systems.texw'
+    command = 'cd papers && pweave -f texminted paper_expert_systems_2019.texw'
     run(command, hide=False, warn=True)
 
 
 @task
-def build_paper_pdf_expert_systems(context):
+def build_paper_pdf_expert_systems_2019(context):
     print("Building pdf through pdflatex ...")
     command = 'cd papers ' \
-              '&& pdflatex -shell-escape paper_expert_systems.tex ' \
-              '&& bibtex paper_expert_systems.aux ' \
-              '&& pdflatex -shell-escape paper_expert_systems.tex ' \
-              '&& pdflatex -shell-escape paper_expert_systems.tex'
+              '&& pdflatex -shell-escape paper_expert_systems_2019.tex ' \
+              '&& bibtex paper_expert_systems_2019.aux ' \
+              '&& pdflatex -shell-escape paper_expert_systems_2019.tex ' \
+              '&& pdflatex -shell-escape paper_expert_systems_2019.tex'
     run(command, hide=False, warn=True)
 
 
 @task
-def build_paper_expert_systems(context):
+def build_paper_expert_systems_2019(context):
     """
     Cleans and build the paper using pweave, pdflatex and bibtex.
     Output file: report.pdf
     """
     clean_paper(context)
-    build_paper_latex_expert_systems(context)
-    build_paper_pdf_expert_systems(context)
+    build_paper_latex_expert_systems_2019(context)
+    build_paper_pdf_expert_systems_2019(context)
 
 if __name__ == "__main__":
     import sys
