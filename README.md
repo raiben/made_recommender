@@ -231,3 +231,9 @@ Options:
   none
 ```
 
+### New paper
+
+You have to do these in turn:
+
+    invoke build-paper-latex-expert-systems-2019
+    invoke build-paper-pdf-expert-systems-2019
