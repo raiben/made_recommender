@@ -6,3 +6,5 @@ _minted-report
 *.out
 *.pdf
 *.tex
+*.pyg
+*.pag

@@ -25,7 +25,7 @@ pip install -r requirements.txt
 ``` 
 
 If you make changes and need to rebuild the requirements.txt, 
-do it  through ```pireqs```.
+do it  through ```pipreqs```.
 
 ```console
 pip3 install pipreqs
@@ -231,3 +231,9 @@ Options:
   none
 ```
 
+### New paper
+
+You have to do these in turn:
+
+    invoke build-paper-latex-expert-systems-2019
+    invoke build-paper-pdf-expert-systems-2019
