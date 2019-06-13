@@ -3,6 +3,7 @@ import os
 from invoke import task, run
 
 from mapper.film_mapper import FilmMapper
+from rating_evaluator.evaluator_builder import EvaluatorBuilder
 from tvtropes_scraper.tvtropes_scraper import TVTropesScraper
 
 
@@ -51,6 +52,22 @@ def _check_file_exists(parameter, file_name):
         print(f'Please, provide a valid path for {parameter}')
         exit(1)
 
+@task
+def build_evaluator(context, extended_dataset, target_folder='datasets/'):
+    """
+    Builds an evaluator using a Neural Network trained with the extended dataset.
+    The inputs of the evaluator are the tropes of the film and the output is the rating.
+
+    :type extended_dataset: path of the csv/h5 file that contains the extended information from the films
+    :type target_file: file that will keep the pickled evaluator, so it can be loaded and used later on
+
+    """
+    FilmMapper.set_logger_file_id('build_evaluator')
+
+    evaluator = EvaluatorBuilder(extended_dataset)
+    evaluator.run()
+    evaluator.pickle(target_folder)
+    evaluator.finish()
 
 @task
 def show_genres(search_query, page=0, results=10):

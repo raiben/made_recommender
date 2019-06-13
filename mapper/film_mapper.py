@@ -78,8 +78,6 @@ class FilmMapper(BaseScript):
         self._write_dataset()
         self._finish_and_summary()
 
-        pass
-
     def _load_information_from_imdb_dataset(self):
         self.films_in_imdb = []
         self.films_in_imdb_by_id = {}
