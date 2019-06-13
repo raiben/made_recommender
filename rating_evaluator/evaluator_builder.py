@@ -49,7 +49,7 @@ class EvaluatorBuilder(BaseScript):
 
         self.neural_network = MLPRegressor(activation='relu', alpha=0.0001,
                                            hidden_layer_sizes=(self.layer_sizes[1], self.layer_sizes[2]),
-                                           solver='adam', max_iter=40, verbose=True)
+                                           solver='adam', max_iter=400, verbose=True)
         self.neural_network.fit(inputs, outputs)
 
     def pickle(self, target_folder):
