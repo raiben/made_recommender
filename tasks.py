@@ -53,18 +53,19 @@ def _check_file_exists(parameter, file_name):
         exit(1)
 
 @task
-def build_evaluator(context, extended_dataset, target_folder='datasets/'):
+def build_evaluator(context, extended_dataset, target_folder='datasets/', random_seed=0):
     """
     Builds an evaluator using a Neural Network trained with the extended dataset.
     The inputs of the evaluator are the tropes of the film and the output is the rating.
 
     :type extended_dataset: path of the csv/h5 file that contains the extended information from the films
     :type target_file: file that will keep the pickled evaluator, so it can be loaded and used later on
+    :type random_seed: a number to use as random seed (executions with the same seed give the same results)
 
     """
     FilmMapper.set_logger_file_id('build_evaluator')
 
-    evaluator = EvaluatorBuilder(extended_dataset)
+    evaluator = EvaluatorBuilder(extended_dataset, random_seed=int(random_seed))
     evaluator.run()
     evaluator.pickle(target_folder)
     evaluator.finish()

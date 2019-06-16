@@ -9,7 +9,7 @@ from tabulate import tabulate
 class BaseScript(object):
     _logger = logging.getLogger(__name__)
     logging.basicConfig(level=logging.INFO, format='%(asctime)s %(name)-12s %(levelname)-8s %(message)s',
-                        datefmt='%m-%d %H:%M:%m', )
+                        datefmt='%m-%d %H:%M:%S', )
 
     def __init__(self, parameters_dictionary):
         self.datetime_start = datetime.now()
