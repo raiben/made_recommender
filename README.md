@@ -231,7 +231,7 @@ Options:
   none
 ```
 
-### New paper
+### Building new paper
 
 You have to do these in turn:
 
