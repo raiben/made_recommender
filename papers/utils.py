@@ -12,7 +12,6 @@ from tabulate import tabulate
 
 data = {}
 
-
 def read_compressed_json(file_path):
     if file_path in data:
         return data[file_path]
@@ -60,7 +59,7 @@ def tex_wrap_and_escape(text, length=40):
             wrapped_text = '\makecell[tl]{' + wrapped_text.replace('\n', ' \\\\ ') + '}'
         return tex_escape(wrapped_text)
     if isinstance(text, list):
-        text = ', '.join(text)
+        text = ', '.join([str(element) for element in text])
         return tex_wrap_and_escape(text)
     return text
 

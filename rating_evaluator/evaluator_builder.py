@@ -7,7 +7,9 @@ import os
 from io import StringIO
 
 import pandas as pd
-from sklearn.externals import joblib
+import pygraphviz
+from pandas.io import pytables
+
 from sklearn.neural_network import MLPRegressor
 
 from common.base_script import BaseScript
