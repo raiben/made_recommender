@@ -135,28 +135,13 @@ and improvement of quality films in the context of authoring tools and Content G
 % Intenta responder a: Por qué generar o mejorar el conjunto de tropos (sistemas complejos +  guiones + videojuegos, etc)
 
 % Intenta responder a: La metodología (no imagen, solo explicar los pasos de manera general)
-Our methodology is divided in four main steps:
-\begin{itemize}
-    \item[Step 1] Extract/scrape the tropes for every film
-    and codify them as \textit{Film DNAs}.
-    As we will see, our dataset will have limitations derived
-    from the fact that it is fed from
-    the community, finding that popular films are broadly described in terms of tropes
-    and unpopular films poorly described or directly missing.
-    \item[Step 2] Map the films' features such as the rating and genres to the previously built
-    \textit{Film DNAs}. This \textit{extended dataset}  will show limitations as well
-    based on the limitations from the original one
-    and the automatic matching based on different heuristics.
-    As we will see, A trope that is widely used doesn't need to be linked to good ratings,
-    tropes that are present in bad films can be become good in different combinations and vice-versa.
-    \item[Step 3] Build a Neural Network to predict the rating from a \textit{Film DNA}.
-    We will follow different \textit{rules of the thumb}
-    to achieve a moderately good solution that serves our purposes.
-    The neural network will handle the unknown relations between tropes and their combinations.
-    \item[Step 3] Build a Genetic Algorithm with specific operators
-    that relies in the Neural Network as surrogate model
-    to build new constrained \textit{Film DNAs} that optimize the expected rating.
-\end{itemize}
+Our approach extracts the tropes, the ratings and the \textit{Film DNAs}
+from external Data Sources in order to build what we have called the \textit{Extended Dataset},
+a set of XXX films that links to XXX tropes and the rating.
+We use a Genetic Algorithm to build a \textit{Film DNA}
+that maximizes the rating evaluated through a surrogate model:
+a \textit{Neural Network} that is trained with the \textit{Extended Dataset}
+and is able to predict the rating from the \textit{Film DNA}.
 
 % Intenta explicar: Los experimentos que vamos a hacer
 The effect of the different parameters for the Genetic Algorithm
@@ -176,6 +161,30 @@ by adding tropes that will increase the quality of the film.
 % TODO: conclusión: lo que vamos a hacer es mejor
 
 \section{Methodology}
+
+Our methodology is divided in four main steps:
+
+\begin{itemize}
+    \item[Step 1] Extract/scrape the tropes for every film
+    and codify them as \textit{Film DNAs}.
+    As we will see, our dataset will have limitations derived
+    from the fact that it is fed from
+    the community, finding that popular films are broadly described in terms of tropes
+    and unpopular films poorly described or directly missing.
+    \item[Step 2] Map the films' features such as the rating and genres to the previously built
+    \textit{Film DNAs}. This \textit{extended dataset}  will show limitations as well
+    based on the limitations from the original one
+    and the automatic matching based on different heuristics.
+    As we will see, A trope that is widely used doesn't need to be linked to good ratings,
+    tropes that are present in bad films can be become good in different combinations and vice-versa.
+    \item[Step 3] Build a Neural Network to predict the rating from a \textit{Film DNA}.
+    We will follow different \textit{rules of the thumb}
+    to achieve a moderately good solution that serves our purposes.
+    The neural network will handle the unknown relations between tropes and their combinations.
+    \item[Step 4] Build a Genetic Algorithm with specific operators
+    that relies in the Neural Network as surrogate model
+    to build new constrained \textit{Film DNAs} that optimize the expected rating.
+\end{itemize}
 
 % TODO: Diagrama y explicar los pasos
 <<echo=False>>=
