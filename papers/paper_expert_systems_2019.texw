@@ -73,16 +73,21 @@ T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
 
 \section{Introduction}\label{sec1}
 
-Measuring the quality of a film is hard because there are complex and subjective components
-that require, in most of the cases, the human evaluation and interpretation; % TODO: cite required
-however, if we want to achieve the goal of building an authoring tool to help
-on the design of films from the quality perspective, we need a way to describe a film
-and a way to evaluate the quality: our candidates for both mechanisms are out there,
-tropes and human-evaluated ratings, respectively.
+Crafting quality films is quite challenging, according to ~\cite{Hennig-Thurau2019},
+because of the plot complexities and the \textit{multiplicative production function} of entertainment,
+in other words, the elements need to work together and a single failing one can provoke a disaster in cascade.
+That is why, in the current research, in order to build an authoring tool to help
+on the design of films from the quality perspective, we are counting with the experts' contributions
+to, both, model the films in a way that describes them from many perspectives, and have a measure of quality
+that summarizes all the perspectives in 360 degrees,
+considering the \textit{multiplicative production function} as well.
+Our candidates for both mechanisms are out there,
+tropes or patterns that have been discovered in the films, and the massive human-evaluated ratings, respectively.
 
 % Intenta responder a: que son los tropos y por que nos importan
 
-A trope can be defined as a recurring narrative device~\cite{baldick2015oxford};
+We can model a film by using the set of tropes that we can find in it.
+A trope is as a recurring narrative device~\cite{baldick2015oxford};
 it can be a technique, a motif, an archetype or a \textit{clich\'e},
 used by the authors to achieve specific effects that might vary from increasing
 the interest, surprising, recall familiarity, entertaining, etc,
@@ -162,7 +167,8 @@ by adding tropes that will increase the quality of the film.
 
 \section{Methodology}
 
-Our methodology is divided in four main steps:
+Our methodology is divided in four main steps, explained below and described
+in the figure~\ref{fig:main_workflow_extended}:
 
 \begin{itemize}
     \item[Step 1] Extract/scrape the tropes for every film
@@ -235,7 +241,7 @@ draw_graphviz(workflow, "main_workflow_extended.pdf")
 \centering
 \includegraphics[width=\textwidth]{figures/main_workflow_extended.pdf}
 \caption[Methodology]{Methodology to generate constrained optimal Film DNAs using Genetic Algorithms with Neural
-Networks as surrogate models, fed from TVTropes and IMDb.}
+Networks as surrogate models, fed from TVTropes and IMDb.\label{fig:main_workflow_extended}}
 \end{figure}
 
 
