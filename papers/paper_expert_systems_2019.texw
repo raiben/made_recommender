@@ -1,3 +1,22 @@
+<<echo=False>>=
+import os
+import pandas as pd
+import scipy.stats  as stats
+import matplotlib.pyplot as plt
+import sys
+sys.path.append(os.getcwd())
+
+from utils import *
+
+FILM_TROPES_JSON_BZ2_FILE = '../datasets/scraper/cache/20190501/films_tropes_20190501.json.bz2'
+FILM_EXTENDED_DATASET_BZ2_FILE = '../datasets/extended_dataset.csv.bz2'
+USE_HDF = True
+SCRAPER_LOG_FILE = '../logs/scrape_tvtropes_20190501_20190512_191015.log'
+MAPPER_LOG_FILE = '../logs/map_films_20190526_164459.log'
+EVALUATOR_BUILDER_LOG_FILE = '../logs/build_evaluator_20190616_211935.log'
+TOP_VALUES = 25
+@
+
 \documentclass[APA,LATO1COL]{WileyNJD-v2}
 \usepackage{moreverb}
 
@@ -54,16 +73,11 @@ T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
 
 \section{Introduction}\label{sec1}
 
-The goal of the paper is to demonstrate
-how computational intelligence can use film tropes to help on the creation
-and improvement of quality films in the context of authoring tools and Content Generation.
-% Intenta responder a: Por qué generar o mejorar el conjunto de tropos (sistemas complejos +  guiones + videojuegos, etc)
-
 Measuring the quality of a film is hard because there are complex and subjective components
 that require, in most of the cases, the human evaluation and interpretation; % TODO: cite required
 however, if we want to achieve the goal of building an authoring tool to help
 on the design of films from the quality perspective, we need a way to describe a film
-and a way to evaluate the quality: our candidates for both metrics are out there,
+and a way to evaluate the quality: our candidates for both mechanism are out there,
 tropes and human-evaluated ratings, respectively.
 
 % Intenta responder a: que son los tropos y por que nos importan
@@ -82,64 +96,73 @@ name~\cite{bitsilli1983chekhov},
 but there are thousands of not-so-widely used tropes as well, discovered and
 catalogued everyday by professionals and enthusiastic of the storytelling;
 their study is organic, dynamic and extensive.
-
-In this paper, will call \textit{Trope Signature} to the set of tropes
+In this paper, will call \textit{Film DNA} to the set of tropes
 that we are able to find in a film
 and define the structure, characters, events, mood, settings, narration, etc.
-Different \textit{Trope Signatures} generate different stories.
 As the tropes are \textit{living concepts},
 which grow as they are discovered as common
-patterns in other stories, the \textit{Trope Signature} is, by definition, incomplete and evolving,
+patterns in other stories, the \textit{Film DNA} is, by definition, incomplete and evolving,
 yet it is still interesting to define stories, catalog them
 and model them from a mathematical perspective.
 
 % Intenta responder a: Que es la calidad (muy difícil + subjetivo -> rating es un indicador)
-At the same time, our goal includes the words quality/compelling,
-so we need to be able to add these features to our \textit{Tropes Signatures} and interpret them,
-otherwise they are useless for our goal.
+At the same time, we need to be able to link a measure of quality to the \textit{Film DNA}
+and it is a complex metric.
 Luckily we have access to databases with films' information
-that includes the popularity of the films and their human evaluated ratings,
+that include the popularity of the films and their human evaluated ratings,
 provided by the community of fans,
 so we can rely in these evaluations as a measure of quality and add it to our model,
 in order to process them, make new evaluations and suggestions.
 
-Given this model, that has \textit{Trope Signatures} and ratings,
+Given this model, that has \textit{Film DNAs} and ratings,
 the first thing to confirm is that there are correlations
-and internal relations between the \textit{Tropes Signature}
-so we can predict the rating from a \textit{Trope Signature}.
-Intuitively, this method will not guarantee the quality of a film,
-as a signature can lead to infinite implementations/films with different qualities
+and internal relations between the \textit{Film DNAs} and the ratings
+so we can predict the rating from a \textit{Film DNA}.
+Furthermore, even though intuitively
+the \textit{Film DNA} is a profound way to describe a story
+from many different perspectives, following the analogy of the DNA,
+there are environmental factors that could deeply affect the performance of the story as well.
+This method might not guarantee the quality of a film,
+as a \textit{Film DNA} can lead to infinite implementations/films with different qualities
 and there are many parameters to consider
-that are not reflected in the \textit{Tropes Signature};
+that are not reflected in the \textit{Film DNA}.
 however, it can be used as an indicator of the potential of the story or the
 most probable implementation based on the universe of currently analyzed films.
+
+The goal of the paper is to demonstrate
+how computational intelligence can use film tropes to help on the creation
+and improvement of quality films in the context of authoring tools and Content Generation.
+% Intenta responder a: Por qué generar o mejorar el conjunto de tropos (sistemas complejos +  guiones + videojuegos, etc)
 
 % Intenta responder a: La metodología (no imagen, solo explicar los pasos de manera general)
 Our methodology is divided in four main steps:
 \begin{itemize}
     \item[Step 1] Extract/scrape the tropes for every film
-    and codify them as \textit{Trope Signatures}.
+    and codify them as \textit{Film DNAs}.
     As we will see, our dataset will have limitations derived
     from the fact that it is fed from
     the community, finding that popular films are broadly described in terms of tropes
-    and unpopular films poorly described or missing.
+    and unpopular films poorly described or directly missing.
     \item[Step 2] Map the films' features such as the rating and genres to the previously built
-    \textit{Tropes Signatures}. The \textit{extended dataset}  will show limitations as well
+    \textit{Film DNAs}. This \textit{extended dataset}  will show limitations as well
     based on the limitations from the original one
     and the automatic matching based on different heuristics.
-    \item[Step 3] Build a Neural Network to predict the rating from a \textit{Trope Signature}.
-    We wil follow different \textit{rules of the thumb}
+    As we will see, A trope that is widely used doesn't need to be linked to good ratings,
+    tropes that are present in bad films can be become good in different combinations and vice-versa.
+    \item[Step 3] Build a Neural Network to predict the rating from a \textit{Film DNA}.
+    We will follow different \textit{rules of the thumb}
     to achieve a moderately good solution that serves our purposes.
+    The neural network will handle the unknown relations between tropes and their combinations.
     \item[Step 3] Build a Genetic Algorithm with specific operators
     that relies in the Neural Network as surrogate model
-    to build new constrained \textit{Trope Signatures} that optimize the expected rating.
+    to build new constrained \textit{Film DNAs} that optimize the expected rating.
 \end{itemize}
 
 % Intenta explicar: Los experimentos que vamos a hacer
 The effect of the different parameters for the Genetic Algorithm
 will be tested in two different experiments:
-An attempt to find the \textit{Trope Signature} with the highest expected rating for a fixed set size
-and an attempt to \textit{improve} an existing \textit{Trope Signature}
+An attempt to find the \textit{Film DNA} with the highest expected rating for a fixed set size
+and an attempt to \textit{improve} an existing \textit{Film DNA}
 by adding tropes that will increase the quality of the film.
 
 % TODO:El resto del paper…
@@ -153,7 +176,60 @@ by adding tropes that will increase the quality of the film.
 % TODO: conclusión: lo que vamos a hacer es mejor
 
 \section{Methodology}
+
 % TODO: Diagrama y explicar los pasos
+<<echo=False>>=
+films_dictionary = read_compressed_json(FILM_TROPES_JSON_BZ2_FILE)
+tropes_dictionary = reverse_dictionary(films_dictionary)
+
+
+n_films = len(films_dictionary.keys())
+n_tropes = len(tropes_dictionary.keys())
+
+
+workflow = f'''
+digraph {{
+    splines=polyline
+    rankdir=LR
+    margin=0;
+    graph [ resolution=128, fontsize=14];
+
+    node [margin=0 fontcolor=black fontsize=10 width=1];
+    tvtropes[label="TVTropes\nwebsite\n\ntvtropes.org" type="database"];
+    scrape_tropes[label="Step 1:\nScrape tropes\n\nPython+\nrequests+\nlxml+bz2\n~11.900 pages" type="process"];
+    dataset[label="Dataset\n\nfilms->tropes\n({n_films}->{n_tropes})" type="data"];
+    imdb[label="IMDB\ndatasets:\n\nwww.imdb.com\ninterfaces/" type="database"];
+    map_rating[label="Step 2:\nMap Genres\nand Rating\n\nPython+\nHeuristics+\nbz2" type="process"];
+    extended_dataset[label="Extended\nDataset\n\nFilm DNA +\nrating" type="data"];
+    build_recommender[label="Step 3:\nBuild\nRecommender\n\npandas+\nsklearn" type="process"];
+    recommender[label="Surrogate model\n\nNeural Network\nFilm DNA ->\nRating\n\nNLPRegressor\n(2 hidden layers)" type="tool"];
+    user[label="User's\npre-selected\ntropes" type="data"];
+    dna_builder[label="Step 4:\nGenetic Algorithm\nto Build\nFilm DNAs\n\ninspyred+\ncachetools" type="process"];
+    trope_sequence[label="Optimal\nFilm DNA" type="data"];
+
+    tvtropes -> scrape_tropes;
+    scrape_tropes -> dataset;
+    dataset -> map_rating;
+    imdb -> map_rating;
+    map_rating -> extended_dataset;
+    extended_dataset -> build_recommender;
+    build_recommender -> recommender;
+    recommender -> dna_builder
+    user -> dna_builder
+    dna_builder -> trope_sequence
+}}'''
+
+draw_graphviz(workflow, "main_workflow_extended.pdf")
+@
+
+\begin{figure}
+\centering
+\includegraphics[width=\textwidth]{figures/main_workflow_extended.pdf}
+\caption[Methodology]{Methodology to generate constrained optimal Film DNAs using Genetic Algorithms with Neural
+Networks as surrogate models, fed from TVTropes and IMDb.}
+\end{figure}
+
+
 % TODO: Extracción de tropos: Explicar brevemente el tema de TVTRopes, DBTropes y nuetsro scraper + explicar los datos (Gráficas y tops)
 % TODO: Mapeo con nota: Explicar brevemente el tema de iMDb y el mapeo + explicar los datos y correlaciones (gráficas)
 % TODO: Generación del modelo surrogado: Red Neuronal + descripción de parámetros estándar + decisiones + (en proceso de ver lo mínimo que hay que evaluar)

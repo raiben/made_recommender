@@ -37,9 +37,10 @@ def reverse_dictionary(original_dictionary):
 
 def draw_graphviz(dot, filename):
     new_dot = dot.replace('type="start"', 'shape="ellipse" margin=0.2')
-    new_dot = dot.replace('type="database"', 'shape="cylinder" margin=0.2')
+    new_dot = new_dot.replace('type="database"', 'shape="cylinder" margin=0.2')
+    new_dot = new_dot.replace('type="tool"', 'shape="box" margin=0.2')
     new_dot = new_dot.replace('type="process"', 'shape="box3d" margin=0.2 style="filled" fillcolor="gray91"')
-    new_dot = new_dot.replace('type="data"', 'shape="polygon" skew=.4 margin=0')
+    new_dot = new_dot.replace('type="data"', 'shape="polygon" skew=0.5 margin=0')
 
     G = pgv.AGraph(string=new_dot)
     G.layout(prog='dot')
