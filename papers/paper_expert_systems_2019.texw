@@ -77,7 +77,7 @@ Measuring the quality of a film is hard because there are complex and subjective
 that require, in most of the cases, the human evaluation and interpretation; % TODO: cite required
 however, if we want to achieve the goal of building an authoring tool to help
 on the design of films from the quality perspective, we need a way to describe a film
-and a way to evaluate the quality: our candidates for both mechanism are out there,
+and a way to evaluate the quality: our candidates for both mechanisms are out there,
 tropes and human-evaluated ratings, respectively.
 
 % Intenta responder a: que son los tropos y por que nos importan
@@ -102,16 +102,16 @@ and define the structure, characters, events, mood, settings, narration, etc.
 As the tropes are \textit{living concepts},
 which grow as they are discovered as common
 patterns in other stories, the \textit{Film DNA} is, by definition, incomplete and evolving,
-yet it is still interesting to define stories, catalog them
+yet it is still interesting to define stories, categorize them
 and model them from a mathematical perspective.
 
 % Intenta responder a: Que es la calidad (muy difícil + subjetivo -> rating es un indicador)
 At the same time, we need to be able to link a measure of quality to the \textit{Film DNA}
 and it is a complex metric.
 Luckily we have access to databases with films' information
-that include the popularity of the films and their human evaluated ratings,
+that includes the popularity of the films and their human evaluated ratings,
 provided by the community of fans,
-so we can rely in these evaluations as a measure of quality and add it to our model,
+so we can rely on these evaluations as a measure of quality and add it to our model,
 in order to process them, make new evaluations and suggestions.
 
 Given this model, that has \textit{Film DNAs} and ratings,
@@ -146,7 +146,7 @@ and is able to predict the rating from the \textit{Film DNA}.
 % Intenta explicar: Los experimentos que vamos a hacer
 The effect of the different parameters for the Genetic Algorithm
 will be tested in two different experiments:
-An attempt to find the \textit{Film DNA} with the highest expected rating for a fixed set size
+An attempt to find the \textit{Film DNA} with the highest expected rating for fixed set size
 and an attempt to \textit{improve} an existing \textit{Film DNA}
 by adding tropes that will increase the quality of the film.
 
@@ -176,7 +176,7 @@ Our methodology is divided in four main steps:
     based on the limitations from the original one
     and the automatic matching based on different heuristics.
     As we will see, A trope that is widely used doesn't need to be linked to good ratings,
-    tropes that are present in bad films can be become good in different combinations and vice-versa.
+    tropes that are present in bad films can become good in different combinations and vice-versa.
     \item[Step 3] Build a Neural Network to predict the rating from a \textit{Film DNA}.
     We will follow different \textit{rules of the thumb}
     to achieve a moderately good solution that serves our purposes.
