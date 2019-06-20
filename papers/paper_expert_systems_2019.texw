@@ -192,7 +192,7 @@ in the figure~\ref{fig:main_workflow_extended}:
     to build new constrained \textit{Film DNAs} that optimize the expected rating.
 \end{itemize}
 
-% TODO: Diagrama y explicar los pasos
+% DONE: Diagrama y explicar los pasos
 <<echo=False>>=
 films_dictionary = read_compressed_json(FILM_TROPES_JSON_BZ2_FILE)
 tropes_dictionary = reverse_dictionary(films_dictionary)
@@ -206,32 +206,34 @@ workflow = f'''
 digraph {{
     splines=polyline
     rankdir=LR
+    ranksep=0.25;
     margin=0;
-    graph [ resolution=128, fontsize=14];
+    nodesep=0.3;
+    graph [ resolution=128, fontsize=30];
 
     node [margin=0 fontcolor=black fontsize=10 width=1];
-    tvtropes[label="TVTropes\nwebsite\n\ntvtropes.org" type="database"];
+    tvtropes[label="TVTropes\nwebsite\n\ntvtropes.org\n " type="database"];
     scrape_tropes[label="Step 1:\nScrape tropes\n\nPython+\nrequests+\nlxml+bz2\n~11.900 pages" type="process"];
-    dataset[label="Dataset\n\nfilms->tropes\n({n_films}->{n_tropes})" type="data"];
-    imdb[label="IMDB\ndatasets:\n\nwww.imdb.com\ninterfaces/" type="database"];
+    dataset[label="Dataset\n\nfilms->tropes\n({n_films}->{n_tropes})\n " type="data"];
+    imdb[label="IMDB\ndatasets:\nimdb.com/\ninterfaces/" type="database"];
     map_rating[label="Step 2:\nMap Genres\nand Rating\n\nPython+\nHeuristics+\nbz2" type="process"];
     extended_dataset[label="Extended\nDataset\n\nFilm DNA +\nrating" type="data"];
-    build_recommender[label="Step 3:\nBuild\nRecommender\n\npandas+\nsklearn" type="process"];
-    recommender[label="Surrogate model\n\nNeural Network\nFilm DNA ->\nRating\n\nNLPRegressor\n(2 hidden layers)" type="tool"];
+    build_recommender[label="Step 3:\nBuild\nRecommender\n\npandas+\nsklearn\n " type="process"];
+    recommender[label="Surrogate model\n\nNeural Network\nFilm DNA ->\nRating\n\nNLPRegressor" type="tool"];
     user[label="User's\npre-selected\ntropes" type="data"];
     dna_builder[label="Step 4:\nGenetic Algorithm\nto Build\nFilm DNAs\n\ninspyred+\ncachetools" type="process"];
-    trope_sequence[label="Optimal\nFilm DNA" type="data"];
+    trope_sequence[label="Optimal\nFilm\nDNA" type="data"];
 
-    tvtropes -> scrape_tropes;
-    scrape_tropes -> dataset;
+    tvtropes -> scrape_tropes[minlen=0];
+    scrape_tropes -> dataset[minlen=1];
     dataset -> map_rating;
-    imdb -> map_rating;
+    imdb -> map_rating[minlen=0];
     map_rating -> extended_dataset;
     extended_dataset -> build_recommender;
     build_recommender -> recommender;
-    recommender -> dna_builder
-    user -> dna_builder
-    dna_builder -> trope_sequence
+    recommender -> dna_builder;
+    user -> dna_builder[minlen=0];
+    dna_builder -> trope_sequence;
 }}'''
 
 draw_graphviz(workflow, "main_workflow_extended.pdf")
@@ -246,6 +248,113 @@ Networks as surrogate models, fed from TVTropes and IMDb.\label{fig:main_workflo
 
 
 % TODO: Extracción de tropos: Explicar brevemente el tema de TVTRopes, DBTropes y nuetsro scraper + explicar los datos (Gráficas y tops)
+
+\subsection{Step 1: Extract the tropes}
+
+Tropes are described in a live wiki called \cite{tvtropes_2}, that is being
+collecting thousand of descriptions and examples of tropes from 2014 until now. As the data is fed by a community
+of users, we could find the bias that popular films are better described and analysed in terms of the tropes than independent
+films, and that popular tropes are more recognised than very specific ones.
+The semantic network of knowledge behind \textit{TVTropes.org} is huge and complex; it massively links hierarchies of tropes
+to their usage in creations for digital entertainment. The data, however, is only available through its web interface,
+which is why, in order to make it usable by the scientific community, \cite{maltekiesel_2} extracted all
+their data to a database so-called \textit{DBTropes.org}.\\
+
+As the base of the research on automatic trope generation, we begun with a dataset based in the
+latest version of DBTropes, called PicTropes\cite{garcia2018overview} that included 5,925 films with 18,270 tropes.
+However, the last version of BDTropes is from 2016, and the community of users of TVTropes has tripled the size
+of the database since then; if we work with the latest data from TVTropes our machine learning algorithms
+would benefit from having much entries and hence, provide better results. That's why our first step is to
+extract the data directly from TVTropes, as discussed in next section.
+
+
+<<echo=False>>=
+films_dictionary = read_compressed_json(FILM_TROPES_JSON_BZ2_FILE)
+tropes_dictionary = reverse_dictionary(films_dictionary)
+
+n_films = len(films_dictionary.keys())
+n_tropes = len(tropes_dictionary.keys())
+
+
+workflow = f'''
+digraph {{
+    splines=polyline
+    ranksep=0.3;
+    nodesep=0.3;
+    rankdir=LR
+    margin=0;
+    graph [ resolution=128, fontsize=30];
+
+    subgraph cluster_0 {{
+        style=invis
+        start [label="Start" type="start"]
+        extractcategories [label="Extract\nCategories" type="process"];
+        extractfilms [label="Extract\nFilms" type="process"];
+        extracttropes [label="Extract\nTropes" type="process"];
+        dataset1 [label="Dataset\n\nfilms->tropes\n({n_films}->{n_tropes})" type="data"];
+    }}
+    subgraph cluster_1 {{
+        style=invis
+        retrievepage[label="Retrieve\nPage" type="process"];
+    }}
+    subgraph cluster_2 {{
+        style=invis
+        filecache[label="File\nCache" type="data"];
+        tvtropes[label="TVTropes\nwebsite:\n\nhttps://tvtropes.org/" type="database"];
+    }}
+
+
+    start -> extractcategories -> extractfilms -> extracttropes -> dataset1;
+    retrievepage -> filecache;
+    retrievepage -> tvtropes;
+    extractcategories -> retrievepage[constraint=false, dir="both"];
+    extractfilms -> retrievepage[constraint=false, dir="both"];
+    extracttropes -> retrievepage[constraint=false, dir="both"];
+    fake_start -> fake_1 [style=invis];
+    fake_1 -> retrievepage [style=invis];
+    fake_start[style=invis]
+    fake_1[style=invis]
+}}'''
+
+draw_graphviz(workflow, "scraper_workflow.pdf")
+@
+
+\begin{figure}
+\centering
+\includegraphics[width=0.6\textwidth]{figures/scraper_workflow.pdf}
+\caption[Scraper]{Trope scraping process.\label{fig:scraper_workflow}}
+\end{figure}
+
+We built a crawler that extracts the tropes from TVtropes:
+
+\begin{itemize}
+\item
+  The scraper \textbf{extracts all the categories} from the main
+  categories page: \\ \href{https://tvtropes.org/pmwiki/pmwiki.php/Main/Film}{https://tvtropes.org/pmwiki/pmwiki.php/Main/Film}.
+  Then, for each category page, it extracts \textbf{all the film
+  identifiers} assigned to it. Finally, for every film page, it extracts
+  \textbf{all the trope identifiers}. As result, it builds a
+  \textbf{dictionary of films and tropes}.
+\item
+  The process \textbf{can be stopped and re-launched at any moment}
+  because the pages are permanently stored in the local cache, so it
+  will continue from the last page processed.
+\item
+  The files in cache and the final output file are \textbf{compressed
+  using bzip2} with a block size of 900k (the highest compression
+  available).
+\item
+  The file names are \textbf{encoded in base64} to avoid using special
+  characters. The character `-' is replaced by '\_'.
+\item
+  The code avoids slowing down TVTropes servers by \textbf{waiting
+  between each download}.
+\item
+  The execution when no page is cached takes around 3\textasciitilde{}4
+  hours. When pages are cached it takes \textasciitilde{}2 minutes. It
+  can retrieve around 12K pages.
+\end{itemize}
+
 % TODO: Mapeo con nota: Explicar brevemente el tema de iMDb y el mapeo + explicar los datos y correlaciones (gráficas)
 % TODO: Generación del modelo surrogado: Red Neuronal + descripción de parámetros estándar + decisiones + (en proceso de ver lo mínimo que hay que evaluar)
 % TODO: Generación de conjuntos de tropos mediante GAs: Descripción del algoritmo + operadores + parámetros
