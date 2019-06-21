@@ -433,11 +433,70 @@ that will ultimately help us train a surrogate model.
 IMDb Datasets are a compendium of information that IMDb offers for personal and
 non-commercial use. Both conditions of use and dataset descriptions are explained in
 https://www.imdb.com/interfaces/.
+
 Our current research will make use of these datasets to extend the film information from TVTropes, in particular,
 title.basics.tsv, which contains metadata from the films such as the title, the year, the genres
 and the duration, and title.ratings.tsv, which contains the rating and the number of votes.
 
+<<echo=False>>=
+films_dictionary = read_compressed_json(FILM_TROPES_JSON_BZ2_FILE)
+tropes_dictionary = reverse_dictionary(films_dictionary)
 
+n_films = len(films_dictionary.keys())
+n_tropes = len(tropes_dictionary.keys())
+
+
+workflow = f'''
+digraph {{
+    splines=polyline
+    ranksep=0.3;
+    nodesep=0.3;
+    rankdir=LR
+    margin=0;
+    graph [ resolution=128, fontsize=30];
+
+    subgraph cluster_0 {{
+        style=invis
+        dataset1 [label="Tropes dataset\n\nfilms->tropes\n({n_films}->{n_tropes})" type="data"];
+        dataset2 [label="IMDb Dataset\n\ntitle.basics.tsv\n(id,title,\nyear,genres)" type="database"];
+        dataset3 [label="IMDb Dataset\n\ntitle.ratings.tsv\n(id,rating,votes)" type="database"];
+        titles [label="Title/Year\nnormalization" type="process"];
+        map_title_year [label="Select\nunique matches\nby title & year" type="process"];
+        map_title [label="Select\nunique matches\nby title" type="process"];
+        map_popularity [label="Select\nmost popular candidates\nby title" type="process"];
+    }}
+    subgraph cluster_1 {{
+        style=invis
+        ignored [label="Ignored films", type="data"]
+        extended_dataset [label="Extended Dataset\n\nid,title_imdb,\ntitle_tvtropes,\nyear,genres,\ntropes", type="data"]
+    }}
+    dataset1->titles;
+    dataset2->titles;
+    dataset3->titles;
+    map_title_year->extended_dataset[constraint=false];
+    map_title->extended_dataset[constraint=false];
+    map_popularity->extended_dataset[constraint=false];
+    map_popularity->ignored;
+    titles->map_title_year->map_title->map_popularity;
+}}'''
+
+draw_graphviz(workflow, "mapper_workflow.pdf")
+@
+
+\begin{figure}
+\centering
+\includegraphics[width=0.8\textwidth]{figures/mapper_workflow.pdf}
+\caption[Scraper]{Rating mapping process.\label{fig:mapper_workflow}}
+\end{figure}
+
+As described in Figure~\ref{fig:mapper_workflow}, in order to be able to map the film names,
+we normalize the titles and extract the year whenever is present from both, IMDb and TVtropes.
+For every film in our tropes datasey,
+if the year is present and matches uniquely a film in IMDb from that year, it is accepted.
+Otherwise try to uniquely match regardless the year.
+Whenever we find multiple candidates, we follow the thumb rule
+that TVTropes will probably contain the most popular film,
+and our heuristic of popularity is the number of votes in IMDb.
 
 
 % TODO: Mapeo con nota: Explicar brevemente el tema de iMDb y el mapeo + explicar los datos y correlaciones (gráficas)
