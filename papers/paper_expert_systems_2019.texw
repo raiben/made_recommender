@@ -457,9 +457,8 @@ digraph {{
 
     subgraph cluster_0 {{
         style=invis
-        dataset1 [label="Tropes dataset\n\nfilms->tropes\n({n_films}->{n_tropes})" type="data"];
-        dataset2 [label="IMDb Dataset\n\ntitle.basics.tsv\n(id,title,\nyear,genres)" type="database"];
-        dataset3 [label="IMDb Dataset\n\ntitle.ratings.tsv\n(id,rating,votes)" type="database"];
+        start [label="Start" type="start"]
+        retrieve [label="Retrieve data" type="process"]
         titles [label="Title/Year\nnormalization" type="process"];
         map_title_year [label="Select\nunique matches\nby title & year" type="process"];
         map_title [label="Select\nunique matches\nby title" type="process"];
@@ -470,9 +469,21 @@ digraph {{
         ignored [label="Ignored films", type="data"]
         extended_dataset [label="Extended Dataset\n\nid,title_imdb,\ntitle_tvtropes,\nyear,genres,\ntropes", type="data"]
     }}
-    dataset1->titles;
-    dataset2->titles;
-    dataset3->titles;
+    subgraph cluster_2 {{
+        style=invis
+        dataset1 [label="Tropes dataset\n\nfilms->tropes\n({n_films}->{n_tropes})" type="data"];
+        dataset2 [label="IMDb Dataset\n\ntitle.basics.tsv\n(id,title,\nyear,genres)" type="database"];
+        dataset3 [label="IMDb Dataset\n\ntitle.ratings.tsv\n(id,rating,votes)" type="database"];
+    }}
+    start->retrieve
+
+    retrieve->dataset1[constraint=false];
+    retrieve->dataset2[constraint=false];
+    retrieve->dataset3[constraint=false];
+    dataset1->dataset2[style=invis]
+    dataset2->dataset3[style=invis]
+
+    retrieve->titles;
     map_title_year->extended_dataset[constraint=false];
     map_title->extended_dataset[constraint=false];
     map_popularity->extended_dataset[constraint=false];
