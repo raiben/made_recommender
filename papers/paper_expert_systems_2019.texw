@@ -271,7 +271,7 @@ latest version of DBTropes, called PicTropes\cite{garcia2018overview} that inclu
 However, the last version of BDTropes is from 2016, and the community of users of TVTropes has tripled the size
 of the database since then; if we work with the latest data from TVTropes our machine learning algorithms
 would benefit from having much entries and hence, provide better results. That's why our first step is to
-extract the data directly from TVTropes, as discussed in next section.
+extract the data directly from TVTropes.
 
 
 <<echo=False>>=
@@ -331,37 +331,17 @@ draw_graphviz(workflow, "scraper_workflow.pdf")
 \caption[Scraper]{Trope scraping process.\label{fig:scraper_workflow}}
 \end{figure}
 
-We built a crawler that extracts the tropes from TVtropes:
 
-\begin{itemize}
-\item
-  The scraper \textbf{extracts all the categories} from the main
-  categories page: \\ \href{https://tvtropes.org/pmwiki/pmwiki.php/Main/Film}{https://tvtropes.org/pmwiki/pmwiki.php/Main/Film}.
-  Then, for each category page, it extracts \textbf{all the film
-  identifiers} assigned to it. Finally, for every film page, it extracts
-  \textbf{all the trope identifiers}. As result, it builds a
-  \textbf{dictionary of films and tropes}.
-\item
-  The process \textbf{can be stopped and re-launched at any moment}
-  because the pages are permanently stored in the local cache, so it
-  will continue from the last page processed.
-\item
-  The files in cache and the final output file are \textbf{compressed
-  using bzip2} with a block size of 900k (the highest compression
-  available).
-\item
-  The file names are \textbf{encoded in base64} to avoid using special
-  characters. The character `-' is replaced by '\_'.
-\item
-  The code avoids slowing down TVTropes servers by \textbf{waiting
-  between each download}.
-\item
-  The execution when no page is cached takes around 3\textasciitilde{}4
-  hours. When pages are cached it takes \textasciitilde{}2 minutes. It
-  can retrieve around 12K pages.
-\end{itemize}
-
-% ----------
+Our scraper extracts all the categories from the main
+categories page (\href{https://tvtropes.org/pmwiki/pmwiki.php/Main/Film}{https://tvtropes.org/pmwiki/pmwiki.php/Main/Film})
+and for each category page, it extracts all the film identifiers assigned to it.
+Finally, for every film page, it extracts all the trope identifiers.
+As result, it builds a dictionary of films and tropes.
+In order to ease the execution, it can be stopped and re-launched at any time
+because it makes use of a local permanent cache compressed in bzip2 with a block size of 900k,
+the highest compression available.
+In order to avoid hurting the TvTropes servers, the process inserts waits between each two consecutive calls.
+As result, the executions retrieved around 12K pages in 3 to 4 hours.
 
 <<echo=False>>=
 tropes_summary_dictionary = {}
