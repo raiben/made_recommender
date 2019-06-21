@@ -419,6 +419,26 @@ plot.set_xlabel("Tropes by number of films")
     \label{fig:films_analysis}
 \end{figure}
 
+% TODO: Explicar los datasets
+
+\subsection{Step 2: Map genres and rating}
+
+TvTropes is a huge yet very specific database of tropes but it doesn't include a rating
+or links to an external database that we could use as a rating source;
+however, IMDb offers their database for non-commercial use and they provide datasets with lots of interesting features,
+including the rating and the popularity.
+Our research just needs a way to map both tropes and ratings in order to build an extended dataset
+that will ultimately help us train a surrogate model.
+
+IMDb Datasets are a compendium of information that IMDb offers for personal and
+non-commercial use. Both conditions of use and dataset descriptions are explained in
+https://www.imdb.com/interfaces/.
+Our current research will make use of these datasets to extend the film information from TVTropes, in particular,
+title.basics.tsv, which contains metadata from the films such as the title, the year, the genres
+and the duration, and title.ratings.tsv, which contains the rating and the number of votes.
+
+
+
 
 % TODO: Mapeo con nota: Explicar brevemente el tema de iMDb y el mapeo + explicar los datos y correlaciones (gráficas)
 % TODO: Generación del modelo surrogado: Red Neuronal + descripción de parámetros estándar + decisiones + (en proceso de ver lo mínimo que hay que evaluar)
