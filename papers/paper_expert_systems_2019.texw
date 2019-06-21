@@ -14,11 +14,17 @@ USE_HDF = True
 SCRAPER_LOG_FILE = '../logs/scrape_tvtropes_20190501_20190512_191015.log'
 MAPPER_LOG_FILE = '../logs/map_films_20190526_164459.log'
 EVALUATOR_BUILDER_LOG_FILE = '../logs/build_evaluator_20190616_211935.log'
-TOP_VALUES = 25
+TOP_VALUES = 14
 @
 
 \documentclass[APA,LATO1COL]{WileyNJD-v2}
 \usepackage{moreverb}
+
+% -- begin: Added by Rubén
+\usepackage{subcaption}
+\captionsetup{compatibility=false}
+\usepackage{tabularx}
+% -- end: Added by Rubén
 
 
 \newcommand\BibTeX{{\rmfamily B\kern-.05em \textsc{i\kern-.025em b}\kern-.08em
@@ -354,6 +360,83 @@ We built a crawler that extracts the tropes from TVtropes:
   hours. When pages are cached it takes \textasciitilde{}2 minutes. It
   can retrieve around 12K pages.
 \end{itemize}
+
+% ----------
+
+<<echo=False>>=
+tropes_summary_dictionary = {}
+for key in films_dictionary:
+    tropes_summary_dictionary[key] = {'tropes':len(films_dictionary[key])}
+
+tropes_summary_dataframe = pd.DataFrame(tropes_summary_dictionary).transpose()
+
+films_summary_dictionary = {}
+for key in tropes_dictionary:
+    films_summary_dictionary[key] = {'films':len(tropes_dictionary[key])}
+
+films_summary_dataframe = pd.DataFrame(films_summary_dictionary).transpose()
+@
+
+\begin{figure}
+    \centering
+    \begin{subfigure}[b]{0.15\textwidth}
+        \centering
+        <%=print(get_table_for_dataframe(tropes_summary_dataframe.describe([.1,.2,.3,.4,.5,.6,.7,.8,.9]), fixed_width=True))%>
+        \caption{}
+        \label{fig:descriptive_analysis_tropes}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.4\textwidth}
+        \centering
+<<width="\\linewidth",echo=False, results='hidden'>>=
+tropes_summary_dataframe.plot.hist(log=True, color='#86bf91', figsize=(5, 5.5), ec="k", zorder=2, rwidth=0.9)
+@
+        \caption{}
+        \label{fig:histogram_tropes}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.35\textwidth}
+        \centering
+        <%=print(get_table_for_dataframe(tropes_summary_dataframe.sort_values('tropes',ascending=False).head(TOP_VALUES), fixed_width=True))%>
+        \caption{}
+        \label{fig:top_tropes_films}
+    \end{subfigure}
+    \caption{\textbf{(a)} Descriptive analysis of the Tropes by appearance in films.
+    \textbf{(b)} Histogram of number of tropes by film.
+    \textbf{(c)} Top films by number of tropes}
+    \label{fig:tropes_analysis}
+\end{figure}
+
+\begin{figure}
+    \centering
+    \begin{subfigure}[b]{0.15\textwidth}
+        \centering
+        <%=print(get_table_for_dataframe(films_summary_dataframe.describe([.1,.2,.3,.4,.5,.6,.7,.8,.9]), fixed_width=True))%>
+        \caption{}
+        \label{fig:descriptive_analysis_films}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.4\textwidth}
+        \centering
+<<width="\\linewidth",echo=False, results='hidden'>>=
+films_summary_dataframe.plot.hist(log=True, color='#86bf91', figsize=(5, 5.5), ec="k", zorder=2, rwidth=0.9)
+@
+        \caption{}
+        \label{fig:histogram_films}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.35\textwidth}
+        \centering
+        <%=print(get_table_for_dataframe(films_summary_dataframe.sort_values('films',ascending=False).head(TOP_VALUES), fixed_width=True))%>
+        \caption{}
+        \label{fig:top_films_tropes}
+    \end{subfigure}
+    \caption{\textbf{(a)} Descriptive analysis of the films by tropes occurrences.
+    \textbf{(b)} Histogram of number of films by tropes.
+    \textbf{(c)} Top tropes by number of films}
+    \label{fig:films_analysis}
+\end{figure}
+
 
 % TODO: Mapeo con nota: Explicar brevemente el tema de iMDb y el mapeo + explicar los datos y correlaciones (gráficas)
 % TODO: Generación del modelo surrogado: Red Neuronal + descripción de parámetros estándar + decisiones + (en proceso de ver lo mínimo que hay que evaluar)

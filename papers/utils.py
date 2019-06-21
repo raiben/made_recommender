@@ -49,8 +49,13 @@ def draw_graphviz(dot, filename):
     G.draw(os.path.join('figures', filename))
 
 
-def get_table_for_dataframe(df, **kwargs):
-    return tabulate(df, headers=df, tablefmt='latex_raw', **kwargs)
+def get_table_for_dataframe(df, fixed_width=None, **kwargs):
+    latex_code = tabulate(df, headers=df, tablefmt='latex_raw', **kwargs)
+    latex_code = latex_code.replace('%', '\\%')
+    if fixed_width is not None:
+        latex_code = latex_code.replace('\\begin{tabular}','\\begin{tabularx}{\\textwidth}')
+        latex_code = latex_code.replace('\\end{tabular}', '\\end{tabularx}')
+    return latex_code
 
 
 def tex_wrap_and_escape(text, length=40):
