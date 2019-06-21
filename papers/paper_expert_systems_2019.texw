@@ -421,6 +421,8 @@ plot.set_xlabel("Tropes by number of films")
 
 % TODO: Explicar los datasets
 
+% DONE: Mapeo con nota: Explicar brevemente el tema de iMDb y el mapeo + explicar los datos y correlaciones (gráficas)
+
 \subsection{Step 2: Map genres and rating}
 
 TvTropes is a huge yet very specific database of tropes but it doesn't include a rating
@@ -500,17 +502,83 @@ draw_graphviz(workflow, "mapper_workflow.pdf")
 \caption[Scraper]{Extending the dataset with genres and rating.\label{fig:mapper_workflow}}
 \end{figure}
 
+Items in IMDb that don't relate to films are excluded (tvEpisode, tvSeries, tvSpecial, tvShort, videoGame,
+tvMiniSeries, titleType) because they are not in our TVTropes scraped dataset and they would only increase
+ambiguity as more films might match the same name.
+
 As described in Figure~\ref{fig:mapper_workflow}, in order to be able to map the film names,
-we normalize the titles and extract the year whenever is present from both, IMDb and TVtropes.
-For every film in our tropes datasey,
-if the year is present and matches uniquely a film in IMDb from that year, it is accepted.
-Otherwise try to uniquely match regardless the year.
-Whenever we find multiple candidates, we follow the thumb rule
-that TVTropes will probably contain the most popular film,
-and our heuristic of popularity is the number of votes in IMDb.
+films names are normalized in both cases, TVTropes and IMDb, converting camel-case to Title case, removing
+non-alphanumerical values and extra blanks, splitting name and year when required, and converting to lowercase.
+Normalized names in TvTropes and IMDb are matched, ideally \{1->1\}.
+In order to reduce ambiguity, if the year is present in TvTropes's identifier,
+we reduce the search to the specific year in IMDb.
+If there are more than one match for a tvTropes's identifier in IMDb,
+we just choose the one with the highest number of votes.
+This heuristic relies in the fact that both data sources (tropes and votes)
+are maintained by different communities of users, enthusiasts in both cases,
+so if there is a film in TVTropes and there are many films with the same name in IMDb,
+it will probably be the one with highest popularity, that is reflected in the number of votes.
+We decided to include the original title so that non-English titles can be handled as well.
+A resulting CSV includes the identifier in IMDb, in TVTropes, the name of the film, the year, the rating,
+the number of votes, the tropes for the film (0 if not present, 1 if present) and the genre (0 if not present,
+1 if present).
 
+<<echo=False>>=
+EVERYTHING_BUT_TROPES = ['Id','NameTvTropes', 'NameIMDB', 'Rating', 'Votes', 'Year']
 
-% TODO: Mapeo con nota: Explicar brevemente el tema de iMDb y el mapeo + explicar los datos y correlaciones (gráficas)
+extended_dataframe = read_dataframe(FILM_EXTENDED_DATASET_BZ2_FILE, USE_HDF)
+trope_names = [key for key in extended_dataframe.keys() if key not in EVERYTHING_BUT_TROPES and '[GENRE]' not in key]
+extended_dataframe['Number of tropes'] = sum(getattr(extended_dataframe,key) for key in trope_names)
+
+coefficient_rating_votes, p_value_rating_votes = stats.pearsonr(extended_dataframe['Rating'], extended_dataframe['Votes'])
+coefficient_rating_ntropes, p_value_rating_ntropes = stats.pearsonr(extended_dataframe['Rating'], extended_dataframe['Number of tropes'])
+coefficient_votes_ntropes, p_value_votes_ntropes = stats.pearsonr(extended_dataframe['Votes'], extended_dataframe['Number of tropes'])
+coefficient_year_ntropes, p_value_year_ntropes = stats.pearsonr(extended_dataframe['Year'], extended_dataframe['Number of tropes'])
+@
+
+\begin{figure}
+    \centering
+    \begin{subfigure}[b]{0.3\textwidth}
+        \centering
+<<width="\\linewidth",echo=False, results='hidden'>>=
+extended_dataframe.plot.scatter(x='Rating', y='Number of tropes', color='darkgray', label='Films', figsize=(4, 4))
+plot_regression(extended_dataframe, 'Rating', 'Number of tropes', 'black')
+@
+        \caption{\begin{tabularx}{\textwidth}{lX} coefficient: & <%=coefficient_rating_ntropes%> \\ p-value & <%=p_value_rating_ntropes%> \end{tabularx}}
+        \label{fig:rating_ntropes}
+    \end{subfigure}
+    \hfill
+    \centering
+    \begin{subfigure}[b]{0.3\textwidth}
+        \centering
+<<width="\\linewidth",echo=False, results='hidden'>>=
+extended_dataframe.plot.scatter(x='Votes', y='Number of tropes', color='darkgray', label='Films', figsize=(4, 4))
+plot_regression(extended_dataframe, 'Votes', 'Number of tropes', 'black')
+@
+        \caption{\begin{tabularx}{\textwidth}{lX} coefficient: & <%=coefficient_votes_ntropes%> \\ p-value & <%=p_value_votes_ntropes%> \end{tabularx}}
+        \label{fig:votes_ntropes}
+    \end{subfigure}
+    \hfill
+    \centering
+    \begin{subfigure}[b]{0.3\textwidth}
+        \centering
+<<width="\\linewidth",echo=False, results='hidden'>>=
+extended_dataframe.plot.scatter(x='Year', y='Number of tropes', color='darkgray', label='Films', figsize=(4, 4))
+plot_regression(extended_dataframe, 'Year', 'Number of tropes', 'black')
+@
+        \caption{\begin{tabularx}{\textwidth}{lX} coefficient: & <%=coefficient_year_ntropes%> \\ p-value & <%=p_value_year_ntropes%> \end{tabularx}}
+        \label{fig:year_ntropes}
+    \end{subfigure}
+    \hfill
+    \caption{Scatter plot to show the relation between: \textbf{(a)} Rating vs. Nº of tropes
+    \textbf{(b)} Votes vs. Nº of tropes \textbf{(c)} Year vs. Nº of tropes}
+    \label{fig:extended_dataset_scatterplots}
+\end{figure}
+
+The resulting Extended Dataset is a table with XXX rows (films) and XXX (tropes).
+A brief analysis of the new extended dataset, in Figure \ref{fig:extended_dataset_scatterplots}
+shows that there are significant correlations ... % TODO
+
 % TODO: Generación del modelo surrogado: Red Neuronal + descripción de parámetros estándar + decisiones + (en proceso de ver lo mínimo que hay que evaluar)
 % TODO: Generación de conjuntos de tropos mediante GAs: Descripción del algoritmo + operadores + parámetros
 
