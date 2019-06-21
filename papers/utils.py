@@ -55,6 +55,7 @@ def get_table_for_dataframe(df, fixed_width=None, **kwargs):
     if fixed_width is not None:
         latex_code = latex_code.replace('\\begin{tabular}','\\begin{tabularx}{\\textwidth}')
         latex_code = latex_code.replace('\\end{tabular}', '\\end{tabularx}')
+        latex_code = latex_code.replace('{lr}','{Xr}')
     return latex_code
 
 

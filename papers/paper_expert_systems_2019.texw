@@ -389,7 +389,8 @@ films_summary_dataframe = pd.DataFrame(films_summary_dictionary).transpose()
     \begin{subfigure}[b]{0.4\textwidth}
         \centering
 <<width="\\linewidth",echo=False, results='hidden'>>=
-tropes_summary_dataframe.plot.hist(log=True, color='#86bf91', figsize=(5, 5.5), ec="k", zorder=2, rwidth=0.9)
+plot = tropes_summary_dataframe.plot.hist(log=True, color='#cccccc', figsize=(5, 5.2), ec="k", zorder=2, rwidth=0.5)
+plot.set_xlabel("Films by number of tropes")
 @
         \caption{}
         \label{fig:histogram_tropes}
@@ -419,7 +420,8 @@ tropes_summary_dataframe.plot.hist(log=True, color='#86bf91', figsize=(5, 5.5), 
     \begin{subfigure}[b]{0.4\textwidth}
         \centering
 <<width="\\linewidth",echo=False, results='hidden'>>=
-films_summary_dataframe.plot.hist(log=True, color='#86bf91', figsize=(5, 5.5), ec="k", zorder=2, rwidth=0.9)
+plot = films_summary_dataframe.plot.hist(log=True, color='#cccccc', figsize=(5, 5.2), ec="k", zorder=2, rwidth=0.5)
+plot.set_xlabel("Tropes by number of films")
 @
         \caption{}
         \label{fig:histogram_films}
