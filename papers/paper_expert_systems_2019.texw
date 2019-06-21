@@ -224,8 +224,8 @@ digraph {{
     imdb[label="IMDB\ndatasets:\nimdb.com/\ninterfaces/" type="database"];
     map_rating[label="Step 2:\nMap Genres\nand Rating\n\nPython+\nHeuristics+\nbz2" type="process"];
     extended_dataset[label="Extended\nDataset\n\nFilm DNA +\nrating" type="data"];
-    build_recommender[label="Step 3:\nBuild\nRecommender\n\npandas+\nsklearn\n " type="process"];
-    recommender[label="Surrogate model\n\nNeural Network\nFilm DNA ->\nRating\n\nNLPRegressor" type="tool"];
+    build_evaluator[label="Step 3:\nBuild\nEvaluator\n\npandas+\nsklearn\n " type="process"];
+    evaluator[label="Surrogate model\n\nNeural Network\nFilm DNA ->\nRating\n\nNLPRegressor" type="tool"];
     user[label="User's\npre-selected\ntropes" type="data"];
     dna_builder[label="Step 4:\nGenetic Algorithm\nto Build\nFilm DNAs\n\ninspyred+\ncachetools" type="process"];
     trope_sequence[label="Optimal\nFilm\nDNA" type="data"];
@@ -235,9 +235,9 @@ digraph {{
     dataset -> map_rating;
     imdb -> map_rating[minlen=0];
     map_rating -> extended_dataset;
-    extended_dataset -> build_recommender;
-    build_recommender -> recommender;
-    recommender -> dna_builder;
+    extended_dataset -> build_evaluator;
+    build_evaluator -> evaluator;
+    evaluator -> dna_builder;
     user -> dna_builder[minlen=0];
     dna_builder -> trope_sequence;
 }}'''
@@ -579,7 +579,25 @@ The resulting Extended Dataset is a table with XXX rows (films) and XXX (tropes)
 A brief analysis of the new extended dataset, in Figure \ref{fig:extended_dataset_scatterplots}
 shows that there are significant correlations ... % TODO
 
-% TODO: Generación del modelo surrogado: Red Neuronal + descripción de parámetros estándar + decisiones + (en proceso de ver lo mínimo que hay que evaluar)
+% DONE: Generación del modelo surrogado: Red Neuronal + descripción de parámetros estándar + decisiones + (en proceso de ver lo mínimo que hay que evaluar)
+
+\subsection{Step 3: Build the Evaluator}
+
+Given our Extended Dataset, our goal is to build an evaluator
+that can be used as a surrogate model by the Genetic Algorithm, in further steps.
+
+The inputs are binary values for every trope defined in the Extended Dataset
+and the output is a continuous numeric value that represents the rating of the film.
+A neural network is a technique that perfectly fits in our requirements,
+because the relations among inputs are unclear and the effect on the rating is complex.
+
+We will follow different rules of the thumb to build a proper neural network:
+\begin{itemize}
+\item Hidden layers: 2 according to... % TODO
+\item Neurons in the hidden layers: XXX, YYY according to the geometric pyramid rule proposed by \cite{masters1993practical}.
+\end{itemize}
+
+
 % TODO: Generación de conjuntos de tropos mediante GAs: Descripción del algoritmo + operadores + parámetros
 
 \section{Experimental setup}
