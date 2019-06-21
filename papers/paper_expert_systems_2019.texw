@@ -542,7 +542,7 @@ coefficient_year_ntropes, p_value_year_ntropes = stats.pearsonr(extended_datafra
         \centering
 <<width="\\linewidth",echo=False, results='hidden'>>=
 extended_dataframe.plot.scatter(x='Rating', y='Number of tropes', color='darkgray', label='Films', figsize=(4, 4))
-plot_regression(extended_dataframe, 'Rating', 'Number of tropes', 'black')
+#plot_regression(extended_dataframe, 'Rating', 'Number of tropes', 'black')
 @
         \caption{\begin{tabularx}{\textwidth}{lX} coefficient: & <%=coefficient_rating_ntropes%> \\ p-value & <%=p_value_rating_ntropes%> \end{tabularx}}
         \label{fig:rating_ntropes}
@@ -593,8 +593,17 @@ because the relations among inputs are unclear and the effect on the rating is c
 
 We will follow different rules of the thumb to build a proper neural network:
 \begin{itemize}
-\item Hidden layers: 2 according to... % TODO
-\item Neurons in the hidden layers: XXX, YYY according to the geometric pyramid rule proposed by \cite{masters1993practical}.
+\item Hidden layers: 2; according to \cite{reed1999neural},
+although a single hidden layer can theoretically be used to approximate any function that we require
+(universal approximation theorem),
+using two hidden layers (or more) can be much more efficient.
+\item Neurons in the hidden layers: XXX and YYY respectivelly,
+according to the geometric pyramid rule proposed by \cite{masters1993practical}.
+\item Activation: ReLU, the most widely used activation function
+because of the sparsity and the reduced likelihood of vanishing gradient,
+is the default activation function for the hidden layer in the package sklearn.
+\item Solver: adam, an efficient algorithm that works well on large problems,
+also the default in the package sklearn.
 \end{itemize}
 
 
