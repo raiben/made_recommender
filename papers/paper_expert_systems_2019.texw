@@ -496,8 +496,8 @@ draw_graphviz(workflow, "mapper_workflow.pdf")
 
 \begin{figure}
 \centering
-\includegraphics[width=0.8\textwidth]{figures/mapper_workflow.pdf}
-\caption[Scraper]{Rating mapping process.\label{fig:mapper_workflow}}
+\includegraphics[width=0.9\textwidth]{figures/mapper_workflow.pdf}
+\caption[Scraper]{Extending the dataset with genres and rating.\label{fig:mapper_workflow}}
 \end{figure}
 
 As described in Figure~\ref{fig:mapper_workflow}, in order to be able to map the film names,
