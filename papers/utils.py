@@ -148,3 +148,38 @@ def plot_regression(dataframe, x_column, y_column, color='red'):
 
     regr.fit(X_train, Y_train)
     plt.plot(X_test, regr.predict(X_test), color=color, linewidth=3, )
+
+
+def extract_iterations_from_log(log_file_name):
+    iteration_line = '^.*\\| Iteration ([0-9]+), loss = ([0-9\.]+)$'
+
+    values = []
+    with open(log_file_name, 'r') as scraper_log:
+        lines = scraper_log.readlines()
+    import re
+    for line in lines:
+        matches = re.search(iteration_line, line)
+        if matches:
+            entry = {'iteration': float(matches.group(1)), 'loss': float(matches.group(2))}
+            values.append(entry)
+
+    return pd.DataFrame(values)
+
+if __name__=='__main__':
+    FILM_TROPES_JSON_BZ2_FILE = '../datasets/scraper/cache/20190501/films_tropes_20190501.json.bz2'
+    FILM_EXTENDED_DATASET_BZ2_FILE = '../datasets/extended_dataset.csv.bz2'
+    USE_HDF = True
+    SCRAPER_LOG_FILE = '../logs/scrape_tvtropes_20190501_20190512_191015.log'
+    MAPPER_LOG_FILE = '../logs/map_films_20190526_164459.log'
+    EVALUATOR_BUILDER_LOG_FILE = '../logs/build_evaluator_20190616_211935.log'
+    TOP_VALUES = 14
+    EVERYTHING_BUT_TROPES = ['Id', 'NameTvTropes', 'NameIMDB', 'Rating', 'Votes', 'Year']
+
+    input, output = get_experiment_execution_information('../logs/build_evaluator_20190616_211935.log')
+
+
+    df = extract_iterations_from_log(log_file_name=EVALUATOR_BUILDER_LOG_FILE)
+    plot.set_ylabel("loss")
+    pass
+
+

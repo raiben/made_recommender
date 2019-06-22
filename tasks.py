@@ -47,10 +47,12 @@ def map_films(context, tvtropes_films_file, imdb_titles_file, imdb_ratings_file,
                         remove_ambiguities=remove_ambiguities)
     mapper.run()
 
+
 def _check_file_exists(parameter, file_name):
     if not os.path.isfile(file_name):
         print(f'Please, provide a valid path for {parameter}')
         exit(1)
+
 
 @task
 def build_evaluator(context, extended_dataset, target_folder='datasets/', random_seed=0):
@@ -69,6 +71,7 @@ def build_evaluator(context, extended_dataset, target_folder='datasets/', random
     evaluator.run()
     evaluator.pickle(target_folder)
     evaluator.finish()
+
 
 @task
 def show_genres(search_query, page=0, results=10):
@@ -91,10 +94,13 @@ def recommend(genres_to_include='', tropes_to_include='', length=40):
 
 
 @task
-def clean_paper(context):
+def clean_paper(context, documentation_mode=False):
     print("Cleaning ...")
-    patterns = ['papers/_*', 'papers/figures', 'papers/*.aux', 'papers/*.log', 'papers/*.out',
+    patterns = ['papers/_*', 'papers/*.aux', 'papers/*.log', 'papers/*.out',
                 'papers/*.tex', 'papers/*.pdf', 'papers/*.pyc', 'papers/*.bbl', 'papers/*.blg']
+    if not documentation_mode:
+        patterns.append('papers/figures')
+
     for pattern in patterns:
         context.run(f'rm -rf {pattern}')
 
@@ -133,10 +139,15 @@ def build_paper(context):
     build_paper_latex(context)
     build_paper_pdf(context)
 
+
 @task
-def build_paper_latex_expert_systems_2019(context):
+def build_paper_latex_expert_systems_2019(context, documentation_mode=False):
     print("Building latex file and figures through pweave ...")
     command = 'cd papers && pweave -f texminted paper_expert_systems_2019.texw'
+
+    if documentation_mode:
+        command = command + ' -d'
+
     run(command, hide=False, warn=True)
 
 
@@ -152,13 +163,13 @@ def build_paper_pdf_expert_systems_2019(context):
 
 
 @task
-def build_paper_expert_systems_2019(context):
+def build_paper_expert_systems_2019(context, documentation_mode=False):
     """
     Cleans and build the paper using pweave, pdflatex and bibtex.
     Output file: report.pdf
     """
-    clean_paper(context)
-    build_paper_latex_expert_systems_2019(context)
+    clean_paper(context, documentation_mode)
+    build_paper_latex_expert_systems_2019(context, documentation_mode)
     build_paper_pdf_expert_systems_2019(context)
 
 if __name__ == "__main__":
