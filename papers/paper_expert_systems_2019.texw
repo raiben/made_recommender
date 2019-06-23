@@ -145,7 +145,7 @@ provided by the community of fans,
 so we can rely on these evaluations as a measure of quality and add it to our model,
 in order to process them, make new evaluations and suggestions.
 
-Given this model, that has \textit{Film DNAs} and ratings,
+Given this model, that includes \textit{Film DNAs} and ratings,
 the first thing to confirm is that there are correlations
 and internal relations between the \textit{Film DNAs} and the ratings
 so we can predict the rating from a \textit{Film DNA}.
@@ -153,6 +153,8 @@ Furthermore, even though intuitively
 the \textit{Film DNA} is a profound way to describe a story
 from many different perspectives, following the analogy of the DNA,
 there are environmental factors that could deeply affect the performance of the story as well.
+% Those are epigenetic factors, not the DNA. Following the analogy of
+% an organism developing from its DNA, maybe... - JJ
 This method might not guarantee the quality of a film,
 as a \textit{Film DNA} can lead to infinite implementations/films with different qualities
 and there are many parameters to consider
@@ -162,17 +164,28 @@ most probable implementation based on the universe of currently analyzed films.
 
 The goal of the paper is to demonstrate
 how computational intelligence can use film tropes to help on the creation
-and improvement of quality films in the context of authoring tools and Content Generation.
+and improvement of quality films % or film scripts? Or film DNA? - JJ
+ in the context of authoring tools and Content Generation.
 % Intenta responder a: Por qué generar o mejorar el conjunto de tropos (sistemas complejos +  guiones + videojuegos, etc)
+% That should be in the first paragraph. "We want to do this, but *this* is
+% difficult. So we have thought about solving *that*, which is difficult (but less)
+% because... ""
 
 % Intenta responder a: La metodología (no imagen, solo explicar los pasos de manera general)
 Our approach extracts the tropes, the ratings and the \textit{Film DNAs}
 from external Data Sources in order to build what we have called the \textit{Extended Dataset},
 a set of XXX films that links to XXX tropes and the rating.
-We use a Genetic Algorithm to build a \textit{Film DNA}
+% You can use variables from the code directly - JJ
+We use a genetic algorithm to build a \textit{Film DNA} % trope bag might be better - JJ
 that maximizes the rating evaluated through a surrogate model:
 a \textit{Neural Network} that is trained with the \textit{Extended Dataset}
 and is able to predict the rating from the \textit{Film DNA}.
+
+% «However, submitting our trope bags to the box office is impossible, which is
+% why we will be using deep learning to create a surrogate model that is able
+% to infer, from any combination of tropes, ratings and box office »
+% Write something like that to explain the different steps of what we are going
+% to do: first deep learning, then the evolutionary algorithm - JJ
 
 % Intenta explicar: Los experimentos que vamos a hacer
 The effect of the different parameters for the Genetic Algorithm
@@ -180,11 +193,16 @@ will be tested in two different experiments:
 An attempt to find the \textit{Film DNA} with the highest expected rating for fixed set size
 and an attempt to \textit{improve} an existing \textit{Film DNA}
 by adding tropes that will increase the quality of the film.
+% I didn't know about this one. You need to justify this in terms of your objective
+% Which is not improving existing films. It might be an academic exercise, but
+% you need to justify it very well.
 
 % TODO:El resto del paper…
 
 
 \section{State of the art}
+% But this part is important. You should at least know related work, because
+% some of them might be so important to mention in the introduction - JJ
 % TODO:Tropes (Citas de papers gente que use tropos para cosas y tb TVTRopes, DBTropes, y las limitaciones). Enlazarlo con lo nuestro.
 % TODO:La calidad (Citas de gente que mida la calidad en cualquier cosa, y específicamente estructurales -> tropos). Enlazarlo con lo nuestro.
 % TODO: Modelos surrogados. Enlazarlo con lo nuestro.
@@ -193,27 +211,38 @@ by adding tropes that will increase the quality of the film.
 
 \section{Methodology}
 
-Our methodology is divided in four main steps, explained below and described
-in the figure~\ref{fig:main_workflow_extended}:
+% The objective of our methodology is... (open source, open science, open data,
+% high performance, repeatability... )
 
+Our methodology is divided in four main steps, explained below and described
+in the figure~\ref{fig:main_workflow_extended}: % As is usual, say the objective
+% you want to achieve and then what you do to achieve that. Explicitly mentioned
+% in step 3, check the rest - JJ
 \begin{itemize}
     \item[Step 1] Extract/scrape the tropes for every film
     and codify them as \textit{Film DNAs}.
     As we will see, our dataset will have limitations derived
     from the fact that it is fed from
     the community, finding that popular films are broadly described in terms of tropes
-    and unpopular films poorly described or directly missing.
-    \item[Step 2] Map the films' features such as the rating and genres to the previously built
+    and unpopular films poorly described or directly missing. % Explain variability - JJ
+    \item[Step 2] % Disambiguation of film names needs to be at least mentioned - JJ
+    % Or rather you should change "map" to disambiguation, which seems the best
+    % description for this step - JJ
+    Map the films' features such as the rating and genres to the previously built
     \textit{Film DNAs}. This \textit{extended dataset}  will show limitations as well
-    based on the limitations from the original one
+    based on the original one
     and the automatic matching based on different heuristics.
-    As we will see, A trope that is widely used doesn't need to be linked to good ratings,
+    As we will see, a trope that is widely used doesn't need to be linked to good ratings,
     tropes that are present in bad films can become good in different combinations and vice-versa.
-    \item[Step 3] Build a Neural Network to predict the rating from a \textit{Film DNA}.
-    We will follow different \textit{rules of the thumb}
+% Need to explain that this will cull the initial TVtropes database to only a subset - JJ
+    \item[Step 3] % Train a surrogate model
+    Build a Neural Network to predict the rating from a \textit{Film DNA}.
+    We will follow different \textit{rules of thumb}
     to achieve a moderately good solution that serves our purposes.
     The neural network will handle the unknown relations between tropes and their combinations.
-    \item[Step 4] Build a Genetic Algorithm with specific operators
+    \item[Step 4] % Don't say what you do, say your objective
+    % → Optimize the "trope bag" with respect to ratings or box office. - JJ
+    Build a Genetic Algorithm with specific operators
     that relies in the Neural Network as surrogate model
     to build new constrained \textit{Film DNAs} that optimize the expected rating.
 \end{itemize}
@@ -276,22 +305,24 @@ Networks as surrogate models, fed from TVTropes and IMDb.\label{fig:main_workflo
 % TODO: Extracción de tropos: Explicar brevemente el tema de TVTRopes, DBTropes y nuetsro scraper + explicar los datos (Gráficas y tops)
 
 \subsection{Step 1: Extract the tropes}
-
-Tropes are described in a live wiki called \cite{tvtropes_2}, that is being
+% Don't need to devote much time to this except if it's extraordinarily novel
+% Refer to former report (PicTropes) and the upcoming one - JJ
+We are going to use tropes as described in a live wiki called \cite{tvtropes_2}, that is
 collecting thousand of descriptions and examples of tropes from 2014 until now. As the data is fed by a community
 of users, we could find the bias that popular films are better described and analysed in terms of the tropes than independent
-films, and that popular tropes are more recognised than very specific ones.
+films, and that popular tropes are more recognised than very specific ones. % REFERENCE NEEDED - JJ
+% Which means that... (tropes cound be under/overrepresented|false positives and negatives are possible) - JJ
 The semantic network of knowledge behind \textit{TVTropes.org} is huge and complex; it massively links hierarchies of tropes
 to their usage in creations for digital entertainment. The data, however, is only available through its web interface,
 which is why, in order to make it usable by the scientific community, \cite{maltekiesel_2} extracted all
 their data to a database so-called \textit{DBTropes.org}.\\
-
+% But we are not using it... And that Db is outdated - JJ
 As the base of the research on automatic trope generation, we begun with a dataset based in the
 latest version of DBTropes, called PicTropes\cite{garcia2018overview} that included 5,925 films with 18,270 tropes.
 However, the last version of BDTropes is from 2016, and the community of users of TVTropes has tripled the size
 of the database since then; if we work with the latest data from TVTropes our machine learning algorithms
 would benefit from having much entries and hence, provide better results. That's why our first step is to
-extract the data directly from TVTropes.
+extract the data directly from TVTropes. % and made this dataset available to the public... - JJ
 
 
 <<echo=False>>=
@@ -351,7 +382,7 @@ draw_graphviz(workflow, "scraper_workflow.pdf")
 \caption[Scraper]{Trope scraping process.\label{fig:scraper_workflow}}
 \end{figure}
 
-
+% You need to mention it's been released in Pypi and GitHub - JJ
 Our scraper extracts all the categories from the main
 categories page (\href{https://tvtropes.org/pmwiki/pmwiki.php/Main/Film}{https://tvtropes.org/pmwiki/pmwiki.php/Main/Film})
 and for each category page, it extracts all the film identifiers assigned to it.
@@ -360,6 +391,8 @@ As result, it builds a dictionary of films and tropes.
 In order to ease the execution, it can be stopped and re-launched at any time
 because it makes use of a local permanent cache compressed in bzip2 with a block size of 900k,
 the highest compression available.
+% You use like 3 different forms for TvTropes (with or without caps).
+% Settle on just 1! - JJ
 In order to avoid hurting the TvTropes servers, the process inserts waits between each two consecutive calls.
 As result, the executions retrieved around 12K pages in 3 to 4 hours.
 
@@ -433,8 +466,8 @@ plot.set_xlabel("Tropes by number of films")
         \caption{}
         \label{fig:top_films_tropes}
     \end{subfigure}
-    \caption{\textbf{(a)} Descriptive analysis of the films by tropes occurrences.
-    \textbf{(b)} Histogram of number of films by tropes.
+    \caption{\textbf{(a)} Descriptive analysis of the tropes by number of films in which they appear.
+    \textbf{(b)} Histogram of number of films by tropes. Please note the logarithmic $y$ axis.
     \textbf{(c)} Top tropes by number of films}
     \label{fig:films_analysis}
 \end{figure}
@@ -445,7 +478,7 @@ plot.set_xlabel("Tropes by number of films")
 
 \subsection{Step 2: Map genres and rating}
 
-TvTropes is a huge yet very specific database of tropes but it doesn't include a rating
+TVTropes is a huge yet very specific database of tropes but it doesn't include a rating
 or links to an external database that we could use as a rating source;
 however, IMDb offers their database for non-commercial use and they provide datasets with lots of interesting features,
 including the rating and the popularity.
@@ -457,8 +490,8 @@ non-commercial use. Both conditions of use and dataset descriptions are explaine
 https://www.imdb.com/interfaces/.
 
 Our current research will make use of these datasets to extend the film information from TVTropes, in particular,
-title.basics.tsv, which contains metadata from the films such as the title, the year, the genres
-and the duration, and title.ratings.tsv, which contains the rating and the number of votes.
+{\tt title.basics.tsv}, which contains metadata from the films such as the title, the year, the genres
+and the duration, and {\tt title.ratings.tsv}, which contains the rating and the number of votes.
 
 <<echo=False>>=
 films_dictionary = read_compressed_json(FILM_TROPES_JSON_BZ2_FILE)
@@ -524,8 +557,10 @@ draw_graphviz(workflow, "mapper_workflow.pdf")
 
 Items in IMDb that don't relate to films are excluded (tvEpisode, tvSeries, tvSpecial, tvShort, videoGame,
 tvMiniSeries, titleType) because they are not in our TVTropes scraped dataset and they would only increase
-ambiguity as more films might match the same name.
-
+ambiguity as more films might match the same name. % Maybe you're devoting too much time to
+% this. I think this should better go to a separate technical report. In a
+% journal paper you need to focus on what's innovative, not so much on the mechanics
+% - JJ
 As described in Figure~\ref{fig:mapper_workflow}, in order to be able to map the film names,
 films names are normalized in both cases, TVTropes and IMDb, converting camel-case to Title case, removing
 non-alphanumerical values and extra blanks, splitting name and year when required, and converting to lowercase.
@@ -600,8 +635,17 @@ consisting in <%=extended_dataframe.shape[0]%> films linked to <%=len(trope_name
 shows that there are significant positive correlations between the number of tropes
 and the rating, the popularity and the year, as shown in Figure \ref{fig:extended_dataset_scatterplots},
 % TODO why?
-
+% Again, this should be mentioned only in conjunction with the paper objectives.
+% Does this help understand the surrogate model? Will this help understand the
+% eventual GA result? Even if that were the case, spinning initial data analysis
+% and scraping mechanics to a technical report will make this paper lighter
+% without losing value - JJ
 % DONE: Generación del modelo surrogado: Red Neuronal + descripción de parámetros estándar + decisiones + (en proceso de ver lo mínimo que hay que evaluar)
+
+% These steps 1 and 2 are basically the creation of the training set for
+% the surrogate model, together with some initial analysis which is not relevant
+% to the paper at large. It would be probably much better to publish it separately
+% as a technical report in ArXiV - JJ
 
 \subsection{Step 3: Build the Evaluator}
 
@@ -615,12 +659,16 @@ that can be used as a surrogate model by the Genetic Algorithm, in further steps
 
 The inputs are binary values for every trope defined in the Extended Dataset
 and the output is a continuous numeric value that represents the rating of the film.
+% Don't use this as a given. It could be preprocessed in many ways. Say
+% something along the lines of "the deep learning technique will itself act as
+% a feature extractor" or something like that. And in "future work" mention something
+% Also mention the fact that most values will be 0 - JJ
 A neural network is a technique that perfectly fits in our requirements,
 because the relations among inputs are unclear and the effect on the rating is complex.
 
 We will follow different rules of the thumb to build a proper neural network:
 \begin{itemize}
-\item Type: Multi-layer preceptron (MLP), a class of
+\item Type: Multi-layer perceptron (MLP), a class of
 feedforward artificial neural network very flexible and generally used to learn a mapping from inputs to outputs.
 \item Hidden layers: 2; according to \cite{reed1999neural},
 although a single hidden layer can theoretically be used to approximate any function that we require
@@ -655,6 +703,8 @@ common structures and elements in the film, hence we are including them as featu
 As we can see in Figure \ref{fig:evaluator_training},
 the training of the MLP converges to <%=iterations_evaluator['loss'].iloc[-1]%>.
 
+% Which training? How many did you do? Is this a typical training? - JJ
+
 % DOING: Generación de conjuntos de tropos mediante GAs: Descripción del algoritmo + operadores + parámetros
 \subsection{Film DNA builder}
 
@@ -663,6 +713,8 @@ the training of the MLP converges to <%=iterations_evaluator['loss'].iloc[-1]%>.
 % TODO: Básico: Generar conjuntos de tropos de tamaño fijo: Objetivo, con estudio de parámetros (10 ejecuciones al menos), gráfica de evolución / nº de tropos, interpretación de resultados
 % TODO: (Opcional) Mejorar un conjunto de tropos (con tropos fijos): IDEM
 % TODO: Generar conjuntos de tropos sin tamaño fijo (la película perfecta). Hay películas parecidas o mezcladas?
+
+\section{Results}
 
 \section{Conclusions}
 % TODO: Objetivo ha sido ...
