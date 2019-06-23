@@ -642,6 +642,11 @@ and the rating, the popularity and the year, as shown in Figure \ref{fig:extende
 % without losing value - JJ
 % DONE: Generación del modelo surrogado: Red Neuronal + descripción de parámetros estándar + decisiones + (en proceso de ver lo mínimo que hay que evaluar)
 
+% These steps 1 and 2 are basically the creation of the training set for
+% the surrogate model, together with some initial analysis which is not relevant
+% to the paper at large. It would be probably much better to publish it separately
+% as a technical report in ArXiV - JJ
+
 \subsection{Step 3: Build the Evaluator}
 
 <<echo=False>>=
