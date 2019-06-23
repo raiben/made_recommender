@@ -1,5 +1,31 @@
+<<echo=False>>=
+import os
+import pandas as pd
+import scipy.stats  as stats
+import matplotlib.pyplot as plt
+import sys
+sys.path.append(os.getcwd())
+
+from utils import *
+
+FILM_TROPES_JSON_BZ2_FILE = '../datasets/scraper/cache/20190501/films_tropes_20190501.json.bz2'
+FILM_EXTENDED_DATASET_BZ2_FILE = '../datasets/extended_dataset.csv.bz2'
+USE_HDF = True
+SCRAPER_LOG_FILE = '../logs/scrape_tvtropes_20190501_20190512_191015.log'
+MAPPER_LOG_FILE = '../logs/map_films_20190526_164459.log'
+EVALUATOR_BUILDER_LOG_FILE = '../logs/build_evaluator_20190616_211935.log'
+TOP_VALUES = 14
+EVERYTHING_BUT_TROPES = ['Id','NameTvTropes', 'NameIMDB', 'Rating', 'Votes', 'Year']
+@
+
 \documentclass[APA,LATO1COL]{WileyNJD-v2}
 \usepackage{moreverb}
+
+% -- begin: Added by Rubén
+\usepackage{subcaption}
+\captionsetup{compatibility=false}
+\usepackage{tabularx}
+% -- end: Added by Rubén
 
 
 \newcommand\BibTeX{{\rmfamily B\kern-.05em \textsc{i\kern-.025em b}\kern-.08em
@@ -15,15 +41,14 @@ T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
 
 \begin{document}
 
-\title{A demonstration of the \LaTeX\ class file for Wiley NJD Journals\protect\thanks{This is an example for title footnote.}}
+\title{Chasing compelling stories using computational intelligence and tropes}
 
-\author[1]{Author One*}
+\author[1]{Rubén Héctor García Ortega}
 
-\author[2,3]{Author Two}
+\author[2]{Pablo García Sánchez}
 
-\author[3]{Author Three}
+\author[3]{Juan Julián Merelo Guervós}
 
-\authormark{AUTHOR ONE \textsc{et al}}
 
 
 \address[1]{\orgdiv{Org Division}, \orgname{Org name}, \orgaddress{\state{State name}, \country{Country name}}}
@@ -36,10 +61,9 @@ T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
 
 \presentaddress{Present address}
 
-\abstract[Abstract]{This paper describes the use of the \LaTeXe\ \textsf{WileyNJD-v2.cls}
-class file for setting papers for \emph{Mathematical Methods in the Applied Sciences}.}
+\abstract[Abstract]{}
 
-\keywords{Class file; \LaTeXe; \emph{Wiley NJD}}
+\keywords{Computational Intelligence; Tropes; Scrapping; Neural Networks; Genetic Algorithms}
 
 \jnlcitation{\cname{%
 \author{Williams K.},
@@ -56,375 +80,577 @@ class file for setting papers for \emph{Mathematical Methods in the Applied Scie
 
 \section{Introduction}\label{sec1}
 
-Many authors submitting \( \sin \cos \tan \inf_{x} \) to NJD journals use \LaTeXe\ to
-prepare their papers. This paper describes the
-\textsf{WileyNJD-v2.cls} class file which can be used to convert
-articles produced with other \LaTeXe\ class files into the correct
-form for publication in \emph{Wiley NJD Journals}.
+Crafting quality films is quite challenging, according to ~\cite{Hennig-Thurau2019},
+because of the plot complexities and the \textit{multiplicative production function} of entertainment,
+in other words, the elements need to work together and a single failing one can provoke a disaster in cascade.
+That is why, in the current research, in order to build an authoring tool to help
+on the design of films from the quality perspective, we are counting with the experts' contributions
+to, both, model the films in a way that describes them from many perspectives, and have a measure of quality
+that summarizes all the perspectives in 360 degrees,
+considering the \textit{multiplicative production function} as well.
+Our candidates for both mechanisms are out there,
+tropes or patterns that have been discovered in the films, and the massive human-evaluated ratings, respectively.
 
-The \textsf{WileyNJD-v2.cls} class file preserves much of the standard
-\LaTeXe\ interface so that any document which was produced using
-the standard \LaTeXe\ \textsf{article} style can easily be
-converted to work with the \textsf{WileyNJD-v2} style. However, the
-width of text and typesize will vary from that of
-\textsf{article.cls}; therefore, \emph{line breaks will change}
-and it is likely that displayed mathematics and tabular material
-will need re-setting.
+% Intenta responder a: que son los tropos y por que nos importan
 
-In the following sections we describe how to lay out your code to
-use \textsf{WileyNJD-v2.cls} to reproduce the typographical look of
-\emph{Wiley NJD Journals}.
+We can model a film by using the set of tropes that we can find in it.
+A trope is as a recurring narrative device~\cite{baldick2015oxford};
+it can be a technique, a motif, an archetype or a \textit{clich\'e},
+used by the authors to achieve specific effects that might vary from increasing
+the interest, surprising, recall familiarity, entertaining, etc,
+in their creative works, such as books, films, comics or videogames.
+Some tropes are broadly adopted and academically studied such as
+the \textit{Three-act Structure} formulated by Syd Field~\cite{field1982screenplay},
+the \textit{Hero's Journey} studied by Vogler~\cite{vogler2007writer},
+the \textit{McGuffin} popularized by Hitchcock~\cite{truffaut1985hitchcock} and
+the \textit{Chekhov's Gun} developed by the Russian writer with the eponymous
+name~\cite{bitsilli1983chekhov},
+but there are thousands of not-so-widely used tropes as well, discovered and
+catalogued everyday by professionals and enthusiastic of the storytelling;
+their study is organic, dynamic and extensive.
+In this paper, will call \textit{Film DNA} to the set of tropes
+that we are able to find in a film
+and define the structure, characters, events, mood, settings, narration, etc.
+As the tropes are \textit{living concepts},
+which grow as they are discovered as common
+patterns in other stories, the \textit{Film DNA} is, by definition, incomplete and evolving,
+yet it is still interesting to define stories, categorize them
+and model them from a mathematical perspective.
 
-\subsection{Procedure to install fonts}
+% Intenta responder a: Que es la calidad (muy difícil + subjetivo -> rating es un indicador)
+At the same time, we need to be able to link a measure of quality to the \textit{Film DNA}
+and it is a complex metric.
+Luckily we have access to databases with films' information
+that includes the popularity of the films and their human evaluated ratings,
+provided by the community of fans,
+so we can rely on these evaluations as a measure of quality and add it to our model,
+in order to process them, make new evaluations and suggestions.
 
-\begin{enumerate}
-\item All font files are available under the Lato-Fonts folder
-\item Font installer is available under the same folder Windows-Lato-fontinstaller.exe
-\item Execute (double click the EXE file) the EXE file that will install all fonts/map files to your local drive.
-\end{enumerate}
+Given this model, that has \textit{Film DNAs} and ratings,
+the first thing to confirm is that there are correlations
+and internal relations between the \textit{Film DNAs} and the ratings
+so we can predict the rating from a \textit{Film DNA}.
+Furthermore, even though intuitively
+the \textit{Film DNA} is a profound way to describe a story
+from many different perspectives, following the analogy of the DNA,
+there are environmental factors that could deeply affect the performance of the story as well.
+This method might not guarantee the quality of a film,
+as a \textit{Film DNA} can lead to infinite implementations/films with different qualities
+and there are many parameters to consider
+that are not reflected in the \textit{Film DNA}.
+however, it can be used as an indicator of the potential of the story or the
+most probable implementation based on the universe of currently analyzed films.
 
-\subsection{The Three Golden Rules}
+The goal of the paper is to demonstrate
+how computational intelligence can use film tropes to help on the creation
+and improvement of quality films in the context of authoring tools and Content Generation.
+% Intenta responder a: Por qué generar o mejorar el conjunto de tropos (sistemas complejos +  guiones + videojuegos, etc)
 
-Before we proceed, we would like to
-stress \emph{three golden rules} that need to be followed to
-enable the most efficient use of your code at the typesetting
-stage:
-\begin{enumerate}
-\item[(i)] keep your own macros to an absolute minimum;
+% Intenta responder a: La metodología (no imagen, solo explicar los pasos de manera general)
+Our approach extracts the tropes, the ratings and the \textit{Film DNAs}
+from external Data Sources in order to build what we have called the \textit{Extended Dataset},
+a set of XXX films that links to XXX tropes and the rating.
+We use a Genetic Algorithm to build a \textit{Film DNA}
+that maximizes the rating evaluated through a surrogate model:
+a \textit{Neural Network} that is trained with the \textit{Extended Dataset}
+and is able to predict the rating from the \textit{Film DNA}.
 
-\item[(ii)] as \TeX\ is designed to make sensible spacing
-decisions by itself, do \emph{not} use explicit horizontal or
-vertical spacing commands, except in a few accepted (mostly
-mathematical) situations, such as \verb"\," before a
-differential~d, or \verb"\quad" to separate an equation from its
-qualifier;
+% Intenta explicar: Los experimentos que vamos a hacer
+The effect of the different parameters for the Genetic Algorithm
+will be tested in two different experiments:
+An attempt to find the \textit{Film DNA} with the highest expected rating for fixed set size
+and an attempt to \textit{improve} an existing \textit{Film DNA}
+by adding tropes that will increase the quality of the film.
 
-\item[(iii)] follow the \emph{NJD} reference style.
-\begin{enumerate}[a.]
-\item Chemistry --- Use the ``APA'' option as \verb"\documentclass[APA]{WileyNJD-v2.cls}"
-
-\end{enumerate}
-\end{enumerate}
-
-
-\section{Getting Started} The \textsf{WileyNJD-v2.cls} class file should run
-on any standard \LaTeXe\ installation. If any of the fonts, class
-files or packages it requires are missing from your installation,
-they can be found on the \emph{\TeX\ Live} CD-ROMs or from CTAN.
-
-LaTeX document class options
-
-\begin{flushleft}
-\begin{enumerate}[a.]
-\item LATO1COL--- For LATO font large one column layout use the ``LATO1COL'' option as \verb"\documentclass[APA,LATO1COL]{WileyNJD-v2}"
-\item LATO2COL--- For LATO font large two column layout use the ``LATO2COL'' option as \verb"\documentclass[APA,LATO2COL]{WileyNJD-v2}"
-\item LATOSMALL--- For LATO font small layout use the ``LATOSMALL'' option as \verb"\documentclass[APA,LATOSMALL]{WileyNJD-v2}"
-\end{enumerate}
-\end{flushleft}
-
-
-
-\section{The Article Header Information}
-The heading for any file using \textsf{WileyNJD-v2.cls} is shown in
-Figure~\ref{F1}.
-
-\subsection{Remarks}
-
-\begin{enumerate}[(I).]
-
-\item Use \verb"\title{<title> \protect\thanks{<title footnotes}}" for article title and title footnote.
-\item Use \verb"\authormark{}" for running heads.
-
-\item Note the use of \verb"\author[<link>]{<name>}" and \verb"\address[<link>]{<name>}" to
-link names and addresses. The author for correspondence is marked
-by ``*'' and \verb"\corres{}" is used to give that
-author's address, which will be printed besides abstract, prefaced by
-`Correspondence to:'.
-
-\item For submitting a double-spaced manuscript, add
-\verb"doublespace" as an option to the documentclass line. \verb"\documentclass[doublespace]{WileyNJD-v2}"
-
-\item Use \verb"\presentaddress{}" for present address.
-
-\item In abstract \verb"\abstract[<title>]{abstract paragraph}" use optional parameter for title followed by abstract paragraph.
-
-\item For Key words use \verb"\keywords{}".
-
-\item For how to site use \verb"\jnlcitation{\cname{\author{<author name>},"
-
-\verb"\ctitle{<title>}, \cjournal{<Journal name>}, \cvol{<vol>}.}}".
-
-\item For title page abbreviations use \verb"\footnotetext{<\textbf{Abbreviation title:} Abreviations>}"
-
-\item Use \verb"\articletype{<article category}" for article header information
-
-\item Use \verb"\received{<received date>} \revised{<revised date>} \accepted{<accepted date>}" for history dates.
-
-\end{enumerate}
+% TODO:El resto del paper…
 
 
+\section{State of the art}
+% TODO:Tropes (Citas de papers gente que use tropos para cosas y tb TVTRopes, DBTropes, y las limitaciones). Enlazarlo con lo nuestro.
+% TODO:La calidad (Citas de gente que mida la calidad en cualquier cosa, y específicamente estructurales -> tropos). Enlazarlo con lo nuestro.
+% TODO: Modelos surrogados. Enlazarlo con lo nuestro.
+% TODO: Algoritmos genéticos aplicados a la generación de historias. Enlazarlo con lo nuestro.
+% TODO: conclusión: lo que vamos a hacer es mejor
 
-\begin{figure}[p]
-\setlength{\fboxsep}{0pt}%
-\setlength{\fboxrule}{0pt}%
-\begin{center}
-\begin{boxedverbatim}
+\section{Methodology}
 
-\documentclass[APA,LATO1COL]{WileyNJD-v2}
+Our methodology is divided in four main steps, explained below and described
+in the figure~\ref{fig:main_workflow_extended}:
 
-\articletype{Article Type}%
+\begin{itemize}
+    \item[Step 1] Extract/scrape the tropes for every film
+    and codify them as \textit{Film DNAs}.
+    As we will see, our dataset will have limitations derived
+    from the fact that it is fed from
+    the community, finding that popular films are broadly described in terms of tropes
+    and unpopular films poorly described or directly missing.
+    \item[Step 2] Map the films' features such as the rating and genres to the previously built
+    \textit{Film DNAs}. This \textit{extended dataset}  will show limitations as well
+    based on the limitations from the original one
+    and the automatic matching based on different heuristics.
+    As we will see, A trope that is widely used doesn't need to be linked to good ratings,
+    tropes that are present in bad films can become good in different combinations and vice-versa.
+    \item[Step 3] Build a Neural Network to predict the rating from a \textit{Film DNA}.
+    We will follow different \textit{rules of the thumb}
+    to achieve a moderately good solution that serves our purposes.
+    The neural network will handle the unknown relations between tropes and their combinations.
+    \item[Step 4] Build a Genetic Algorithm with specific operators
+    that relies in the Neural Network as surrogate model
+    to build new constrained \textit{Film DNAs} that optimize the expected rating.
+\end{itemize}
 
-\received{26 April 2016}
-\revised{6 June 2016}
-\accepted{6 June 2016}
+% DONE: Diagrama y explicar los pasos
+<<echo=False>>=
+films_dictionary = read_compressed_json(FILM_TROPES_JSON_BZ2_FILE)
+tropes_dictionary = reverse_dictionary(films_dictionary)
 
-\begin{document}
 
-\title{<Initial cap, lower case>\protect\thanks{<title footnote.>}}
+n_films = len(films_dictionary.keys())
+n_tropes = len(tropes_dictionary.keys())
 
-\author[<address link>]{<Author name><corresponding author*>}
 
-\author[<address link>,<address link>]{Author Name}
+workflow = f'''
+digraph {{
+    splines=polyline
+    rankdir=LR
+    ranksep=0.25;
+    margin=0;
+    nodesep=0.3;
+    graph [ resolution=128, fontsize=30];
 
-\authormark{AUTHOR ONE \textsc{et al}}
+    node [margin=0 fontcolor=black fontsize=10 width=1];
+    tvtropes[label="TVTropes\nwebsite\n\ntvtropes.org\n " type="database"];
+    scrape_tropes[label="Step 1:\nScrape tropes\n\nPython+\nrequests+\nlxml+bz2\n~11.900 pages" type="process"];
+    dataset[label="Dataset\n\nfilms->tropes\n({n_films}->{n_tropes})\n " type="data"];
+    imdb[label="IMDB\ndatasets:\nimdb.com/\ninterfaces/" type="database"];
+    map_rating[label="Step 2:\nMap Genres\nand Rating\n\nPython+\nHeuristics+\nbz2" type="process"];
+    extended_dataset[label="Extended\nDataset\n\nFilm DNA +\nrating" type="data"];
+    build_evaluator[label="Step 3:\nBuild\nEvaluator\n\npandas+\nsklearn\n " type="process"];
+    evaluator[label="Surrogate model\n\nNeural Network\nFilm DNA ->\nRating\n\nNLPRegressor" type="tool"];
+    user[label="User's\npre-selected\ntropes" type="data"];
+    dna_builder[label="Step 4:\nGenetic Algorithm\nto Build\nFilm DNAs\n\ninspyred+\ncachetools" type="process"];
+    trope_sequence[label="Optimal\nFilm\nDNA" type="data"];
 
-\address[<address link>]{\orgdiv{<Org Division>}, \orgname{<Org name>},
-\orgaddress{\state{<State name>}, \country{<Country name>}}}
-\address[<address link>]{\orgdiv{<Org Division>}, \orgname{<Org name>},
- \orgaddress{\state{<State name>}, \country{<Country name>}}}
+    tvtropes -> scrape_tropes[minlen=0];
+    scrape_tropes -> dataset[minlen=1];
+    dataset -> map_rating;
+    imdb -> map_rating[minlen=0];
+    map_rating -> extended_dataset;
+    extended_dataset -> build_evaluator;
+    build_evaluator -> evaluator;
+    evaluator -> dna_builder;
+    user -> dna_builder[minlen=0];
+    dna_builder -> trope_sequence;
+}}'''
 
-\corres{<corresponding author link*> <author name, address.
- \email{<authorone@email.com>}}
+draw_graphviz(workflow, "main_workflow_extended.pdf")
+@
 
-\presentaddress{<Present address>}
-
-\abstract[<Abstract heading>]{<Abstract paragraph>}
-
-\keywords{<keyword1>, <keyword2>,...}
-
-\jnlcitation{\cname{%
-\author{<aurhor name>},
-\author{<aurhor name>},
-\author{<aurhor name>},
-\author{<aurhor name>},  and
-\author{<aurhor name>}} (\cyear{<year>}),
-\ctitle{<journal title>}, \cjournal{<journal name>} <year> <vol> Page <xxx>-<xxx>}
-
-\footnotetext{\textbf{<abbreviation head:>} <abbreviations> ..}
-
-\maketitle
-
-\section{Introduction}
-.
-.
-.
-\end{boxedverbatim}
-\end{center}
-\caption{Example for title page.\label{F1}}
-\end{figure}
-
-\section{The Body of the Article}
-
-\subsection{Section headings}
-
-\begin{enumerate}[(H1)]
-\item Section --- use \verb"\section{}"
-\item SubSection--- use \verb"\subsection{}"
-\item SubSubSectioin--- use \verb"\subsubsection{}"
-\item Paragraph--- use \verb"\paragraph{}"
-\item Subparagraph--- use \verb"\subparagraph{}"
-\end{enumerate}
-
-\subsection{Mathematics} \textsf{WileyNJD-v2.cls} makes the full
-functionality of \AmS\/\TeX\ available. We encourage the use of
-the \verb"align", \verb"gather" and \verb"multline" environments
-for displayed mathematics.
-
-\subsection{Figures and Tables}
-
-\textsf{WileyNJD-v2.cls} uses the
-\textsf{graphicx} package for handling figures.
-
-Figures are called in as follows:
-\begin{verbatim}
 \begin{figure}
 \centering
-\includegraphics{<figure name>}
-\caption{<Figure caption>}
+\includegraphics[width=\textwidth]{figures/main_workflow_extended.pdf}
+\caption[Methodology]{Methodology to generate constrained optimal Film DNAs using Genetic Algorithms with Neural
+Networks as surrogate models, fed from TVTropes and IMDb.\label{fig:main_workflow_extended}}
 \end{figure}
-\end{verbatim}
 
-The standard coding for a table is shown in Figure~\ref{F2}.
 
-\begin{figure}[h]
-\setlength{\fboxsep}{0pt}%
-\setlength{\fboxrule}{0pt}%
-\begin{center}
-\begin{boxedverbatim}
-\begin{table}
-\caption{<Table caption>}
+% TODO: Extracción de tropos: Explicar brevemente el tema de TVTRopes, DBTropes y nuetsro scraper + explicar los datos (Gráficas y tops)
+
+\subsection{Step 1: Extract the tropes}
+
+Tropes are described in a live wiki called \cite{tvtropes_2}, that is being
+collecting thousand of descriptions and examples of tropes from 2014 until now. As the data is fed by a community
+of users, we could find the bias that popular films are better described and analysed in terms of the tropes than independent
+films, and that popular tropes are more recognised than very specific ones.
+The semantic network of knowledge behind \textit{TVTropes.org} is huge and complex; it massively links hierarchies of tropes
+to their usage in creations for digital entertainment. The data, however, is only available through its web interface,
+which is why, in order to make it usable by the scientific community, \cite{maltekiesel_2} extracted all
+their data to a database so-called \textit{DBTropes.org}.\\
+
+As the base of the research on automatic trope generation, we begun with a dataset based in the
+latest version of DBTropes, called PicTropes\cite{garcia2018overview} that included 5,925 films with 18,270 tropes.
+However, the last version of BDTropes is from 2016, and the community of users of TVTropes has tripled the size
+of the database since then; if we work with the latest data from TVTropes our machine learning algorithms
+would benefit from having much entries and hence, provide better results. That's why our first step is to
+extract the data directly from TVTropes.
+
+
+<<echo=False>>=
+films_dictionary = read_compressed_json(FILM_TROPES_JSON_BZ2_FILE)
+tropes_dictionary = reverse_dictionary(films_dictionary)
+
+n_films = len(films_dictionary.keys())
+n_tropes = len(tropes_dictionary.keys())
+
+
+workflow = f'''
+digraph {{
+    splines=polyline
+    ranksep=0.3;
+    nodesep=0.3;
+    rankdir=LR
+    margin=0;
+    graph [ resolution=128, fontsize=30];
+
+    subgraph cluster_0 {{
+        style=invis
+        start [label="Start" type="start"]
+        extractcategories [label="Extract\nCategories" type="process"];
+        extractfilms [label="Extract\nFilms" type="process"];
+        extracttropes [label="Extract\nTropes" type="process"];
+        dataset1 [label="Dataset\n\nfilms->tropes\n({n_films}->{n_tropes})" type="data"];
+    }}
+    subgraph cluster_1 {{
+        style=invis
+        retrievepage[label="Retrieve\nPage" type="process"];
+    }}
+    subgraph cluster_2 {{
+        style=invis
+        filecache[label="File\nCache" type="data"];
+        tvtropes[label="TVTropes\nwebsite:\n\nhttps://tvtropes.org/" type="database"];
+    }}
+
+
+    start -> extractcategories -> extractfilms -> extracttropes -> dataset1;
+    retrievepage -> filecache;
+    retrievepage -> tvtropes;
+    extractcategories -> retrievepage[constraint=false, dir="both"];
+    extractfilms -> retrievepage[constraint=false, dir="both"];
+    extracttropes -> retrievepage[constraint=false, dir="both"];
+    fake_start -> fake_1 [style=invis];
+    fake_1 -> retrievepage [style=invis];
+    fake_start[style=invis]
+    fake_1[style=invis]
+}}'''
+
+draw_graphviz(workflow, "scraper_workflow.pdf")
+@
+
+\begin{figure}
 \centering
-\begin{tabular}{<table alignment>}
-\toprule
-<column headings>\\
-\midrule
-<table entries
-(separated by & as usual)>\\
-<table entries>\\
-.
-.
-.\\
-\bottomrule
-\end{tabular}
-\begin{tablenotes}
-\item Source: xxx.
-\item[1] xxx.
-\item[2] xxx.
-\end{tablenotes}
-\end{table}
-\end{boxedverbatim}
-\end{center}
-\caption{Example for table layout.\label{F2}}
+\includegraphics[width=0.6\textwidth]{figures/scraper_workflow.pdf}
+\caption[Scraper]{Trope scraping process.\label{fig:scraper_workflow}}
 \end{figure}
 
-\subsection{Cross-referencing}
-The use of the \LaTeX\ cross-reference system
-for figures, tables, equations, etc., is encouraged
-(using \verb"\ref{<name>}" and \verb"\label{<name>}").
 
-\subsection{Box text}
+Our scraper extracts all the categories from the main
+categories page (\href{https://tvtropes.org/pmwiki/pmwiki.php/Main/Film}{https://tvtropes.org/pmwiki/pmwiki.php/Main/Film})
+and for each category page, it extracts all the film identifiers assigned to it.
+Finally, for every film page, it extracts all the trope identifiers.
+As result, it builds a dictionary of films and tropes.
+In order to ease the execution, it can be stopped and re-launched at any time
+because it makes use of a local permanent cache compressed in bzip2 with a block size of 900k,
+the highest compression available.
+In order to avoid hurting the TvTropes servers, the process inserts waits between each two consecutive calls.
+As result, the executions retrieved around 12K pages in 3 to 4 hours.
 
-\begin{verbatim}
-\begin{boxtext}
-\section*{<title>}%
-Paragraph
-\end{boxtext}
-\end{verbatim}
+<<echo=False>>=
+tropes_summary_dictionary = {}
+for key in films_dictionary:
+    tropes_summary_dictionary[key] = {'tropes':len(films_dictionary[key])}
 
-\subsection{List items}
+tropes_summary_dataframe = pd.DataFrame(tropes_summary_dictionary).transpose()
 
-\subsubsection{Enumerate list styles}
-\begin{verbatim}
-\begin{enumerate}[1]
-\item
-\end{enumerate}
+films_summary_dictionary = {}
+for key in tropes_dictionary:
+    films_summary_dictionary[key] = {'films':len(tropes_dictionary[key])}
 
-\begin{enumerate}[1.]
-\item
-\end{enumerate}
+films_summary_dataframe = pd.DataFrame(films_summary_dictionary).transpose()
+@
 
-\begin{enumerate}[(1)]
-\item
-\end{enumerate}
+\begin{figure}
+    \centering
+    \begin{subfigure}[b]{0.15\textwidth}
+        \centering
+        <%=print(get_table_for_dataframe(tropes_summary_dataframe.describe([.1,.2,.3,.4,.5,.6,.7,.8,.9]), fixed_width=True))%>
+        \caption{}
+        \label{fig:descriptive_analysis_tropes}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.4\textwidth}
+        \centering
+<<width="\\linewidth",echo=False, results='hidden'>>=
+plot = tropes_summary_dataframe.plot.hist(log=True, color='#cccccc', figsize=(5, 5.2), ec="k", zorder=2, rwidth=0.5)
+plot.set_xlabel("Films by number of tropes")
+@
+        \caption{}
+        \label{fig:histogram_tropes}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.35\textwidth}
+        \centering
+        <%=print(get_table_for_dataframe(tropes_summary_dataframe.sort_values('tropes',ascending=False).head(TOP_VALUES), fixed_width=True))%>
+        \caption{}
+        \label{fig:top_tropes_films}
+    \end{subfigure}
+    \caption{\textbf{(a)} Descriptive analysis of the Tropes by appearance in films.
+    \textbf{(b)} Histogram of number of tropes by film.
+    \textbf{(c)} Top films by number of tropes}
+    \label{fig:tropes_analysis}
+\end{figure}
 
-\begin{enumerate}[I]
-\item
-\end{enumerate}
+\begin{figure}
+    \centering
+    \begin{subfigure}[b]{0.15\textwidth}
+        \centering
+        <%=print(get_table_for_dataframe(films_summary_dataframe.describe([.1,.2,.3,.4,.5,.6,.7,.8,.9]), fixed_width=True))%>
+        \caption{}
+        \label{fig:descriptive_analysis_films}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.4\textwidth}
+        \centering
+<<width="\\linewidth",echo=False, results='hidden'>>=
+plot = films_summary_dataframe.plot.hist(log=True, color='#cccccc', figsize=(5, 5.2), ec="k", zorder=2, rwidth=0.5)
+plot.set_xlabel("Tropes by number of films")
+@
+        \caption{}
+        \label{fig:histogram_films}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.35\textwidth}
+        \centering
+        <%=print(get_table_for_dataframe(films_summary_dataframe.sort_values('films',ascending=False).head(TOP_VALUES), fixed_width=True))%>
+        \caption{}
+        \label{fig:top_films_tropes}
+    \end{subfigure}
+    \caption{\textbf{(a)} Descriptive analysis of the films by tropes occurrences.
+    \textbf{(b)} Histogram of number of films by tropes.
+    \textbf{(c)} Top tropes by number of films}
+    \label{fig:films_analysis}
+\end{figure}
 
-\begin{enumerate}[i]
-\item
-\end{enumerate}
+% TODO: Explicar los datasets
 
-\begin{enumerate}[a]
-\item
-\end{enumerate}
+% DONE: Mapeo con nota: Explicar brevemente el tema de iMDb y el mapeo + explicar los datos y correlaciones (gráficas)
 
-\end{verbatim}
+\subsection{Step 2: Map genres and rating}
 
-\subsubsection{Bullet list styles}
+TvTropes is a huge yet very specific database of tropes but it doesn't include a rating
+or links to an external database that we could use as a rating source;
+however, IMDb offers their database for non-commercial use and they provide datasets with lots of interesting features,
+including the rating and the popularity.
+Our research just needs a way to map both tropes and ratings in order to build an extended dataset
+that will ultimately help us train a surrogate model.
 
-\begin{verbatim}
+IMDb Datasets are a compendium of information that IMDb offers for personal and
+non-commercial use. Both conditions of use and dataset descriptions are explained in
+https://www.imdb.com/interfaces/.
+
+Our current research will make use of these datasets to extend the film information from TVTropes, in particular,
+title.basics.tsv, which contains metadata from the films such as the title, the year, the genres
+and the duration, and title.ratings.tsv, which contains the rating and the number of votes.
+
+<<echo=False>>=
+films_dictionary = read_compressed_json(FILM_TROPES_JSON_BZ2_FILE)
+tropes_dictionary = reverse_dictionary(films_dictionary)
+
+n_films = len(films_dictionary.keys())
+n_tropes = len(tropes_dictionary.keys())
+
+
+workflow = f'''
+digraph {{
+    splines=polyline
+    ranksep=0.3;
+    nodesep=0.3;
+    rankdir=LR
+    margin=0;
+    graph [ resolution=128, fontsize=30];
+
+    subgraph cluster_0 {{
+        style=invis
+        start [label="Start" type="start"]
+        retrieve [label="Retrieve data" type="process"]
+        titles [label="Title/Year\nnormalization" type="process"];
+        map_title_year [label="Select\nunique matches\nby title & year" type="process"];
+        map_title [label="Select\nunique matches\nby title" type="process"];
+        map_popularity [label="Select\nmost popular candidates\nby title" type="process"];
+    }}
+    subgraph cluster_1 {{
+        style=invis
+        ignored [label="Ignored films", type="data"]
+        extended_dataset [label="Extended Dataset\n\nid,title_imdb,\ntitle_tvtropes,\nyear,genres,\ntropes", type="data"]
+    }}
+    subgraph cluster_2 {{
+        style=invis
+        dataset1 [label="Tropes dataset\n\nfilms->tropes\n({n_films}->{n_tropes})" type="data"];
+        dataset2 [label="IMDb Dataset\n\ntitle.basics.tsv\n(id,title,\nyear,genres)" type="database"];
+        dataset3 [label="IMDb Dataset\n\ntitle.ratings.tsv\n(id,rating,votes)" type="database"];
+    }}
+    start->retrieve
+
+    retrieve->dataset1[constraint=false];
+    retrieve->dataset2[constraint=false];
+    retrieve->dataset3[constraint=false];
+    dataset1->dataset2[style=invis]
+    dataset2->dataset3[style=invis]
+
+    retrieve->titles;
+    map_title_year->extended_dataset[constraint=false];
+    map_title->extended_dataset[constraint=false];
+    map_popularity->extended_dataset[constraint=false];
+    map_popularity->ignored;
+    titles->map_title_year->map_title->map_popularity;
+}}'''
+
+draw_graphviz(workflow, "mapper_workflow.pdf")
+@
+
+\begin{figure}
+\centering
+\includegraphics[width=0.9\textwidth]{figures/mapper_workflow.pdf}
+\caption[Scraper]{Extending the dataset with genres and rating.\label{fig:mapper_workflow}}
+\end{figure}
+
+Items in IMDb that don't relate to films are excluded (tvEpisode, tvSeries, tvSpecial, tvShort, videoGame,
+tvMiniSeries, titleType) because they are not in our TVTropes scraped dataset and they would only increase
+ambiguity as more films might match the same name.
+
+As described in Figure~\ref{fig:mapper_workflow}, in order to be able to map the film names,
+films names are normalized in both cases, TVTropes and IMDb, converting camel-case to Title case, removing
+non-alphanumerical values and extra blanks, splitting name and year when required, and converting to lowercase.
+Normalized names in TvTropes and IMDb are matched, ideally \{1->1\}.
+In order to reduce ambiguity, if the year is present in TvTropes's identifier,
+we reduce the search to the specific year in IMDb.
+If there are more than one match for a tvTropes's identifier in IMDb,
+we just choose the one with the highest number of votes.
+This heuristic relies in the fact that both data sources (tropes and votes)
+are maintained by different communities of users, enthusiasts in both cases,
+so if there is a film in TVTropes and there are many films with the same name in IMDb,
+it will probably be the one with highest popularity, that is reflected in the number of votes.
+We decided to include the original title so that non-English titles can be handled as well.
+
+
+<<echo=False>>=
+extended_dataframe = read_dataframe(FILM_EXTENDED_DATASET_BZ2_FILE, USE_HDF)
+trope_names = [key for key in extended_dataframe.keys() if key not in EVERYTHING_BUT_TROPES and '[GENRE]' not in key]
+extended_dataframe['Number of tropes'] = sum(getattr(extended_dataframe,key) for key in trope_names)
+
+coefficient_rating_votes, p_value_rating_votes = stats.pearsonr(extended_dataframe['Rating'], extended_dataframe['Votes'])
+coefficient_rating_ntropes, p_value_rating_ntropes = stats.pearsonr(extended_dataframe['Rating'], extended_dataframe['Number of tropes'])
+coefficient_votes_ntropes, p_value_votes_ntropes = stats.pearsonr(extended_dataframe['Votes'], extended_dataframe['Number of tropes'])
+coefficient_year_ntropes, p_value_year_ntropes = stats.pearsonr(extended_dataframe['Year'], extended_dataframe['Number of tropes'])
+@
+
+\begin{figure}
+    \centering
+    \begin{subfigure}[b]{0.3\textwidth}
+        \centering
+<<width="\\linewidth",echo=False, results='hidden'>>=
+extended_dataframe.plot.scatter(x='Rating', y='Number of tropes', color='darkgray', label='Films', figsize=(4, 4))
+#plot_regression(extended_dataframe, 'Rating', 'Number of tropes', 'black')
+@
+        \caption{\begin{tabularx}{\textwidth}{lX} coefficient: & <%=coefficient_rating_ntropes%> \\ p-value & <%=p_value_rating_ntropes%> \end{tabularx}}
+        \label{fig:rating_ntropes}
+    \end{subfigure}
+    \hfill
+    \centering
+    \begin{subfigure}[b]{0.3\textwidth}
+        \centering
+<<width="\\linewidth",echo=False, results='hidden'>>=
+extended_dataframe.plot.scatter(x='Votes', y='Number of tropes', color='darkgray', label='Films', figsize=(4, 4))
+#plot_regression(extended_dataframe, 'Votes', 'Number of tropes', 'black')
+@
+        \caption{\begin{tabularx}{\textwidth}{lX} coefficient: & <%=coefficient_votes_ntropes%> \\ p-value & <%=p_value_votes_ntropes%> \end{tabularx}}
+        \label{fig:votes_ntropes}
+    \end{subfigure}
+    \hfill
+    \centering
+    \begin{subfigure}[b]{0.3\textwidth}
+        \centering
+<<width="\\linewidth",echo=False, results='hidden'>>=
+extended_dataframe.plot.scatter(x='Year', y='Number of tropes', color='darkgray', label='Films', figsize=(4, 4))
+#plot_regression(extended_dataframe, 'Year', 'Number of tropes', 'black')
+@
+        \caption{\begin{tabularx}{\textwidth}{lX} coefficient: & <%=coefficient_year_ntropes%> \\ p-value & <%=p_value_year_ntropes%> \end{tabularx}}
+        \label{fig:year_ntropes}
+    \end{subfigure}
+    \hfill
+    \caption{Scatter plot to show the relation between: \textbf{(a)} Rating vs. Nº of tropes
+    \textbf{(b)} Votes vs. Nº of tropes \textbf{(c)} Year vs. Nº of tropes}
+    \label{fig:extended_dataset_scatterplots}
+\end{figure}
+
+A resulting table includes the identifier in IMDb, in TVTropes, the name of the film, the year, the rating,
+the number of votes, the tropes for the film (0 if not present, 1 if present) and the genre (0 if not present,
+1 if present).
+
+A brief analysis of the new extended dataset,
+consisting in <%=extended_dataframe.shape[0]%> films linked to <%=len(trope_names)%> tropes,
+shows that there are significant positive correlations between the number of tropes
+and the rating, the popularity and the year, as shown in Figure \ref{fig:extended_dataset_scatterplots},
+% TODO why?
+
+% DONE: Generación del modelo surrogado: Red Neuronal + descripción de parámetros estándar + decisiones + (en proceso de ver lo mínimo que hay que evaluar)
+
+\subsection{Step 3: Build the Evaluator}
+
+<<echo=False>>=
+input, output = get_experiment_execution_information(EVALUATOR_BUILDER_LOG_FILE)
+layers = output[output['parameter']=='Layer sizes']['value'][0].split(', ')
+@
+
+Given our Extended Dataset, our goal is to build an evaluator
+that can be used as a surrogate model by the Genetic Algorithm, in further steps.
+
+The inputs are binary values for every trope defined in the Extended Dataset
+and the output is a continuous numeric value that represents the rating of the film.
+A neural network is a technique that perfectly fits in our requirements,
+because the relations among inputs are unclear and the effect on the rating is complex.
+
+We will follow different rules of the thumb to build a proper neural network:
 \begin{itemize}
-\item
+\item Type: Multi-layer preceptron (MLP), a class of
+feedforward artificial neural network very flexible and generally used to learn a mapping from inputs to outputs.
+\item Hidden layers: 2; according to \cite{reed1999neural},
+although a single hidden layer can theoretically be used to approximate any function that we require
+(universal approximation theorem),
+using two hidden layers (or more) can be much more efficient.
+\item Structure: <%='/'.join(layers)%>,
+according to the geometric pyramid rule proposed by \cite{masters1993practical}.
+\item Activation: ReLU, the most widely used activation function
+because of the sparsity and the reduced likelihood of vanishing gradient,
+is the default activation function for the hidden layer in the package sklearn.
+\item Solver: adam, an efficient algorithm that works well on large problems,
+also the default in the package sklearn.
 \end{itemize}
-\end{verbatim}
 
-\subsubsection{Description list}
+<<echo=False>>=
+iterations_evaluator = extract_iterations_from_log(log_file_name=EVALUATOR_BUILDER_LOG_FILE)
+@
 
-\begin{verbatim}
-\begin{description}
-\item[<entry>] description text.
-\end{description}
-\end{verbatim}
+\begin{figure}
+    \centering
+<<width=".5\\linewidth",echo=False, results='hidden'>>=
+plot = iterations_evaluator.plot(x='iteration', y='loss', logy=True, color='black')
+plot.set_ylabel("loss")
+@
+    \caption{Iterations of the evaluator training vs loss (surrogate model) }
+    \label{fig:evaluator_training}
+\end{figure}
 
-\subsection{Enunciations}
+Regarding the genres from IMDb, we also consider them (high level) tropes because a genre usually sets
+common structures and elements in the film, hence we are including them as features in our MLP.
 
-\begin{verbatim}
-\begin{theorem}[<Theorem subhead>]\label{thm1}
-<theorem text>.
-\end{theorem}
-
-\begin{proposition}[<proposition subhead>]\label{pro1}
-<proposition text>.
-\end{proposition}
-
-\begin{definition}[<definition subhead>]\label{dfn1}
-<definition text>.
-\end{definition}
-
-\begin{proof}
-<proof text>.
-\end{proof}
-
-\begin{proof}[Proof of Theorem~\ref{thm1}]
-<proof text>.
-\end{proof}
-
-\end{verbatim}
-
-\subsection{Program codes}
-
-Use \verb+\begin{verbatim}...\end{verbatim}+ for program codes without math. Use \verb+\begin{alltt}...\end{alltt}+ for program codes with math. Based on the text provided inside the optional argument of \verb+\begin{code}[Psecode|Listing|Box|Code|+\hfill\break \verb+Specification|Procedure|Sourcecode|Program]...+ \verb+\end{code}+ tag corresponding boxed like floats are generated. Also note that \verb+\begin{code}[Code|Listing]...+ \verb+\end{code}+ tag with either Code or Listing text as optional argument text are set with computer modern typewriter font.  All other code environments are set with normal text font. Refer below example:
-
-\begin{verbatim}
-\begin{lstlisting}[caption={Descriptive Caption Text},label=DescriptiveLabel]
-for i:=maxint to 0 do
-begin
-{ do nothing }
-end;
-Write('Case insensitive ');
-WritE('Pascal keywords.');
-\end{lstlisting}
-\end{verbatim}
+As we can see in Figure \ref{fig:evaluator_training},
+the training of the MLP converges to <%=iterations_evaluator['loss'].iloc[-1]%>.
 
 
-\subsection{Acknowledgements} An Acknowledgements section is started with \verb"\ack" or
-\verb"\acks" for \textit{Acknowledgement} or
-\textit{Acknowledgements}, respectively. It must be placed just
-before the References.
+% TODO: Generación de conjuntos de tropos mediante GAs: Descripción del algoritmo + operadores + parámetros
 
-\subsection{Bibliography}
+\section{Experimental setup}
+% TODO: Básico: Generar conjuntos de tropos de tamaño fijo: Objetivo, con estudio de parámetros (10 ejecuciones al menos), gráfica de evolución / nº de tropos, interpretación de resultados
+% TODO: (Opcional) Mejorar un conjunto de tropos (con tropos fijos): IDEM
+% TODO: Generar conjuntos de tropos sin tamaño fijo (la película perfecta). Hay películas parecidas o mezcladas?
 
-\begin{enumerate}[1]
-\item Use \verb"\bibliography{wileyNJD-AMA}" BST file for AMA reference style
-\item Use \verb"\bibliography{wileyNJD-APA}" BST file for APA reference style
-\item Use \verb"\bibliography{wileyNJD-AMS}" BST file for AMS reference style
-\item Use \verb"\bibliography{wileyNJD-VANCOUVER}" BST file for Vancouver reference style
-\item Use \verb"\bibliography{wileyNJD-ACS}" BST file for Chemistry reference style
-\end{enumerate}
+\section{Conclusions}
+% TODO: Objetivo ha sido ...
+% TODO: Para ello hemos realizado tal (metodología y experimentos) ...
+% TODO: Los resultados nos dicen que ...
+% TODO: Esto puede ser la base para una futura linea...
 
-The normal commands for producing the reference list are:
-
-\begin{verbatim}
-\begin{thebibliography}{99}
-\bibitem{<x-ref label>}
-         <Reference details>
-.
-.
-.
-\end{thebibliography}
-\end{verbatim}
-
-\subsection{Appendix Section}
-
-\begin{verbatim}
-\appendix
-
-\section{Section title of first appendix\label{app1}}
-.
-.
-.
-
-\end{verbatim}
+\section{Bibliography}
+\bibliography{report}
 
 \end{document}

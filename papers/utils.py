@@ -12,7 +12,6 @@ from tabulate import tabulate
 
 data = {}
 
-
 def read_compressed_json(file_path):
     if file_path in data:
         return data[file_path]
@@ -38,9 +37,10 @@ def reverse_dictionary(original_dictionary):
 
 def draw_graphviz(dot, filename):
     new_dot = dot.replace('type="start"', 'shape="ellipse" margin=0.2')
-    new_dot = dot.replace('type="database"', 'shape="cylinder" margin=0.2')
+    new_dot = new_dot.replace('type="database"', 'shape="cylinder" margin=0.2')
+    new_dot = new_dot.replace('type="tool"', 'shape="box" margin=0.2')
     new_dot = new_dot.replace('type="process"', 'shape="box3d" margin=0.2 style="filled" fillcolor="gray91"')
-    new_dot = new_dot.replace('type="data"', 'shape="polygon" skew=.4 margin=0')
+    new_dot = new_dot.replace('type="data"', 'shape="polygon" skew=0.5 margin=0')
 
     G = pgv.AGraph(string=new_dot)
     G.layout(prog='dot')
@@ -49,8 +49,14 @@ def draw_graphviz(dot, filename):
     G.draw(os.path.join('figures', filename))
 
 
-def get_table_for_dataframe(df, **kwargs):
-    return tabulate(df, headers=df, tablefmt='latex_raw', **kwargs)
+def get_table_for_dataframe(df, fixed_width=None, **kwargs):
+    latex_code = tabulate(df, headers=df, tablefmt='latex_raw', **kwargs)
+    latex_code = latex_code.replace('%', '\\%')
+    if fixed_width is not None:
+        latex_code = latex_code.replace('\\begin{tabular}','\\begin{tabularx}{\\textwidth}')
+        latex_code = latex_code.replace('\\end{tabular}', '\\end{tabularx}')
+        latex_code = latex_code.replace('{lr}','{Xr}')
+    return latex_code
 
 
 def tex_wrap_and_escape(text, length=40):
@@ -60,7 +66,7 @@ def tex_wrap_and_escape(text, length=40):
             wrapped_text = '\makecell[tl]{' + wrapped_text.replace('\n', ' \\\\ ') + '}'
         return tex_escape(wrapped_text)
     if isinstance(text, list):
-        text = ', '.join(text)
+        text = ', '.join([str(element) for element in text])
         return tex_wrap_and_escape(text)
     return text
 
@@ -142,3 +148,38 @@ def plot_regression(dataframe, x_column, y_column, color='red'):
 
     regr.fit(X_train, Y_train)
     plt.plot(X_test, regr.predict(X_test), color=color, linewidth=3, )
+
+
+def extract_iterations_from_log(log_file_name):
+    iteration_line = '^.*\\| Iteration ([0-9]+), loss = ([0-9\.]+)$'
+
+    values = []
+    with open(log_file_name, 'r') as scraper_log:
+        lines = scraper_log.readlines()
+    import re
+    for line in lines:
+        matches = re.search(iteration_line, line)
+        if matches:
+            entry = {'iteration': float(matches.group(1)), 'loss': float(matches.group(2))}
+            values.append(entry)
+
+    return pd.DataFrame(values)
+
+if __name__=='__main__':
+    FILM_TROPES_JSON_BZ2_FILE = '../datasets/scraper/cache/20190501/films_tropes_20190501.json.bz2'
+    FILM_EXTENDED_DATASET_BZ2_FILE = '../datasets/extended_dataset.csv.bz2'
+    USE_HDF = True
+    SCRAPER_LOG_FILE = '../logs/scrape_tvtropes_20190501_20190512_191015.log'
+    MAPPER_LOG_FILE = '../logs/map_films_20190526_164459.log'
+    EVALUATOR_BUILDER_LOG_FILE = '../logs/build_evaluator_20190616_211935.log'
+    TOP_VALUES = 14
+    EVERYTHING_BUT_TROPES = ['Id', 'NameTvTropes', 'NameIMDB', 'Rating', 'Votes', 'Year']
+
+    input, output = get_experiment_execution_information('../logs/build_evaluator_20190616_211935.log')
+
+
+    df = extract_iterations_from_log(log_file_name=EVALUATOR_BUILDER_LOG_FILE)
+    plot.set_ylabel("loss")
+    pass
+
+

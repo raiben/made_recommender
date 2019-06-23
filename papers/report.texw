@@ -15,6 +15,7 @@ FILM_EXTENDED_DATASET_BZ2_FILE = '../datasets/extended_dataset.csv.bz2'
 USE_HDF = True
 SCRAPER_LOG_FILE = '../logs/scrape_tvtropes_20190501_20190512_191015.log'
 MAPPER_LOG_FILE = '../logs/map_films_20190526_164459.log'
+EVALUATOR_BUILDER_LOG_FILE = '../logs/build_evaluator_20190616_211935.log'
 TOP_VALUES = 25
 
 @
@@ -725,8 +726,55 @@ extended_dataframe.plot.scatter(x='Year', y='Number of tropes', color='DarkRed',
 plot_regression(extended_dataframe, 'Year', 'Number of tropes', 'blue')
 @
 
-\section{Deep larning to predict the quality based on the tropes}
+\section{Deep learning to predict the quality based on the tropes}
 
+The extended dataset which contains a list of XX films linked to YY tropes/genres and their rating is used to train
+a neural network, that will help us predict the rating from the set of tropes.
+
+<<echo=False>>=
+workflow = f'''
+digraph {{
+    splines=polyline
+    rankdir=LR
+    margin=0;
+    graph [ resolution=128, fontsize=14];
+
+    extended_dataset[label="Films Extended Dataset" type="data"]
+    neural_network[label="Neural Network" type="process"]
+
+    extended_dataset -> neural_network;
+}}'''
+
+draw_graphviz(workflow, "scrapper_workflow.pdf")
+@
+
+% TODO Why I have chosen a Neural Network
+% TODO Why
+
+
+Features:
+- rules of the thomb
+- We define geometrical ...
+- MLPRegressor, relu, adam
+- Include tropes and genres
+
+\subsection{Experiments}
+
+<<results="tex">>=
+input, output = get_experiment_execution_information(EVALUATOR_BUILDER_LOG_FILE)
+latex_input = get_table_for_dataframe(input)
+latex_output = get_table_for_dataframe(output)
+@
+
+Log processed: <%=print(tex_escape(EVALUATOR_BUILDER_LOG_FILE))%>.
+
+Input parameters:
+
+<%=print(latex_input)%>
+
+Output values:
+
+<%=print(latex_output)%>
 
 \section{On generating the DNA of a film}
 
