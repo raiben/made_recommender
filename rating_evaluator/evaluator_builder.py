@@ -6,6 +6,7 @@ import math
 import os
 from io import StringIO
 
+import joblib
 import pandas as pd
 import pygraphviz
 from pandas.io import pytables
@@ -45,7 +46,8 @@ class EvaluatorBuilder(BaseScript):
         self._calculate_layer_sizes(tropes_count)
         self.neural_network = MLPRegressor(activation='relu', alpha=0.0001, random_state=self.random_seed,
                                            hidden_layer_sizes=(self.layer_sizes[1], self.layer_sizes[2]),
-                                           solver='adam', max_iter=400, verbose=51)
+                                           solver='adam', max_iter=400, verbose=51,
+                                           early_stopping=True)
 
         with write_stdout_through_logger(self._logger):
             self.neural_network.fit(inputs, outputs)

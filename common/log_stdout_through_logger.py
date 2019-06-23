@@ -12,6 +12,9 @@ def write_stdout_through_logger(logger):
             if len(text.rstrip()):
                 logger.info(text)
 
+        def flush(self, *args, **kwargs):
+            pass
+
     sys.stdout = CustomPrint(old_stdout)
 
     try:
