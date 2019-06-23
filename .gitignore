@@ -8,3 +8,6 @@ _minted-report
 *.pyg
 *.pag
 *.log
+__pycache__
+*~
+_minted*

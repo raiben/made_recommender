@@ -19,7 +19,8 @@ EVERYTHING_BUT_TROPES = ['Id','NameTvTropes', 'NameIMDB', 'Rating', 'Votes', 'Ye
 @
 
 \documentclass[APA,LATO1COL]{WileyNJD-v2}
-\usepackage{moreverb}
+\usepackage{minted}
+%\usepackage{moreverb}
 
 % -- begin: Added by Rubén
 \usepackage{subcaption}
