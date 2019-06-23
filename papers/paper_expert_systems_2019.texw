@@ -655,8 +655,9 @@ common structures and elements in the film, hence we are including them as featu
 As we can see in Figure \ref{fig:evaluator_training},
 the training of the MLP converges to <%=iterations_evaluator['loss'].iloc[-1]%>.
 
+% DOING: Generación de conjuntos de tropos mediante GAs: Descripción del algoritmo + operadores + parámetros
+\subsection{Film DNA builder}
 
-% TODO: Generación de conjuntos de tropos mediante GAs: Descripción del algoritmo + operadores + parámetros
 
 \section{Experimental setup}
 % TODO: Básico: Generar conjuntos de tropos de tamaño fijo: Objetivo, con estudio de parámetros (10 ejecuciones al menos), gráfica de evolución / nº de tropos, interpretación de resultados
