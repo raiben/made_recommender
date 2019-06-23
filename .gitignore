@@ -7,3 +7,7 @@ _minted-report
 *.tex
 *.pyg
 *.pag
+*.log
+__pycache__
+*~
+_minted*

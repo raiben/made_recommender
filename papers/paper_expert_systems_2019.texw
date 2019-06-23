@@ -19,7 +19,8 @@ EVERYTHING_BUT_TROPES = ['Id','NameTvTropes', 'NameIMDB', 'Rating', 'Votes', 'Ye
 @
 
 \documentclass[APA,LATO1COL]{WileyNJD-v2}
-\usepackage{moreverb}
+\usepackage{minted}
+%\usepackage{moreverb}
 
 % -- begin: Added by Rubén
 \usepackage{subcaption}
@@ -65,6 +66,7 @@ T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
 
 \keywords{Computational Intelligence; Tropes; Scrapping; Neural Networks; Genetic Algorithms}
 
+%You should probably edit this too - JJ
 \jnlcitation{\cname{%
 \author{Williams K.},
 \author{B. Hoskins},
@@ -75,17 +77,22 @@ T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
 
 \maketitle
 
+% Edit or eliminate this - JJ
 \footnotetext{\textbf{Abbreviations:} ANA, anti-nuclear antibodies; APC, antigen-presenting cells; IRF, interferon regulatory factor}
 
 
 \section{Introduction}\label{sec1}
 
-Crafting quality films is quite challenging, according to ~\cite{Hennig-Thurau2019},
-because of the plot complexities and the \textit{multiplicative production function} of entertainment,
-in other words, the elements need to work together and a single failing one can provoke a disaster in cascade.
-That is why, in the current research, in order to build an authoring tool to help
-on the design of films from the quality perspective, we are counting with the experts' contributions
-to, both, model the films in a way that describes them from many perspectives, and have a measure of quality
+Crafting quality films % of fill scripts - jj
+ is quite challenging, according to ~\cite{Hennig-Thurau2019},
+because of the plot complexities and the
+\textit{multiplicative production function} % You should probably define this - JJ
+of entertainment,
+in other words, the elements need to work together and a single one failing can provoke a disaster in cascade.
+That is why, in the current research, and in order to build an authoring tool to help
+on the design of films from the quality perspective, we are counting with the
+experts' contributions % Contributors are not experts. Maybe talk about the wisdom of crowds - JJ
+to both model the films in a way that describes them from many perspectives, and have a measure of quality
 that summarizes all the perspectives in 360 degrees,
 considering the \textit{multiplicative production function} as well.
 Our candidates for both mechanisms are out there,
@@ -93,22 +100,29 @@ tropes or patterns that have been discovered in the films, and the massive human
 
 % Intenta responder a: que son los tropos y por que nos importan
 
-We can model a film by using the set of tropes that we can find in it.
+We can model a film % Again, be precise. A bag of tropes does not model a film
+% or even a film script. It describes roughly plot devices and atmosphere - JJ
+% Maybe you don't want to model, but characterize it. Or maybe describe it- JJ
+by using the set of tropes that we can find in it.
 A trope is as a recurring narrative device~\cite{baldick2015oxford};
 it can be a technique, a motif, an archetype or a \textit{clich\'e},
-used by the authors to achieve specific effects that might vary from increasing
-the interest, surprising, recall familiarity, entertaining, etc,
+used by the authors % specify: script writers, producers, director.
+% Are we interested in "films in b&w", for instance, which is purely visual? - JJ
+ to achieve specific effects that might vary from interest-increasing
+to surprising through recall familiarity or entertaining,
 in their creative works, such as books, films, comics or videogames.
 Some tropes are broadly adopted and academically studied such as
 the \textit{Three-act Structure} formulated by Syd Field~\cite{field1982screenplay},
 the \textit{Hero's Journey} studied by Vogler~\cite{vogler2007writer},
 the \textit{McGuffin} popularized by Hitchcock~\cite{truffaut1985hitchcock} and
-the \textit{Chekhov's Gun} developed by the Russian writer with the eponymous
+the \textit{Chekhov's Gun} developed % or mentioned for the first time? - JJ
+by the Russian writer with the eponymous
 name~\cite{bitsilli1983chekhov},
 but there are thousands of not-so-widely used tropes as well, discovered and
 catalogued everyday by professionals and enthusiastic of the storytelling;
-their study is organic, dynamic and extensive.
-In this paper, will call \textit{Film DNA} to the set of tropes
+their study is organic, dynamic and extensive. % A mention to PicTropes would
+% be in order here - JJ
+In this paper, we will call \textit{Film DNA} to the set of tropes
 that we are able to find in a film
 and define the structure, characters, events, mood, settings, narration, etc.
 As the tropes are \textit{living concepts},
@@ -116,6 +130,11 @@ which grow as they are discovered as common
 patterns in other stories, the \textit{Film DNA} is, by definition, incomplete and evolving,
 yet it is still interesting to define stories, categorize them
 and model them from a mathematical perspective.
+
+% So far we don't know why you are interested in all this, and what's the
+% broad outline of the paper. What do you want to do with tropes? The challenges
+% should be presented in the first paragraph. You shouldn't arrive at this point
+% in the introduction and still wonder what the paper is about - JJ
 
 % Intenta responder a: Que es la calidad (muy difícil + subjetivo -> rating es un indicador)
 At the same time, we need to be able to link a measure of quality to the \textit{Film DNA}
