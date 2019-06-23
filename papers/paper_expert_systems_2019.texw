@@ -226,12 +226,15 @@ in the figure~\ref{fig:main_workflow_extended}: % As is usual, say the objective
     the community, finding that popular films are broadly described in terms of tropes
     and unpopular films poorly described or directly missing. % Explain variability - JJ
     \item[Step 2] % Disambiguation of film names needs to be at least mentioned - JJ
+    % Or rather you should change "map" to disambiguation, which seems the best
+    % description for this step - JJ
     Map the films' features such as the rating and genres to the previously built
     \textit{Film DNAs}. This \textit{extended dataset}  will show limitations as well
-    based on the limitations from the original one
+    based on the original one
     and the automatic matching based on different heuristics.
     As we will see, a trope that is widely used doesn't need to be linked to good ratings,
     tropes that are present in bad films can become good in different combinations and vice-versa.
+% Need to explain that this will cull the initial TVtropes database to only a subset - JJ
     \item[Step 3] % Train a surrogate model
     Build a Neural Network to predict the rating from a \textit{Film DNA}.
     We will follow different \textit{rules of thumb}
@@ -304,21 +307,22 @@ Networks as surrogate models, fed from TVTropes and IMDb.\label{fig:main_workflo
 \subsection{Step 1: Extract the tropes}
 % Don't need to devote much time to this except if it's extraordinarily novel
 % Refer to former report (PicTropes) and the upcoming one - JJ
-Tropes are described in a live wiki called \cite{tvtropes_2}, that is being
+We are going to use tropes as described in a live wiki called \cite{tvtropes_2}, that is
 collecting thousand of descriptions and examples of tropes from 2014 until now. As the data is fed by a community
 of users, we could find the bias that popular films are better described and analysed in terms of the tropes than independent
-films, and that popular tropes are more recognised than very specific ones.
+films, and that popular tropes are more recognised than very specific ones. % REFERENCE NEEDED - JJ
+% Which means that... (tropes cound be under/overrepresented|false positives and negatives are possible) - JJ
 The semantic network of knowledge behind \textit{TVTropes.org} is huge and complex; it massively links hierarchies of tropes
 to their usage in creations for digital entertainment. The data, however, is only available through its web interface,
 which is why, in order to make it usable by the scientific community, \cite{maltekiesel_2} extracted all
 their data to a database so-called \textit{DBTropes.org}.\\
-
+% But we are not using it... And that Db is outdated - JJ
 As the base of the research on automatic trope generation, we begun with a dataset based in the
 latest version of DBTropes, called PicTropes\cite{garcia2018overview} that included 5,925 films with 18,270 tropes.
 However, the last version of BDTropes is from 2016, and the community of users of TVTropes has tripled the size
 of the database since then; if we work with the latest data from TVTropes our machine learning algorithms
 would benefit from having much entries and hence, provide better results. That's why our first step is to
-extract the data directly from TVTropes.
+extract the data directly from TVTropes. % and made this dataset available to the public... - JJ
 
 
 <<echo=False>>=
@@ -387,6 +391,8 @@ As result, it builds a dictionary of films and tropes.
 In order to ease the execution, it can be stopped and re-launched at any time
 because it makes use of a local permanent cache compressed in bzip2 with a block size of 900k,
 the highest compression available.
+% You use like 3 different forms for TvTropes (with or without caps).
+% Settle on just 1! - JJ
 In order to avoid hurting the TvTropes servers, the process inserts waits between each two consecutive calls.
 As result, the executions retrieved around 12K pages in 3 to 4 hours.
 
@@ -460,8 +466,8 @@ plot.set_xlabel("Tropes by number of films")
         \caption{}
         \label{fig:top_films_tropes}
     \end{subfigure}
-    \caption{\textbf{(a)} Descriptive analysis of the films by tropes occurrences.
-    \textbf{(b)} Histogram of number of films by tropes.
+    \caption{\textbf{(a)} Descriptive analysis of the tropes by number of films in which they appear.
+    \textbf{(b)} Histogram of number of films by tropes. Please note the logarithmic $y$ axis.
     \textbf{(c)} Top tropes by number of films}
     \label{fig:films_analysis}
 \end{figure}
@@ -699,6 +705,8 @@ the training of the MLP converges to <%=iterations_evaluator['loss'].iloc[-1]%>.
 % TODO: Básico: Generar conjuntos de tropos de tamaño fijo: Objetivo, con estudio de parámetros (10 ejecuciones al menos), gráfica de evolución / nº de tropos, interpretación de resultados
 % TODO: (Opcional) Mejorar un conjunto de tropos (con tropos fijos): IDEM
 % TODO: Generar conjuntos de tropos sin tamaño fijo (la película perfecta). Hay películas parecidas o mezcladas?
+
+\section{Results}
 
 \section{Conclusions}
 % TODO: Objetivo ha sido ...
