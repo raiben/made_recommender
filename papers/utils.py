@@ -152,6 +152,7 @@ def plot_regression(dataframe, x_column, y_column, color='red'):
 
 def extract_iterations_from_log(log_file_name):
     iteration_line = '^.*\\| Iteration ([0-9]+), loss = ([0-9\.]+)$'
+    validation_score = '^.*\\| Validation score: ([0-9\\-\\+\\.]+)$'
 
     values = []
     with open(log_file_name, 'r') as scraper_log:
@@ -162,6 +163,10 @@ def extract_iterations_from_log(log_file_name):
         if matches:
             entry = {'iteration': float(matches.group(1)), 'loss': float(matches.group(2))}
             values.append(entry)
+        matches = re.search(validation_score, line)
+        if matches:
+            entry = values[-1]
+            entry['validation'] = float(matches.group(1))
 
     return pd.DataFrame(values)
 
@@ -193,7 +198,7 @@ if __name__=='__main__':
     USE_HDF = True
     SCRAPER_LOG_FILE = '../logs/scrape_tvtropes_20190501_20190512_191015.log'
     MAPPER_LOG_FILE = '../logs/map_films_20190526_164459.log'
-    EVALUATOR_BUILDER_LOG_FILE = '../logs/build_evaluator_20190616_211935.log'
+    EVALUATOR_BUILDER_LOG_FILE = '../logs/build_evaluator_20190624_223230.log'
     TOP_VALUES = 14
     EVERYTHING_BUT_TROPES = ['Id', 'NameTvTropes', 'NameIMDB', 'Rating', 'Votes', 'Year']
     EVALUATOR_HYPER_PARAMETERS_LOG_FILE = '../logs/build_evaluator_hyperparameters_20190622_203043.log'
@@ -201,7 +206,9 @@ if __name__=='__main__':
     input, output = get_experiment_execution_information('../logs/build_evaluator_20190616_211935.log')
 
 
-    df = extract_grid_parameters_from_log_and_results(log_file_name=EVALUATOR_HYPER_PARAMETERS_LOG_FILE)
+    iterations_evaluator = extract_iterations_from_log(log_file_name=EVALUATOR_BUILDER_LOG_FILE)
+    plot = iterations_evaluator.plot(x='iteration', y=['loss', 'validation'], logy=True, color='black', linestyle='-')
+    plot.set_ylabel("loss")
     pass
 
 

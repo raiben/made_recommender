@@ -13,7 +13,7 @@ FILM_EXTENDED_DATASET_BZ2_FILE = '../datasets/extended_dataset.csv.bz2'
 USE_HDF = True
 SCRAPER_LOG_FILE = '../logs/scrape_tvtropes_20190501_20190512_191015.log'
 MAPPER_LOG_FILE = '../logs/map_films_20190526_164459.log'
-EVALUATOR_BUILDER_LOG_FILE = '../logs/build_evaluator_20190616_211935.log'
+EVALUATOR_BUILDER_LOG_FILE = '../logs/build_evaluator_20190624_223230.log'
 TOP_VALUES = 14
 EVERYTHING_BUT_TROPES = ['Id','NameTvTropes', 'NameIMDB', 'Rating', 'Votes', 'Year']
 EVALUATOR_HYPER_PARAMETERS_LOG_FILE = '../logs/build_evaluator_hyperparameters_20190622_203043.log'
@@ -667,7 +667,7 @@ and the output is a continuous numeric value that represents the rating of the f
 A neural network is a technique that perfectly fits in our requirements,
 because the relations among inputs are unclear and the effect on the rating is complex.
 
-There are many rules of the thumb to build 
+There are many rules of the thumb to build
 
 We will follow different rules of the thumb to build a proper neural network:
 \begin{itemize}
@@ -701,10 +701,12 @@ gridsearch_dataframe = extract_grid_parameters_from_log_and_results(log_file_nam
 \begin{figure}
     \centering
 <<width=".5\\linewidth",echo=False, results='hidden'>>=
-plot = iterations_evaluator.plot(x='iteration', y='loss', logy=True, color='black')
-plot.set_ylabel("loss")
+plot = iterations_evaluator.plot(x='iteration', y=['loss','validation'], logy=True, color='black', linestyle='-')
+plot.lines[1].set_linestyle('--')
+leg = plot.legend()
+plot.grid()
 @
-    \caption{Iterations of the evaluator training vs loss (surrogate model) }
+    \caption{Evolution of the loss and the validation score throughout the training iterations}
     \label{fig:evaluator_training}
 \end{figure}
 
