@@ -16,6 +16,7 @@ MAPPER_LOG_FILE = '../logs/map_films_20190526_164459.log'
 EVALUATOR_BUILDER_LOG_FILE = '../logs/build_evaluator_20190616_211935.log'
 TOP_VALUES = 14
 EVERYTHING_BUT_TROPES = ['Id','NameTvTropes', 'NameIMDB', 'Rating', 'Votes', 'Year']
+EVALUATOR_HYPER_PARAMETERS_LOG_FILE = '../logs/build_evaluator_hyperparameters_20190622_203043.log'
 @
 
 \documentclass[APA,LATO1COL]{WileyNJD-v2}
@@ -637,7 +638,15 @@ also the default in the package sklearn.
 
 <<echo=False>>=
 iterations_evaluator = extract_iterations_from_log(log_file_name=EVALUATOR_BUILDER_LOG_FILE)
+gridsearch_dataframe = extract_grid_parameters_from_log_and_results(log_file_name=EVALUATOR_HYPER_PARAMETERS_LOG_FILE)
 @
+
+\begin{figure}
+    \centering
+<%=print(get_table_for_dataframe(gridsearch_dataframe))%>
+    \caption{Preliminary hyper-parameters' evaluation using 3-folded cross validation}
+    \label{fig:gridsearch_results}
+\end{figure}
 
 \begin{figure}
     \centering

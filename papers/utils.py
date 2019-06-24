@@ -165,6 +165,28 @@ def extract_iterations_from_log(log_file_name):
 
     return pd.DataFrame(values)
 
+def extract_grid_parameters_from_log_and_results(log_file_name):
+    result_line = '^.*\\| Result: [^\{]*(.*)$'
+
+    values = []
+    with open(log_file_name, 'r') as scraper_log:
+        lines = scraper_log.readlines()
+    import re
+    for line in lines:
+        matches = re.search(result_line, line)
+        if matches:
+            text = matches.group(1)
+            text = re.sub("'hidden_layer_sizes': \\(([^\\)]*)\\)", "'hidden_layer_sizes': '(\\1)'", text)
+            text = text.replace('\'','"')
+            entry = json.loads(text)
+            entry = {key.replace('_',' '):value for key,value in entry.items()}
+            values.append(entry)
+    dataframe = pd.DataFrame(values)
+    dataframe = dataframe[['activation','alpha','hidden layer sizes','learning rate','max iter','solver','mean','std']]
+    dataframe = dataframe.sort_values(by='mean', ascending=False).reset_index(drop=True)
+    return dataframe
+
+
 if __name__=='__main__':
     FILM_TROPES_JSON_BZ2_FILE = '../datasets/scraper/cache/20190501/films_tropes_20190501.json.bz2'
     FILM_EXTENDED_DATASET_BZ2_FILE = '../datasets/extended_dataset.csv.bz2'
@@ -174,12 +196,12 @@ if __name__=='__main__':
     EVALUATOR_BUILDER_LOG_FILE = '../logs/build_evaluator_20190616_211935.log'
     TOP_VALUES = 14
     EVERYTHING_BUT_TROPES = ['Id', 'NameTvTropes', 'NameIMDB', 'Rating', 'Votes', 'Year']
+    EVALUATOR_HYPER_PARAMETERS_LOG_FILE = '../logs/build_evaluator_hyperparameters_20190622_203043.log'
 
     input, output = get_experiment_execution_information('../logs/build_evaluator_20190616_211935.log')
 
 
-    df = extract_iterations_from_log(log_file_name=EVALUATOR_BUILDER_LOG_FILE)
-    plot.set_ylabel("loss")
+    df = extract_grid_parameters_from_log_and_results(log_file_name=EVALUATOR_HYPER_PARAMETERS_LOG_FILE)
     pass
 
 
