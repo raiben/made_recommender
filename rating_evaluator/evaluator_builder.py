@@ -8,9 +8,6 @@ from io import StringIO
 
 import joblib
 import pandas as pd
-import pygraphviz
-from pandas.io import pytables
-
 from sklearn.neural_network import MLPRegressor
 
 from common.base_script import BaseScript
@@ -43,16 +40,20 @@ class EvaluatorBuilder(BaseScript):
         outputs = self.extended_dataframe.loc[:]['Rating'].values
         tropes_count = len(self.trope_names)
 
-        self._calculate_layer_sizes(tropes_count)
-        self.neural_network = MLPRegressor(activation='relu', alpha=0.0001, random_state=self.random_seed,
-                                           hidden_layer_sizes=(self.layer_sizes[1], self.layer_sizes[2]),
-                                           solver='adam', max_iter=400, verbose=51,
-                                           early_stopping=True)
+        self._calculate_layer_sizes(tropes_count, number_of_layers=3)
+        parameters = dict(activation='relu', alpha=0.0001, random_state=self.random_seed,
+                          hidden_layer_sizes=tuple(self.layer_sizes[1:-1]),
+                          solver='sgd', max_iter=1000, verbose=100, learning_rate='constant',
+                          early_stopping=True)
+        for key,value in parameters.items():
+            self._add_to_summary(key, value)
+
+        self.neural_network = MLPRegressor(**parameters)
 
         with write_stdout_through_logger(self._logger):
             self.neural_network.fit(inputs, outputs)
 
-    def _calculate_layer_sizes(self, tropes_count):
+    def _calculate_layer_sizes(self, tropes_count, number_of_layers=3):
         # Number of hidden nodes: There is no magic formula for selecting the optimum number of hidden neurons.
         # However, some thumb rules are available for calculating the number of hidden neurons.
         # A rough approximation can be obtained by the geometric pyramid rule proposed by Masters (1993).
@@ -61,8 +62,11 @@ class EvaluatorBuilder(BaseScript):
         # 1 Masters, Timothy. Practical neural network recipes in C++. Morgan Kaufmann, 1993.
         # [2] http://www.iitbhu.ac.in/faculty/min/rajesh-rai/NMEICT-Slope/lecture/c14/l1.html
 
-        self.layer_sizes = [tropes_count, int(math.sqrt(tropes_count * (tropes_count ** (1 / 3)))),
-                            int(tropes_count ** (1 / 3)), 1]
+        if number_of_layers == 3:
+            self.layer_sizes.append([tropes_count, int(math.sqrt(tropes_count)), 1])
+        else:
+            self.layer_sizes = [tropes_count, int(math.sqrt(tropes_count * (tropes_count ** (1 / 3)))),
+                                int(tropes_count ** (1 / 3)), 1]
 
         self._add_to_summary('Layer sizes', self.layer_sizes)
 

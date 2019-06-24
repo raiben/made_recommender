@@ -667,6 +667,8 @@ and the output is a continuous numeric value that represents the rating of the f
 A neural network is a technique that perfectly fits in our requirements,
 because the relations among inputs are unclear and the effect on the rating is complex.
 
+There are many rules of the thumb to build 
+
 We will follow different rules of the thumb to build a proper neural network:
 \begin{itemize}
 \item Type: Multi-layer perceptron (MLP), a class of
