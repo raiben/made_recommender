@@ -688,24 +688,40 @@ and the output is a continuous numeric value that represents the rating of the f
 A neural network is a technique that perfectly fits in our requirements,
 because the relations among inputs are unclear and the effect on the rating is complex.
 
-There are many rules of the thumb to build
+The goal of the research is to evaluate a methodology, and hence, we need a surrogate model
+that suits our needs of estimating the rating from a Film DNA, accepting a reasonable number of false positives and
+false negatives, without actually focusing too much in maximizing its quality.
+There are many decisions that can define the quality of the model;
+some of them will be made based on the state of the art
+and, for others, we will have to make hyper-parameters search.
+In general, although there are many rules of the thumb to build acceptable neural networks,
+results may differ drastically depending on the nature of the problem and
+it is recommended to do a hyper-parameters evaluation % cite required
 
-We will follow different rules of the thumb to build a proper neural network:
-\begin{itemize}
-\item Type: Multi-layer perceptron (MLP), a class of
-feedforward artificial neural network very flexible and generally used to learn a mapping from inputs to outputs.
-\item Hidden layers: 2; according to \cite{reed1999neural},
-although a single hidden layer can theoretically be used to approximate any function that we require
-(universal approximation theorem),
-using two hidden layers (or more) can be much more efficient.
-\item Structure: <%='/'.join(layers)%>,
-according to the geometric pyramid rule proposed by \cite{masters1993practical}.
-\item Activation: ReLU, the most widely used activation function
-because of the sparsity and the reduced likelihood of vanishing gradient,
-is the default activation function for the hidden layer in the package sklearn.
-\item Solver: adam, an efficient algorithm that works well on large problems,
-also the default in the package sklearn.
-\end{itemize}
+We selected the Multi-layer perceptron (MLP)
+because it is a flexible feedforward artificial neural network
+generally used to learn a mapping from inputs to outputs.
+According to \cite{reed1999neural}, although a single hidden layer can theoretically be used
+to approximate any function that we require (universal approximation theorem),
+using two hidden layers (or more) can be much more efficient. Regarding the number of neurons,
+we will follow the geometric pyramid rule proposed by \cite{masters1993practical}.
+
+
+In order to choose hyper-parameters that get along with the nature of our problem
+we did a preliminary search with all the combinations in a domain of possible values
+for the activation (ReLu or tanh),
+the number of hidden layers (1 or 2),
+the number of neurons in each layer (162 or 883/29),
+the learning rate (contant or adaptative)
+and the solver (Adam or SGD).
+We applied 3-fold cross validation and got the average and the standard deviation.
+
+Regarding the genres from IMDb, we also consider them (high level) tropes because a genre usually sets
+common structures and elements in the film, hence we are including them as features in our MLP.
+
+The results in figure~\ref{fig:gridsearch_results} show that
+a MLP with the structure <%='/'.join(layers)%>, using ReLu activation,
+constant learning rate and SGD solver provides the best validation score.
 
 <<echo=False>>=
 iterations_evaluator = extract_iterations_from_log(log_file_name=EVALUATOR_BUILDER_LOG_FILE)
@@ -715,7 +731,7 @@ gridsearch_dataframe = extract_grid_parameters_from_log_and_results(log_file_nam
 \begin{figure}
     \centering
 <%=print(get_table_for_dataframe(gridsearch_dataframe))%>
-    \caption{Preliminary hyper-parameters' evaluation using 3-folded cross validation}
+    \caption{Hyper-parameters evaluation using 3-folded cross validation, sorted by validation score}
     \label{fig:gridsearch_results}
 \end{figure}
 
@@ -731,16 +747,16 @@ plot.grid()
     \label{fig:evaluator_training}
 \end{figure}
 
-Regarding the genres from IMDb, we also consider them (high level) tropes because a genre usually sets
-common structures and elements in the film, hence we are including them as features in our MLP.
-
 As we can see in Figure \ref{fig:evaluator_training},
-the training of the MLP converges to <%=iterations_evaluator['loss'].iloc[-1]%>.
+the training of the MLP using the hyper-parameters found in the preliminary study
+converges to a loss of <%=iterations_evaluator['loss'].iloc[-1]%>
+and a validation score of <%=iterations_evaluator['validation'].iloc[-1]%>.
 
 % Which training? How many did you do? Is this a typical training? - JJ
 
 % DOING: Generación de conjuntos de tropos mediante GAs: Descripción del algoritmo + operadores + parámetros
 \subsection{Film DNA builder}
+
 
 
 \section{Experimental setup}
