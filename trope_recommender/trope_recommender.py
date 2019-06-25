@@ -231,8 +231,8 @@ class TropeRecommender(BaseScript):
 
 
 if __name__ == "__main__":
-    neural_network_file = u'/Users/phd/workspace/made/made_recommender/datasets/MLPRegressor_relu_3120_100_adam.sav'
-    films_file = u'/Users/phd/workspace/made/made_recommender/datasets/film_extended_information_unique_values.csv'
+    neural_network_file = u'/Users/phd/workspace/made/made_recommender/datasets/evaluator_[26273, 162, 1].sav'
+    films_file = u'/Users/phd/workspace/made/made_recommender/datasets/extended_dataset.csv.bz2'
     general_summary = u'/Users/phd/workspace/made/made_recommender/datasets/recommender_logs/general_2.log'
 
     details_file_name = u'/Users/phd/workspace/made/made_recommender/datasets/recommender_logs/details_2.log'
