@@ -17,7 +17,7 @@ class Solution(object):
 
 
 class TropeRecommender(BaseScript):
-    def __init__(self, neural_network_file: str, films_file: str, summary_file_name: str):
+    def __init__(self, neural_network_file: str, summary_file_name: str):
         self.summary_file_name = summary_file_name
 
         self.seed = 0
@@ -34,10 +34,10 @@ class TropeRecommender(BaseScript):
         self.best_candidate_ever = None
         self.last_evaluation_that_improved = 0
 
-        self.evaluator = NeuralNetworkTropesEvaluator(neural_network_file, films_file)
+        self.evaluator = NeuralNetworkTropesEvaluator(neural_network_file)
         self.tropes = self.evaluator.tropes
         self.tropes_indexes = list(range(0, len(self.tropes)))
-        self.cache = cachetools.LRUCache(5000, missing=None, getsizeof=None)
+        self.cache = cachetools.LRUCache(5000, getsizeof=None)
 
         logging.basicConfig(level=logging.INFO, format='%(asctime)s %(name)-12s %(levelname)-8s %(message)s',
                             datefmt='%m-%d %H:%M:%m', )
@@ -55,6 +55,13 @@ class TropeRecommender(BaseScript):
         self.details_file_name = details_file_name
         self.execution_name = execution_name
         self.no_better_results_during_evaluations = no_better_results_during_evaluations
+
+        parameters = dict(crossover_probability=crossover_probability, details_file_name=details_file_name,
+                          execution_name=execution_name, list_of_constrained_tropes=list_of_constrained_tropes,
+                          max_evaluations=max_evaluations, mutation_probability=mutation_probability,
+                          no_better_results_during_evaluations=no_better_results_during_evaluations,
+                          population_size=population_size, seed=seed, solution_length=solution_length)
+        BaseScript.__init__(self, parameters)
 
         self.best_fitness_ever = None
         self.best_candidate_ever = None
@@ -88,6 +95,9 @@ class TropeRecommender(BaseScript):
             [self.execution_name, str(self.best_fitness_ever), str(int(seconds))] + trope_list)
         self.log_summary_line(summary)
 
+        self._add_to_summary('Solution fitness', self.best_fitness_ever)
+        self._add_to_summary('Solution tropes', trope_list)
+
         return Solution(trope_list, self.best_fitness_ever)
 
     def build_terminator(self):
@@ -103,9 +113,9 @@ class TropeRecommender(BaseScript):
             evaluations_without_improvement = num_evaluations - self.last_evaluation_that_improved
             max_did_not_change_enough = evaluations_without_improvement >= self.no_better_results_during_evaluations
 
-            print("Evaluations " + str(num_evaluations) + ", max_evaluations " + str(self.max_evaluations)
-                  + ", last_evaluation_that_improved " + str(self.last_evaluation_that_improved)
-                  + ", best_ind " + str(self.best_fitness_ever))
+            #print("Evaluations " + str(num_evaluations) + ", max_evaluations " + str(self.max_evaluations)
+            #      + ", last_evaluation_that_improved " + str(self.last_evaluation_that_improved)
+            #      + ", best_ind " + str(self.best_fitness_ever))
 
             if evaluation_is_above_max and max_did_not_change_enough:
                 return True
@@ -218,9 +228,11 @@ class TropeRecommender(BaseScript):
 
     def log_detail_line(self, content):
         self.log_line(content, self.details_file_name)
+        #self._info(f'DETAIL: {content}')
 
     def log_summary_line(self, content):
         self.log_line(content, self.summary_file_name)
+        self._info(f'SUMMARY: {content}')
 
     def log_line(self, content, file_name):
         if file_name is None:
@@ -229,17 +241,17 @@ class TropeRecommender(BaseScript):
             with open(file_name, "a") as file:
                 file.write(content + "\n")
 
+    def finish(self):
+        self._finish_and_summary()
 
 if __name__ == "__main__":
     neural_network_file = u'/Users/phd/workspace/made/made_recommender/datasets/evaluator_[26273, 162, 1].sav'
-    films_file = u'/Users/phd/workspace/made/made_recommender/datasets/extended_dataset.csv.bz2'
-    general_summary = u'/Users/phd/workspace/made/made_recommender/datasets/recommender_logs/general_2.log'
+    general_summary = u'/Users/phd/workspace/made/made_recommender/logs/ga_general_log.log'
 
-    details_file_name = u'/Users/phd/workspace/made/made_recommender/datasets/recommender_logs/details_2.log'
-    recommender = TropeRecommender(neural_network_file, films_file, general_summary)
+    details_file_name = u'/Users/phd/workspace/made/made_recommender/logs/ga_details_log.log'
+    recommender = TropeRecommender(neural_network_file, general_summary)
     now = time.time()
     recommender.optimize(seed=1, list_of_constrained_tropes=[], solution_length=42, max_evaluations=30000,
                          mutation_probability=0.0116, crossover_probability=0.5, population_size=50,
                          details_file_name=details_file_name, execution_name=f'sample_{now}',
                          no_better_results_during_evaluations=30000)
-    exit(0)

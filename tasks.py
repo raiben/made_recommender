@@ -1,3 +1,4 @@
+import itertools
 import os
 
 from invoke import task, run
@@ -5,7 +6,9 @@ from invoke import task, run
 from mapper.film_mapper import FilmMapper
 from rating_evaluator.evaluator_builder import EvaluatorBuilder
 from rating_evaluator.evaluator_hyperparameters_tester import EvaluatorHyperparametersTester
+from trope_recommender.trope_recommender import TropeRecommender
 from tvtropes_scraper.tvtropes_scraper import TVTropesScraper
+from multiprocessing import Pool
 
 
 @task
@@ -73,6 +76,7 @@ def build_evaluator(context, extended_dataset, target_folder='datasets/', random
     evaluator.pickle(target_folder)
     evaluator.finish()
 
+
 @task
 def test_evaluator_hyperparameters(context, extended_dataset, target_folder='datasets/'):
     """
@@ -91,6 +95,7 @@ def test_evaluator_hyperparameters(context, extended_dataset, target_folder='dat
     # tester.pickle(target_folder)
     tester.finish()
 
+
 @task
 def show_genres(search_query, page=0, results=10):
     print('TODO!')
@@ -107,8 +112,53 @@ def show_films(search_query, page=2, results=10):
 
 
 @task
-def recommend(genres_to_include='', tropes_to_include='', length=40):
-    print('TODO!')
+def test_recommender(context, neural_network_file):
+    TropeRecommender.set_logger_file_id('trope_recommender')
+
+    executions = range(0, 10)
+    solution_length_alternatives = [30]
+    max_evaluations_alternatives = [30000]
+    mutation_probability_alternatives = [2/30, 1/30, 0.5/30]
+    crossover_probability_alternatives = [0.25, 0.5, 0.75]
+    population_size_alternatives = [50, 100, 200]
+    no_better_results_during_evaluations_alternatives = [10000]
+
+    general_summary = u'logs/recommender_summary.log'
+    details_file_name = u'logs/recommender_details.log'
+
+    list_of_parameters = [executions,solution_length_alternatives, max_evaluations_alternatives,
+                          mutation_probability_alternatives, crossover_probability_alternatives,
+                          population_size_alternatives, no_better_results_during_evaluations_alternatives]
+    combinations = list(itertools.product(*list_of_parameters))
+
+    seed = 0
+    combinations = [list(combination) for combination in combinations]
+    for combination in combinations:
+        combination.extend([seed, neural_network_file, general_summary, details_file_name])
+        seed += 1
+
+    pool = Pool(processes=7)  # start 4 worker processes
+    for combination in combinations:
+        pool.apply_async(run_recommender, combination)  # evaluate "f(10)" asynchronously
+    pool.close()
+    pool.join()
+
+
+def run_recommender(execution, solution_length, max_evaluations, mutation_probability, crossover_probability,
+                    population_size,no_better_results_during_evaluations, seed, neural_network_file, general_summary,
+                    details_file_name):
+    name_components = [execution, solution_length, max_evaluations, mutation_probability, crossover_probability,
+                       population_size, no_better_results_during_evaluations, seed]
+    execution_name = ','.join([str(component) for component in name_components])
+
+    recommender = TropeRecommender(neural_network_file, general_summary)
+    recommender.optimize(
+        seed=seed, list_of_constrained_tropes=[], solution_length=solution_length,
+        max_evaluations=max_evaluations, mutation_probability=mutation_probability,
+        crossover_probability=crossover_probability, population_size=population_size,
+        details_file_name=details_file_name, execution_name=execution_name,
+        no_better_results_during_evaluations=no_better_results_during_evaluations)
+    recommender.finish()
 
 
 @task
@@ -189,6 +239,7 @@ def build_paper_expert_systems_2019(context, documentation_mode=False):
     clean_paper(context, documentation_mode)
     build_paper_latex_expert_systems_2019(context, documentation_mode)
     build_paper_pdf_expert_systems_2019(context)
+
 
 if __name__ == "__main__":
     import sys
