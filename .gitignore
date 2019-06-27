@@ -11,3 +11,4 @@ _minted-report
 __pycache__
 *~
 _minted*
+*.h5
