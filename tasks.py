@@ -1,5 +1,6 @@
 import itertools
 import os
+from multiprocessing import Pool
 
 from invoke import task, run
 
@@ -8,7 +9,6 @@ from rating_evaluator.evaluator_builder import EvaluatorBuilder
 from rating_evaluator.evaluator_hyperparameters_tester import EvaluatorHyperparametersTester
 from trope_recommender.trope_recommender import TropeRecommender
 from tvtropes_scraper.tvtropes_scraper import TVTropesScraper
-from multiprocessing import Pool
 
 
 @task
@@ -115,10 +115,10 @@ def show_films(search_query, page=2, results=10):
 def test_recommender(context, neural_network_file):
     TropeRecommender.set_logger_file_id('trope_recommender')
 
-    executions = range(0, 10)
+    executions = range(20,30) #range(15,20) #range(12, 15)  # range(11,12) #range(10,11) #range(0, 10)
     solution_length_alternatives = [30]
     max_evaluations_alternatives = [30000]
-    mutation_probability_alternatives = [2/30, 1/30, 0.5/30]
+    mutation_probability_alternatives = [2 / 30, 1 / 30, 0.5 / 30]
     crossover_probability_alternatives = [0.25, 0.5, 0.75]
     population_size_alternatives = [50, 100, 200]
     no_better_results_during_evaluations_alternatives = [10000]
@@ -126,7 +126,7 @@ def test_recommender(context, neural_network_file):
     general_summary = u'logs/recommender_summary.log'
     details_file_name = u'logs/recommender_details.log'
 
-    list_of_parameters = [executions,solution_length_alternatives, max_evaluations_alternatives,
+    list_of_parameters = [executions, solution_length_alternatives, max_evaluations_alternatives,
                           mutation_probability_alternatives, crossover_probability_alternatives,
                           population_size_alternatives, no_better_results_during_evaluations_alternatives]
     combinations = list(itertools.product(*list_of_parameters))
@@ -145,7 +145,7 @@ def test_recommender(context, neural_network_file):
 
 
 def run_recommender(execution, solution_length, max_evaluations, mutation_probability, crossover_probability,
-                    population_size,no_better_results_during_evaluations, seed, neural_network_file, general_summary,
+                    population_size, no_better_results_during_evaluations, seed, neural_network_file, general_summary,
                     details_file_name):
     name_components = [execution, solution_length, max_evaluations, mutation_probability, crossover_probability,
                        population_size, no_better_results_during_evaluations, seed]
