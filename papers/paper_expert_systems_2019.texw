@@ -619,8 +619,8 @@ coefficient_year_ntropes, p_value_year_ntropes = stats.pearsonr(extended_datafra
     \begin{subfigure}[b]{0.3\textwidth}
         \centering
 <<width="\\linewidth",echo=False, results='hidden'>>=
-extended_dataframe.plot.scatter(x='Rating', y='Number of tropes', color='darkgray', label='Films', figsize=(4, 4))
-plot_regression(extended_dataframe, 'Rating', 'Number of tropes', 'black')
+extended_dataframe.plot.scatter(x='Number of tropes', y='Rating', color='darkgray', label='Films', figsize=(4, 4))
+plot_regression(extended_dataframe, 'Number of tropes', 'Rating', 'black')
 @
         \caption{\begin{tabularx}{\textwidth}{lX} coefficient: & <%=coefficient_rating_ntropes%> \\ p-value & <%=p_value_rating_ntropes%> \end{tabularx}}
         \label{fig:rating_ntropes}
@@ -649,7 +649,7 @@ plot_regression(extended_dataframe, 'Year', 'Number of tropes', 'black')
     \end{subfigure}
     \hfill
     \caption{Scatter plot to show the relation between: \textbf{(a)} Rating vs. \# of tropes
-    \textbf{(b)} Votes vs. \# of tropes \textbf{(c)} Year vs. N\# of tropes}
+    \textbf{(b)} Votes vs. \# of tropes \textbf{(c)} Year vs. \# of tropes}
     \label{fig:extended_dataset_scatterplots}
 \end{figure}
 
