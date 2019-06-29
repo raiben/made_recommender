@@ -225,8 +225,7 @@ def build_paper_pdf_expert_systems_2019(context):
               '&& pdflatex -shell-escape paper_expert_systems_2019.tex ' \
               '&& bibtex paper_expert_systems_2019.aux ' \
               '&& pdflatex -shell-escape paper_expert_systems_2019.tex ' \
-              '&& pdflatex -shell-escape paper_expert_systems_2019.tex' \
-              '&& cp papers/paper_expert_systems_2019.pdf '
+              '&& pdflatex -shell-escape paper_expert_systems_2019.tex'
     run(command, hide=False, warn=True)
 
 
