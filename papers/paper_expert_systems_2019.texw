@@ -617,7 +617,7 @@ coefficient_year_ntropes, p_value_year_ntropes = stats.pearsonr(extended_datafra
         \centering
 <<width="\\linewidth",echo=False, results='hidden'>>=
 extended_dataframe.plot.scatter(x='Rating', y='Number of tropes', color='darkgray', label='Films', figsize=(4, 4))
-#plot_regression(extended_dataframe, 'Rating', 'Number of tropes', 'black')
+plot_regression(extended_dataframe, 'Rating', 'Number of tropes', 'black')
 @
         \caption{\begin{tabularx}{\textwidth}{lX} coefficient: & <%=coefficient_rating_ntropes%> \\ p-value & <%=p_value_rating_ntropes%> \end{tabularx}}
         \label{fig:rating_ntropes}
@@ -628,7 +628,7 @@ extended_dataframe.plot.scatter(x='Rating', y='Number of tropes', color='darkgra
         \centering
 <<width="\\linewidth",echo=False, results='hidden'>>=
 extended_dataframe.plot.scatter(x='Votes', y='Number of tropes', color='darkgray', label='Films', figsize=(4, 4))
-#plot_regression(extended_dataframe, 'Votes', 'Number of tropes', 'black')
+plot_regression(extended_dataframe, 'Votes', 'Number of tropes', 'black')
 @
         \caption{\begin{tabularx}{\textwidth}{lX} coefficient: & <%=coefficient_votes_ntropes%> \\ p-value & <%=p_value_votes_ntropes%> \end{tabularx}}
         \label{fig:votes_ntropes}
@@ -639,14 +639,14 @@ extended_dataframe.plot.scatter(x='Votes', y='Number of tropes', color='darkgray
         \centering
 <<width="\\linewidth",echo=False, results='hidden'>>=
 extended_dataframe.plot.scatter(x='Year', y='Number of tropes', color='darkgray', label='Films', figsize=(4, 4))
-#plot_regression(extended_dataframe, 'Year', 'Number of tropes', 'black')
+plot_regression(extended_dataframe, 'Year', 'Number of tropes', 'black')
 @
         \caption{\begin{tabularx}{\textwidth}{lX} coefficient: & <%=coefficient_year_ntropes%> \\ p-value & <%=p_value_year_ntropes%> \end{tabularx}}
         \label{fig:year_ntropes}
     \end{subfigure}
     \hfill
-    \caption{Scatter plot to show the relation between: \textbf{(a)} Rating vs. Nº of tropes
-    \textbf{(b)} Votes vs. Nº of tropes \textbf{(c)} Year vs. Nº of tropes}
+    \caption{Scatter plot to show the relation between: \textbf{(a)} Rating vs. \# of tropes
+    \textbf{(b)} Votes vs. \# of tropes \textbf{(c)} Year vs. N\# of tropes}
     \label{fig:extended_dataset_scatterplots}
 \end{figure}
 
