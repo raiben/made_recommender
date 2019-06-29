@@ -95,7 +95,6 @@ def test_evaluator_hyperparameters(context, extended_dataset, target_folder='dat
     # tester.pickle(target_folder)
     tester.finish()
 
-
 @task
 def show_genres(search_query, page=0, results=10):
     print('TODO!')
@@ -226,7 +225,8 @@ def build_paper_pdf_expert_systems_2019(context):
               '&& pdflatex -shell-escape paper_expert_systems_2019.tex ' \
               '&& bibtex paper_expert_systems_2019.aux ' \
               '&& pdflatex -shell-escape paper_expert_systems_2019.tex ' \
-              '&& pdflatex -shell-escape paper_expert_systems_2019.tex'
+              '&& pdflatex -shell-escape paper_expert_systems_2019.tex' \
+              '&& cp papers/paper_expert_systems_2019.pdf '
     run(command, hide=False, warn=True)
 
 

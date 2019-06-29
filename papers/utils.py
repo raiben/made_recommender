@@ -10,6 +10,8 @@ import pandas as pd
 import pygraphviz as pgv
 from tabulate import tabulate
 
+from dataset_displayers.tropes_similarity import TropesSimilarityChecker
+
 data = {}
 
 def read_compressed_json(file_path):
@@ -56,6 +58,8 @@ def get_table_for_dataframe(df, fixed_width=None, **kwargs):
         latex_code = latex_code.replace('\\begin{tabular}','\\begin{tabularx}{\\textwidth}')
         latex_code = latex_code.replace('\\end{tabular}', '\\end{tabularx}')
         latex_code = latex_code.replace('{lr}','{Xr}')
+        latex_code = latex_code.replace('{rllrrl}', '{rLLrrl}')
+        latex_code = latex_code.replace('[GENRE]','')
     return latex_code
 
 
@@ -193,22 +197,17 @@ def extract_grid_parameters_from_log_and_results(log_file_name):
 
 
 if __name__=='__main__':
-    FILM_TROPES_JSON_BZ2_FILE = '../datasets/scraper/cache/20190501/films_tropes_20190501.json.bz2'
-    FILM_EXTENDED_DATASET_BZ2_FILE = '../datasets/extended_dataset.csv.bz2'
-    USE_HDF = True
-    SCRAPER_LOG_FILE = '../logs/scrape_tvtropes_20190501_20190512_191015.log'
-    MAPPER_LOG_FILE = '../logs/map_films_20190526_164459.log'
-    EVALUATOR_BUILDER_LOG_FILE = '../logs/build_evaluator_20190624_223230.log'
-    TOP_VALUES = 14
-    EVERYTHING_BUT_TROPES = ['Id', 'NameTvTropes', 'NameIMDB', 'Rating', 'Votes', 'Year']
-    EVALUATOR_HYPER_PARAMETERS_LOG_FILE = '../logs/build_evaluator_hyperparameters_20190622_203043.log'
+    recommender_log = pd.read_csv('/Users/phd/workspace/made/made_recommender/logs/recommender_summary_copy_od.log',
+                                  header=None)
+    columns = ['execution', 'solution_length', 'max_evaluations', 'mutation_probability',
+               'crossover_probability', 'population_size', 'no_better_results_during_evaluations',
+               'seed', 'fitness', 'time'] + [f'trope_{index}' for index in range(0,30)]
+    recommender_log.columns = columns
 
-    input, output = get_experiment_execution_information('../logs/build_evaluator_20190616_211935.log')
-
-
-    iterations_evaluator = extract_iterations_from_log(log_file_name=EVALUATOR_BUILDER_LOG_FILE)
-    plot = iterations_evaluator.plot(x='iteration', y=['loss', 'validation'], logy=True, color='black', linestyle='-')
-    plot.set_ylabel("loss")
+    reduced_dataframe = pd.DataFrame(recommender_log[['execution', 'mutation_probability', 'crossover_probability',
+                                                      'population_size', 'fitness','time']])
+    group = reduced_dataframe.groupby(['mutation_probability', 'crossover_probability', 'population_size'])
+    description_table = group.describe()
+    description_table.to_csv('/Users/phd/workspace/made/made_recommender/datasets/ga_best_parameters_summary.csv')
     pass
-
 

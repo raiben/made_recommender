@@ -9,7 +9,8 @@ sys.path.append(os.getcwd())
 from utils import *
 
 FILM_TROPES_JSON_BZ2_FILE = '../datasets/scraper/cache/20190501/films_tropes_20190501.json.bz2'
-FILM_EXTENDED_DATASET_BZ2_FILE = '../datasets/extended_dataset.csv.bz2'
+FILM_EXTENDED_DATASET_TABLE_BZ2_FILE = '../datasets/extended_dataset.csv.bz2'
+FILM_EXTENDED_DATASET_DICTIONARY_BZ2_FILE = '/Users/phd/workspace/made/made_recommender/datasets/extended_dataset.json.bz2'
 USE_HDF = True
 SCRAPER_LOG_FILE = '../logs/scrape_tvtropes_20190501_20190512_191015.log'
 MAPPER_LOG_FILE = '../logs/map_films_20190526_164459.log'
@@ -27,6 +28,8 @@ EVALUATOR_HYPER_PARAMETERS_LOG_FILE = '../logs/build_evaluator_hyperparameters_2
 \usepackage{subcaption}
 \captionsetup{compatibility=false}
 \usepackage{tabularx}
+\usepackage{ragged2e}
+\newcolumntype{L}{>{\raggedright\arraybackslash}X}
 % -- end: Added by Rubén
 
 
@@ -601,7 +604,7 @@ We decided to include the original title so that non-English titles can be handl
 
 
 <<echo=False>>=
-extended_dataframe = read_dataframe(FILM_EXTENDED_DATASET_BZ2_FILE, USE_HDF)
+extended_dataframe = read_dataframe(FILM_EXTENDED_DATASET_TABLE_BZ2_FILE, USE_HDF)
 trope_names = [key for key in extended_dataframe.keys() if key not in EVERYTHING_BUT_TROPES and '[GENRE]' not in key]
 extended_dataframe['Number of tropes'] = sum(getattr(extended_dataframe,key) for key in trope_names)
 
@@ -761,14 +764,243 @@ and a validation score of <%=iterations_evaluator['validation'].iloc[-1]%>.
 % DOING: Generación de conjuntos de tropos mediante GAs: Descripción del algoritmo + operadores + parámetros
 \subsection{Film DNA builder}
 
+% explicar el paso
+At this step we already have a set of candidate tropes for the Film DNA and a model
+that allows its evaluation, so our goal is to use a device that allows us to generate a Film DNA that optimizes the rating.
 
+% Que es un GA y por qué es interesante
+We chose to use a Genetic Algorithm because it is a mechanism that allows us to explore the domain of Film DNAs,
+in other words, of combinations of tropes, getting high-quality solutions and dealing with global optimization problems.
+% cite
+
+% Trabajamos con tropos, que es un cromosoma
+Our chromosome will be the DNA film, that is, a set of tropes.
+In practice it will be encoded as an array of different indices on a dictionary of the total set of tropes available
+without value repetitions, given that, \textit{a priori}, the order of the tropes is irrelevant
+(according to their nature, they can refer to specific moments, but also to narrative structures and general settings)
+and also, our rating evaluator does not consider weights or multiple occurrences of the trope in the movie
+(both, training data and model do not consider multiple occurrendes of a trope in a single Film, in other words,
+the trops appears or does not appear).
+
+% La Mutación
+The mutation operator changes a trope of the Film DNA by another that is randomly chosen
+from the set of tropes ou of the Film DNA. By doing this, the Film DNA keeps complying with its restrictions,
+mentioned above, and allows an exploration of new tropes.
+
+% El cruzamiento
+The crossover operator will make a superset of tropes from the parents' Film DNAs
+and randomly selects two subsets for the offspring.
+This way, the offspring will have Film DNAs whose tropes are exclusively from their parents, allowing
+the exploitation of the data.
+
+
+% La función fitness y el modelo surrogado
+As we explained above, we have to rely on a surrogate model for the evaluation of Film DNAs, and our approach uses
+a neural network trained with existing movies. The fitness of our GA will be the result of evaluating a DNA trope with
+the neural network.
+
+According to pour tests, the genetic algorithm has proven to converge towards optimal solutions efficiently,
+given the simplicity of the operators based on set algebra, and fitness calculation, in this case, a trained neural network.
 
 \section{Experimental setup}
-% TODO: Básico: Generar conjuntos de tropos de tamaño fijo: Objetivo, con estudio de parámetros (10 ejecuciones al menos), gráfica de evolución / nº de tropos, interpretación de resultados
-% TODO: (Opcional) Mejorar un conjunto de tropos (con tropos fijos): IDEM
-% TODO: Generar conjuntos de tropos sin tamaño fijo (la película perfecta). Hay películas parecidas o mezcladas?
 
+The evaluation of the methodology is performed unequivocally through its testing in different scenarios
+and the analysis of results.
+In this case, different applications of the methodology have been chosen,
+which will help us answer the following questions:
+Can we try to generate the optimal Trope DNA for a standard movie?
+Could we fix the number of genres while maximizing the rating?
+Could we use this methodology to improve an existing Trope DNA?
+How much do our results resemble existing films?
+
+Our experiment will use a fixed size Film DNA of 30 tropes, which is the median of tropes per film
+in the original dataset.
+
+The most suitable parameters to solve a specific problem require an extensive calibration, which is outside
+of the scope of this paper. However, to choose the set of parameters that we will use in all the experiments
+in this paper, we have made a preliminary selection executing all possible combinations of Population (P) = \{50, 100, 200\},
+Mutation probability (Mp) = \{\(2\div size_{dna}\), \(1\div size_{dna}\), \(0.5\div size_{dna}\)\}
+and Crossover Probability (Cp) = \{0.25, 0.5, 0.75\}
+and we have chosen the combination P = 200, Mp = \(1\div size_dna\) , Cp = 0.5, because it performs better average results.
+
+In the experiments we have set the stop criterion to a minimum of 3000 evaluations and
+until the best generation does not improve during 10000 evaluations.
+
+As tools to interpret the results, we will use two metrics of similarity between finite sample sets.
+The first one is a metric called \textit{Jaccard coefficient}
+and is defined as the cardinality of the intersection of Film DNAs divided by the cardinality of the union of the Film DNAs.
+The second one is called \textit{Overlap coefficient}
+and is defined as the cardinality of the intersection of Film DNAs divided by the smallest length of the two Film DNAs.
+Both metrics are interesting because we are dealing with incomplete data and we cannot assume that a a Film that has few tropes in its DNA
+is actually extensively defined and described by the wisdom of crowds in our Extended Dataset as well as other popular films.
+% TODO Citar las métricas
 \section{Results}
+
+\subsection{Finding the best Trope DNA without genre limitations}
+
+The repetition of the Genetic Algorithm 30 times has resulted in an average fitness of 9.783487634688873 (+- 0.4307202616394516).
+The best solution has a rating of 10.313031174658876 and a Film DNA with the following tropes.
+
+
+DNA = \{ActionHeroBabysitter, DeathByFlashback, DisneyVillainDeath, DuelToTheDeath, EarlyBirdCameo, FightingFromTheInside, HandsOffParenting, Homage, ImNotAfraidOfYou, JumpCut, MouthingTheProfanity, NoSympathy, OminousFog, OneHeadTaller, PoorMansSubstitute, PragmaticAdaptation, RichIdiotWithNoDayJob, SomeoneToRememberHimBy, SpitefulSpit, TalkingHeads, TitledAfterTheSong, WeaponOfXSlaying, [GENRE]Animation, [GENRE]Documentary, [GENRE]Drama, [GENRE]History, [GENRE]Mystery, [GENRE]Romance, [GENRE]War, [GENRE]Western\}
+
+
+<<echo=False>>=
+checker = TropesSimilarityChecker()
+checker.load_extended_dataset_json(FILM_EXTENDED_DATASET_DICTIONARY_BZ2_FILE)
+tropes_list = ['ActionHeroBabysitter', 'DeathByFlashback', 'DisneyVillainDeath', 'DuelToTheDeath',
+               'EarlyBirdCameo', 'FightingFromTheInside', 'HandsOffParenting', 'Homage', 'ImNotAfraidOfYou',
+               'JumpCut', 'MouthingTheProfanity', 'NoSympathy', 'OminousFog', 'OneHeadTaller',
+               'PoorMansSubstitute', 'PragmaticAdaptation', 'RichIdiotWithNoDayJob', 'SomeoneToRememberHimBy',
+               'SpitefulSpit', 'TalkingHeads', 'TitledAfterTheSong', 'WeaponOfXSlaying', '[GENRE]Animation',
+               '[GENRE]Documentary', '[GENRE]Drama', '[GENRE]History', '[GENRE]Mystery', '[GENRE]Romance',
+               '[GENRE]War', '[GENRE]Western']
+top_overlap_exp1_1, top_jaccard_exp1_1 = checker.get_top_films_by_simmilarity(tropes_list, 5)
+@
+
+\begin{figure}
+    \centering
+<%=print(get_table_for_dataframe(top_overlap_exp1_1, fixed_width=True))%>
+    \caption{10 most similar films to the synthetic Film DNA according to the Overlap Metric and sorted by rating}
+    \label{fig:top_overlap_exp1_1}
+\end{figure}
+
+\begin{figure}
+    \centering
+<%=print(get_table_for_dataframe(top_jaccard_exp1_1, fixed_width=True))%>
+    \caption{10 most similar films to the synthetic Film DNA according to the Jaccard Metric and sorted by rating}
+    \label{fig:top_jaccard_exp1_1}
+\end{figure}
+
+<<echo=False>>=
+top_overlap_exp1_1, top_jaccard_exp1_1 = checker.get_top_films_by_simmilarity(tropes_list, 5, ignore_genres=True)
+@
+
+\begin{figure}
+    \centering
+<%=print(get_table_for_dataframe(top_overlap_exp1_1, fixed_width=True))%>
+    \caption{10 most similar films to the synthetic Film DNA according to the Overlap Metric, sorted by rating and ignoring genres}
+    \label{fig:top_overlap_exp1_2}
+\end{figure}
+
+\begin{figure}
+    \centering
+<%=print(get_table_for_dataframe(top_jaccard_exp1_1, fixed_width=True))%>
+    \caption{10 most similar films to the synthetic Film DNA according to the Jaccard Metric, sorted by rating and ignoring genres}
+    \label{fig:top_jaccard_exp1_2}
+\end{figure}
+
+The syntethic Film DNA belongs to a multi-genre film (historical documentary romantic drama set during a war that includes
+western and mistery settings, not comedy).
+However, according to one of the tropes, even if it is historical/documentary,
+it is completely an adaptation from the author with clear differences with the overall known story for pragmatic reasons (PragmaticAdaptation).
+There are tropes that point to specific features of a hero:
+The 'hero' is a rich character with free time (RichIdiotWithNoDayJob),
+that has a position of responsibility for children (ActionHeroBabysitter),
+that could be related to the existence of irresponsible parents (HandsOffParenting).
+There are tropes that define the conflicts and how they will develop:
+Someone resisting the controlling influence acting on them ('FightingFromTheInside'),
+a villain is finally fought by the hero when he is 'not afraid of' anymore (ImNotAfraidOfYou),
+there is a duel (DuelToTheDeath),
+a special weapon is used (WeaponOfXSlaying),
+the villain falls off (DisneyVillainDeath),
+and the hero also dies.
+There are tropes that points to a romantic relation between the hero and a girl,
+that in some scenes is be clearly taller or shorter than him ('OneHeadTaller),
+and that discovers, in the end, that is pregnant (SomeoneToRememberHimBy).
+There are also tropes that define the setting, in this case, there is fog (OminousFog) as part of the mystery genre
+and a clear 'Homage' to a classic or well known artwork in the same genres is present.
+Regading the narrative perspective,
+the story includes a flashback that points to the death of the main character/s (DeathByFlashback),
+uses 'Jump Cuts' (JumpCut) and make a main character appear before his/her introduction (EarlyBirdCameo).
+Some tropes also define very specific sequences; in some cases the film includes spits (SpitefulSpit)
+and the characters swear, although it cannot be heard by the audience (MouthingTheProfanity).
+There is also a scene where terrible things have happened to the main characters but no-one acts as it is really important (NoSympathy),
+and there are scenes with no action, just long conversations where people do not move (TalkingHeads).
+Regarding the meta-tropes present,
+an actor or actress is be relatively unknown but looks alike another well known one (PoorMansSubstitute)
+and the film's name is a reference to an existing song.
+
+
+The films that have the highest similarity according to the Jaccard and Overlap metrics
+and compared to the synthetic Film DNA are listed in Figures~\ref{fig:top_overlap_exp1_1} and~\ref{fig:top_jaccard_exp1_1}
+sorted by similarity and rating. By looking at the films, it is clear that the genre has a very important weight
+on the similarity and might be a source of biases, so we ignore the genres in the similarity analysis in
+Figures~\ref{fig:top_overlap_exp1_2} and~\ref{fig:top_jaccard_exp1_2}
+
+The Synthetic Film DNA is hard combination of genres, and this is why, in the next experiment, the number of genres is fixed.
+Anyway, it is fun to analyze, as it reminds to films as 'Gone with the Wind', 'A Year of the Quiet Sun' or 'Man of the West'
+in the sense that they combine multiple genres that are present in our Synthetic Film DNA. If we ignore the genres,
+we can observe that it reminds to films like 'A Midwinter’s Tale', because of the reference in the Title or the dialogs without action,
+'The Postman (Il postino)' because they both include the idea of 'gone, but not forgotten',
+'Jane Eyre' or 'Tristan and Isolde' for the pragmatic adaptation of the author and some narrative details.
+
+It is important to remark that, in all the cases, the Jaccard metrics indicate that the Film DNA is genuine,
+and most of the films with high rating that resembles it are films with incomplete trope development.
+In the best cases, there are 3 common tropes at maximum.
+
+These results are interesting and directly applicable to the generation of scripts.
+However, we consider that our methodology leads to Film DNAs that promote the appearance of many genres at the same time
+and that could be hard to implement or, in some cases, incompatible. The next experiment tries to fix this situation.
+
+
+\subsection{Finding the best Trope DNA with genre limitations}
+
+This experiment sets the number of genres to the average, X, according to the extended dataset.
+In order to implement it, we decide to implement a variant of the fitness function of the Genetic Algorithm
+that punishes solutions with a number of genres different to X, reducing the fitness by 5 points. This technique has been used
+for ... in .. (citas).
+
+The repetition of the Genetic Algorithm 30 times has resulted in an average fitness of
+aaaa (+- bbbbb).  The best solution has a rating of ccccccc and a Film DNA with the following tropes.
+
+<TO ADD>
+
+
+The 5 films that have the most tropes in common with this Film DNA are:
+
+
+<TO ADD>
+
+
+The minimum set of films that, together, maximize the number of common tropes, are.
+
+
+<TO ADD>
+
+Although the rating is lower than in the previous experiment, a Film with the provided Film DNA is easier to design as we
+are not dealing with big genre incompatibilities.
+
+
+\subsection{Improving the Film DNA of a known film}
+
+Could our methodology keep the essence of a film, that is translated to keeping most of the tropes,
+while adding some new tropes in the Film DNA that optimize the note?
+
+It is totally out of our intention to question a work of art like Star Wars, episode IV,
+however, we feel a special predilection for this masterpiece of all time
+and we consider that it is an appealing example for many of our readers,
+that's why we are using this film as an example.
+
+
+We will try to find Film DNAs that share at least 20 tropes with that film and let the GA find the rest, up to 30,
+so that the new Film DNA of size 30 improves the rating of the original film.
+
+In order to make this experiment we decide to implement a variant of the fitness function of the Genetic Algorithm
+that punishes solutions that do not share at least 20 tropes with the film, reducing the fitness by 5 points. This technique has been used
+for ... in .. (citas).
+
+The repetition of the Genetic Algorithm 30 times has resulted in an average fitness of
+aaaa (+- bbbbb).  The best solution has a rating of ccccccc and a Film DNA with the following tropes.
+
+
+<TO ADD> (show original tropes in one color and the new in other)
+
+The films that better matches the added tropes are:
+
+This results are interesting
+
+
 
 \section{Conclusions}
 % TODO: Objetivo ha sido ...
