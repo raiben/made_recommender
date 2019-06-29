@@ -10,6 +10,9 @@ import pandas as pd
 import pygraphviz as pgv
 from tabulate import tabulate
 
+import sys
+sys.path.append("..")
+
 from dataset_displayers.tropes_similarity import TropesSimilarityChecker
 
 data = {}
