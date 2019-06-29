@@ -33,6 +33,7 @@ class TropeRecommender(BaseScript):
         self.best_fitness_ever = None
         self.best_candidate_ever = None
         self.last_evaluation_that_improved = 0
+        self.penalization_function = None
 
         self.evaluator = NeuralNetworkTropesEvaluator(neural_network_file)
         self.tropes = self.evaluator.tropes
@@ -44,7 +45,8 @@ class TropeRecommender(BaseScript):
 
     def _init_execution_parameters(self, crossover_probability, details_file_name, execution_name,
                                    list_of_constrained_tropes, max_evaluations, mutation_probability,
-                                   no_better_results_during_evaluations, population_size, seed, solution_length):
+                                   no_better_results_during_evaluations, population_size, seed, solution_length,
+                                   penalization_function):
         self.seed = seed
         self.list_of_constrained_tropes = list_of_constrained_tropes
         self.solution_length = solution_length
@@ -55,6 +57,7 @@ class TropeRecommender(BaseScript):
         self.details_file_name = details_file_name
         self.execution_name = execution_name
         self.no_better_results_during_evaluations = no_better_results_during_evaluations
+        self.penalization_function = penalization_function
 
         parameters = dict(crossover_probability=crossover_probability, details_file_name=details_file_name,
                           execution_name=execution_name, list_of_constrained_tropes=list_of_constrained_tropes,
@@ -71,10 +74,12 @@ class TropeRecommender(BaseScript):
     def optimize(self, seed: int, list_of_constrained_tropes: list, solution_length: int, max_evaluations: int,
                  mutation_probability: float, crossover_probability: float, population_size: int,
                  details_file_name: str, execution_name: str,
-                 no_better_results_during_evaluations: int):
+                 no_better_results_during_evaluations: int,
+                 penalization_function=None):
         self._init_execution_parameters(crossover_probability, details_file_name, execution_name,
                                         list_of_constrained_tropes, max_evaluations, mutation_probability,
-                                        no_better_results_during_evaluations, population_size, seed, solution_length)
+                                        no_better_results_during_evaluations, population_size, seed, solution_length,
+                                        penalization_function)
 
         start = time.time()
 
@@ -113,9 +118,9 @@ class TropeRecommender(BaseScript):
             evaluations_without_improvement = num_evaluations - self.last_evaluation_that_improved
             max_did_not_change_enough = evaluations_without_improvement >= self.no_better_results_during_evaluations
 
-            #print("Evaluations " + str(num_evaluations) + ", max_evaluations " + str(self.max_evaluations)
-            #      + ", last_evaluation_that_improved " + str(self.last_evaluation_that_improved)
-            #      + ", best_ind " + str(self.best_fitness_ever))
+            print("Evaluations " + str(num_evaluations) + ", max_evaluations " + str(self.max_evaluations)
+                 + ", last_evaluation_that_improved " + str(self.last_evaluation_that_improved)
+                 + ", best_ind " + str(self.best_fitness_ever))
 
             if evaluation_is_above_max and max_did_not_change_enough:
                 return True
@@ -212,6 +217,12 @@ class TropeRecommender(BaseScript):
             return cached_fitness
 
         fitness = self.evaluator.evaluate_just_rating(candidate)
+        if self.penalization_function:
+            all_tropes = self.evaluator.tropes
+            candidate_tropes = [all_tropes[index] for index in candidate]
+            penalization = self.penalization_function(candidate_tropes)
+            fitness -= penalization
+
         self.cache.__setitem__(cache_key, fitness)
         return fitness
 
@@ -228,7 +239,7 @@ class TropeRecommender(BaseScript):
 
     def log_detail_line(self, content):
         self.log_line(content, self.details_file_name)
-        #self._info(f'DETAIL: {content}')
+        # self._info(f'DETAIL: {content}')
 
     def log_summary_line(self, content):
         self.log_line(content, self.summary_file_name)
@@ -244,14 +255,25 @@ class TropeRecommender(BaseScript):
     def finish(self):
         self._finish_and_summary()
 
+
+def _build_fitness_fixed_genres(n_genres=2):
+    def get_penalization(tropes):
+        genres = [trope for trope in tropes if '[GENRE]' in trope]
+        if len(genres) < n_genres:
+            return 5
+
+        return 0
+
+    return get_penalization
+
 if __name__ == "__main__":
     neural_network_file = u'/Users/phd/workspace/made/made_recommender/datasets/evaluator_[26273, 162, 1].sav'
-    general_summary = u'/Users/phd/workspace/made/made_recommender/logs/ga_general_log.log'
+    general_summary = u'/Users/phd/workspace/made/made_recommender/logs/ga_general_log_borrar.log'
 
-    details_file_name = u'/Users/phd/workspace/made/made_recommender/logs/ga_details_log.log'
+    details_file_name = u'/Users/phd/workspace/made/made_recommender/logs/ga_details_log_borrar.log'
     recommender = TropeRecommender(neural_network_file, general_summary)
     now = time.time()
-    recommender.optimize(seed=1, list_of_constrained_tropes=[], solution_length=42, max_evaluations=30000,
-                         mutation_probability=0.0116, crossover_probability=0.5, population_size=50,
+    recommender.optimize(seed=1, list_of_constrained_tropes=[], solution_length=30, max_evaluations=30000,
+                         mutation_probability=0.0116, crossover_probability=0.5, population_size=200,
                          details_file_name=details_file_name, execution_name=f'sample_{now}',
-                         no_better_results_during_evaluations=30000)
+                         no_better_results_during_evaluations=30000, penalization_function=_build_fitness_fixed_genres(2))

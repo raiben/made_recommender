@@ -142,6 +142,47 @@ def test_recommender(context, neural_network_file):
     pool.close()
     pool.join()
 
+def _build_fitness_fixed_genres(n_genres=2):
+    def get_penalization(tropes):
+        genres = [trope for trope in tropes if '[GENRE]' in trope]
+        if len(genres) != n_genres:
+            return 5
+
+        return 0
+
+    return get_penalization
+
+@task
+def test_recommender_fixed_genres(context, neural_network_file, fixed_genres=2):
+    TropeRecommender.set_logger_file_id('trope_recommender')
+    fixed_genres = int(fixed_genres)
+    executions = range(0,30) #range(15,20) #range(12, 15)  # range(11,12) #range(10,11) #range(0, 10)
+    solution_length_alternatives = [30]
+    max_evaluations_alternatives = [30000]
+    mutation_probability_alternatives = [1 / 30]
+    crossover_probability_alternatives = [0.5]
+    population_size_alternatives = [200]
+    no_better_results_during_evaluations_alternatives = [10000]
+
+    general_summary = f'logs/recommender_summary_fix_{fixed_genres}_genres.log'
+    details_file_name = f'logs/recommender_details_fix_{fixed_genres}_genres.log'
+
+    list_of_parameters = [executions, solution_length_alternatives, max_evaluations_alternatives,
+                          mutation_probability_alternatives, crossover_probability_alternatives,
+                          population_size_alternatives, no_better_results_during_evaluations_alternatives]
+    combinations = list(itertools.product(*list_of_parameters))
+
+    seed = 0
+    combinations = [list(combination) for combination in combinations]
+    for combination in combinations:
+        combination.extend([seed, neural_network_file, general_summary, details_file_name, fixed_genres])
+        seed += 1
+
+    pool = Pool(processes=7)  # start 4 worker processes
+    for combination in combinations:
+        pool.apply_async(run_recommender_fixed_genres, combination)  # evaluate "f(10)" asynchronously
+    pool.close()
+    pool.join()
 
 def run_recommender(execution, solution_length, max_evaluations, mutation_probability, crossover_probability,
                     population_size, no_better_results_during_evaluations, seed, neural_network_file, general_summary,
@@ -159,6 +200,23 @@ def run_recommender(execution, solution_length, max_evaluations, mutation_probab
         no_better_results_during_evaluations=no_better_results_during_evaluations)
     recommender.finish()
 
+def run_recommender_fixed_genres(execution, solution_length, max_evaluations, mutation_probability, crossover_probability,
+                    population_size, no_better_results_during_evaluations, seed, neural_network_file, general_summary,
+                    details_file_name, fixed_genres):
+    name_components = [execution, solution_length, max_evaluations, mutation_probability, crossover_probability,
+                       population_size, no_better_results_during_evaluations, seed]
+    execution_name = ','.join([str(component) for component in name_components])
+
+    recommender = TropeRecommender(neural_network_file, general_summary)
+    recommender.optimize(
+        seed=seed, list_of_constrained_tropes=[], solution_length=solution_length,
+        max_evaluations=max_evaluations, mutation_probability=mutation_probability,
+        crossover_probability=crossover_probability, population_size=population_size,
+        details_file_name=details_file_name, execution_name=execution_name,
+        no_better_results_during_evaluations=no_better_results_during_evaluations,
+        penalization_function=_build_fitness_fixed_genres(fixed_genres)
+    )
+    recommender.finish()
 
 @task
 def clean_paper(context, documentation_mode=False):

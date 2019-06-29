@@ -66,7 +66,20 @@ T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
 
 \presentaddress{Present address}
 
-\abstract[Abstract]{}
+\abstract[Abstract]{Designing a film's plot is a crafty task that requires deep specific human knowledge
+in order to reach a minimum quality and originality.
+In the current work, we propose and evaluate a methodology to synthesise a set of tropes,
+that are high level devices used to describe films from different perspectives,
+in a way that they maximize the potential rating of a film that conforms to them.
+The computational intelligence is achieved through a Genetic Algorithm that
+relies in a surrogate model, trained with the data extracted and processed from huge film databases in
+Internet. We use different similarity metrics in order to analyze the synthesised set of tropes
+and compare them with the corpus of existing films.
+The results show that the methodology works, we are able to build sets of tropes that maximize the rating and
+that these sets are genuine and novel.
+The methodology and tools developed during the paper are directly usable in the context
+of authoring tools for plots generation
+and, ultimately, they could help on the automatic generation of stories in massively populated videogames.}
 
 \keywords{Computational Intelligence; Tropes; Scrapping; Neural Networks; Genetic Algorithms}
 
@@ -944,11 +957,13 @@ However, we consider that our methodology leads to Film DNAs that promote the ap
 and that could be hard to implement or, in some cases, incompatible. The next experiment tries to fix this situation.
 
 
-\subsection{Finding the best Trope DNA with genre limitations}
+\subsection{Finding the best Trope DNA with 2 genres}
 
-This experiment sets the number of genres to the average, X, according to the extended dataset.
+According to the to the extended dataset, the average number of genres by film is 2.41491733234256,
+so we will fix it in this experiment to 2, as it needs to be a natural number.
+
 In order to implement it, we decide to implement a variant of the fitness function of the Genetic Algorithm
-that punishes solutions with a number of genres different to X, reducing the fitness by 5 points. This technique has been used
+that punishes solutions with a number of genres different to 2, reducing the fitness by 5 points. This technique has been used
 for ... in .. (citas).
 
 The repetition of the Genetic Algorithm 30 times has resulted in an average fitness of
