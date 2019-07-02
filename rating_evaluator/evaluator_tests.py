@@ -43,8 +43,9 @@ class EvaluatorTests(object):
             if key not in errors_by_tropes:
                 errors_by_tropes[key] = []
             error = film['rating'] - film['evaluation']
-            errors_by_tropes[key].append(error)
-            self.test_results['errors_by_tropes'].append({'Number of Tropes':key, 'Error':error})
+            abserror = abs(error)
+            errors_by_tropes[key].append(abserror)
+            self.test_results['errors_by_tropes'].append({'Number of Tropes':key, 'Error':error. 'AbsError':abserror})
 
         self.test_results['errors_by_tropes_stats'] = []
         for key, values in errors_by_tropes.items():
@@ -65,11 +66,11 @@ class EvaluatorTests(object):
             f.write(json_bytes)
 
 if __name__ == "__main__":
-    #test = EvaluatorTests(
-    #    evaluator_file=u'/Users/phd/workspace/made/made_recommender/datasets/evaluator_[26273, 162, 1].sav',
-    #    extended_dataset_file='/Users/phd/workspace/made/made_recommender/datasets/extended_dataset.json.bz2')
-    #test.run_tests()
-    #test.store_json(u'/Users/phd/workspace/made/made_recommender/datasets/evaluator_tests.json.bz2')
+    test = EvaluatorTests(
+        evaluator_file=u'datasets/evaluator_[26273, 162, 1].sav',
+        extended_dataset_file='datasets/extended_dataset.json.bz2')
+    test.run_tests()
+    test.store_json('datasets/evaluator_tests.json.bz2')
 
     info_file = 'datasets/evaluator_tests.json.bz2'
     test = EvaluatorTests()
