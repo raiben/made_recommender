@@ -14,6 +14,7 @@ import sys
 sys.path.append("..")
 
 from dataset_displayers.tropes_similarity import TropesSimilarityChecker
+from rating_evaluator.evaluator_tests import EvaluatorTests
 
 data = {}
 

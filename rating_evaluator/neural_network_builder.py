@@ -2,6 +2,7 @@ import logging
 from collections import OrderedDict
 from random import Random
 
+import joblib
 import numpy as np
 import pandas as pd
 from sklearn.neural_network import MLPRegressor
@@ -145,7 +146,6 @@ class NeuralNetworkTropes(object):
         # Iteration 39, loss = 0.00999016
         # Iteration 40, loss = 0.01927843
 
-        from sklearn.externals import joblib
         joblib.dump(nnet, 'MLPRegressor_relu_3120_100_adam.sav')
 
         self.training_data.to_csv('training_data.csv')
