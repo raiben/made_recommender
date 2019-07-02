@@ -42,7 +42,7 @@ class EvaluatorTests(object):
             key = len(film['tropes'])
             if key not in errors_by_tropes:
                 errors_by_tropes[key] = []
-            error = abs(film['rating'] - film['evaluation'])
+            error = film['rating'] - film['evaluation']
             errors_by_tropes[key].append(error)
             self.test_results['errors_by_tropes'].append({'Number of Tropes':key, 'Error':error})
 
@@ -71,7 +71,7 @@ if __name__ == "__main__":
     #test.run_tests()
     #test.store_json(u'/Users/phd/workspace/made/made_recommender/datasets/evaluator_tests.json.bz2')
 
-    info_file = u'/Users/phd/workspace/made/made_recommender/datasets/evaluator_tests.json.bz2'
+    info_file = 'datasets/evaluator_tests.json.bz2'
     test = EvaluatorTests()
     test.init_from_file(info_file)
 
