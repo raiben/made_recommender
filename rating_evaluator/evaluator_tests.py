@@ -45,7 +45,7 @@ class EvaluatorTests(object):
             error = film['rating'] - film['evaluation']
             abserror = abs(error)
             errors_by_tropes[key].append(abserror)
-            self.test_results['errors_by_tropes'].append({'Number of Tropes':key, 'Error':error. 'AbsError':abserror})
+            self.test_results['errors_by_tropes'].append({'Number of Tropes':key, 'Error':error, 'AbsError':abserror})
 
         self.test_results['errors_by_tropes_stats'] = []
         for key, values in errors_by_tropes.items():
@@ -67,25 +67,21 @@ class EvaluatorTests(object):
 
 if __name__ == "__main__":
     test = EvaluatorTests(
-        evaluator_file=u'datasets/evaluator_[26273, 162, 1].sav',
-        extended_dataset_file='datasets/extended_dataset.json.bz2')
+        evaluator_file=u'../datasets/evaluator_[26273, 162, 1].sav',
+        extended_dataset_file='../datasets/extended_dataset.json.bz2')
     test.run_tests()
-    test.store_json('datasets/evaluator_tests.json.bz2')
+    test.store_json('../datasets/evaluator_tests.json.bz2')
 
-    info_file = 'datasets/evaluator_tests.json.bz2'
+    info_file = '../datasets/evaluator_tests.json.bz2'
     test = EvaluatorTests()
     test.init_from_file(info_file)
-
-    errors_by_tropes = pd.DataFrame(test.test_results['errors_by_tropes'])
-    errors_by_tropes.plot.hexbin(x='Number of Tropes', y='Error', gridsize=25, cmap="Blues")
-    plt.show()
 
     errors_by_tropes = pd.DataFrame(test.test_results['errors_by_tropes'])
     errors_by_tropes.plot.hexbin(x='Number of Tropes', y='Error', gridsize=25, cmap="Blues", bins="log")
     plt.show()
 
-    errors_by_tropes_stats = pd.DataFrame(test.test_results['errors_by_tropes_stats'])
-    errors_by_tropes_stats.plot.scatter(x='Number of Tropes', y='Standard Deviation')
+    errors_by_tropes = pd.DataFrame(test.test_results['errors_by_tropes'])
+    errors_by_tropes.plot.hexbin(x='Number of Tropes', y='AbsError', gridsize=25, cmap="Blues", bins="log")
     plt.show()
 
     pass
