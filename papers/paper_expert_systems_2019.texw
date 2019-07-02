@@ -713,12 +713,6 @@ A brief analysis of the new extended dataset,
 consisting in <%=extended_dataframe.shape[0]%> films linked to <%=len(trope_names)%> tropes,
 shows that there are significant positive correlations between the number of tropes
 and the rating, the popularity and the year, as shown in Figure \ref{fig:extended_dataset_scatterplots},
-% TODO why?
-% Again, this should be mentioned only in conjunction with the paper objectives.
-% Does this help understand the surrogate model? Will this help understand the
-% eventual GA result? Even if that were the case, spinning initial data analysis
-% and scraping mechanics to a technical report will make this paper lighter
-% without losing value - JJ
 % DONE: Generación del modelo surrogado: Red Neuronal + descripción de parámetros estándar + decisiones + (en proceso de ver lo mínimo que hay que evaluar)
 
 % These steps 1 and 2 are basically the creation of the training set for
@@ -726,7 +720,7 @@ and the rating, the popularity and the year, as shown in Figure \ref{fig:extende
 % to the paper at large. It would be probably much better to publish it separately
 % as a technical report in ArXiV - JJ
 
-\subsection{Step 3: Build the Evaluator}  \label{sec:methodology_surrogate_model}
+\subsection{Step 3: Training the surrogate model}  \label{sec:methodology_surrogate_model}
 
 <<echo=False>>=
 input, output = get_experiment_execution_information(EVALUATOR_BUILDER_LOG_FILE)
@@ -747,8 +741,7 @@ in order to deal with unknown and unbalanced relations between tropes to achieve
 Although there are different candidates that could perform properly under these circumstances,
 in our current research, we choose a Neural Network
 
-
-The goal of the research is to evaluate a methodology, so
+The goal of this research is to evaluate a methodology, so
 it is out of the scope to focus on the fine tuning of the surrogate model,
 as far as it suits the needs in terms of quality of the estimations,
 with reasonable performance, a number of false positives and
@@ -782,7 +775,7 @@ gridsearch_dataframe = extract_grid_parameters_from_log_and_results(log_file_nam
 \begin{figure}
     \centering
 <%=print(get_table_for_dataframe(gridsearch_dataframe))%>
-    \caption{Hyper-parameters evaluation using 3-folded cross validation, sorted by validation score}
+    \caption{Hyper-parameters evaluation using 3-fold cross validation, sorted by validation score}
     \label{fig:gridsearch_results}
 \end{figure}
 
@@ -847,7 +840,7 @@ errors_by_tropes_stats.plot.scatter(x='Number of Tropes', y='Standard Deviation'
     \end{subfigure}
     \caption{\textbf{(a)} Hexagonal binning plot of the evaluation errors for all the films (color in logaritmic scale).
     \textbf{(b)} Average value of the error by number of tropes.
-    \textbf{(c)} Standard Deviation of the error by number of tropes}
+    \textbf{(c)} Standard deviation of the error by number of tropes}
     \label{fig:errors}
 \end{figure}
 
