@@ -999,10 +999,7 @@ and the film's name is a reference to an existing song.
 % After the descripton above, you still have to give this an angle. For instance,
 % can we find some similarity to existing films?
 % There's another problem here: most very popular films have up to 800 tropes,
-% our has only 30. So it's never going to be similar using these metrics to similar films.
-% Again, this comparison opens many angles of attack and I don't think it really helps
-% to convey the simple message that it's going to be very different from current films - JJ
-
+% our has only 30. So it's never going to be similar using these metrics to other films.
 
 % Also, this is another reason why we need tropes2vec for comparisons. It will
 % make this arithmetic easier - JJ
@@ -1018,14 +1015,13 @@ we can observe that it reminds to films like 'A Midwinter’s Tale', because of 
 
 It is important to remark that, in all the cases, the Jaccard metrics indicate that the Film DNA is genuine,
 and most of the films with high rating that resembles it are films with incomplete trope development.
-In the best cases, there are 3 common tropes at maximum. % This is the only take
-% away message and probably the only paragraph that should be left - JJ
+In the best cases, there are 3 common tropes at maximum. % This is the great take
+% away message so make some emphasis - JJ
 
-These results are interesting and directly applicable to the generation of scripts.
+These results are interesting and directly applicable to the generation of scripts. % How - JJ
 However, we consider that our methodology leads to Film DNAs that promote the appearance of many genres at the same time
 and that could be hard to implement or, in some cases, incompatible. The next experiment tries to fix this situation.
 
-% Not worth the while to keep this subsection - JJ
 \subsection{Finding the best Trope DNA with genre limitations}
 
 This experiment sets the number of genres to the average, X, according to the extended dataset.
@@ -1047,49 +1043,49 @@ aaaa (+- bbbbb).  The best solution has a rating of ccccccc and a Film DNA with 
 The 5 films that have the most tropes in common with this Film DNA are:
 
 
-<TO ADD>
+% <TO ADD>
 
 
 The minimum set of films that, together, maximize the number of common tropes, are.
 
 
-<TO ADD>
+% <TO ADD>
 
 Although the rating is lower than in the previous experiment, a Film with the provided Film DNA is easier to design as we
 are not dealing with big genre incompatibilities.
 
 % Maybe keep it, maybe not. If you want to prove the worth of the surrogate
 % model, maybe, but I don't see what's the point of this - JJ
-\subsection{Improving the Film DNA of a known film}
+% \subsection{Improving the Film DNA of a known film}
 
-Could our methodology keep the essence of a film, that is translated to keeping most of the tropes,
-while adding some new tropes in the Film DNA that optimize the note?
+% Could our methodology keep the essence of a film, that is translated to keeping most of the tropes,
+% while adding some new tropes in the Film DNA that optimize the note?
 
-It is totally out of our intention to question a work of art like Star Wars, episode IV,
-however, we feel a special predilection for this masterpiece of all time
-and we consider that it is an appealing example for many of our readers,
-that's why we are using this film as an example.
-
-
-We will try to find Film DNAs that share at least 20 tropes with that film and let the GA find the rest, up to 30,
-so that the new Film DNA of size 30 improves the rating of the original film.
-
-In order to make this experiment we decide to implement a variant of the fitness function of the Genetic Algorithm
-that punishes solutions that do not share at least 20 tropes with the film, reducing the fitness by 5 points. This technique has been used
-for ... in .. (citas).
-
-The repetition of the Genetic Algorithm 30 times has resulted in an average fitness of
-aaaa (+- bbbbb).  The best solution has a rating of ccccccc and a Film DNA with the following tropes.
+% It is totally out of our intention to question a work of art like Star Wars, episode IV,
+% however, we feel a special predilection for this masterpiece of all time
+% and we consider that it is an appealing example for many of our readers,
+% that's why we are using this film as an example.
 
 
-<TO ADD> (show original tropes in one color and the new in other)
+% We will try to find Film DNAs that share at least 20 tropes with that film and let the GA find the rest, up to 30,
+% so that the new Film DNA of size 30 improves the rating of the original film.
 
-The films that better matches the added tropes are:
+% In order to make this experiment we decide to implement a variant of the fitness function of the Genetic Algorithm
+% that punishes solutions that do not share at least 20 tropes with the film, reducing the fitness by 5 points. This technique has been used
+% for ... in .. (citas).
 
-This results are interesting
+% The repetition of the Genetic Algorithm 30 times has resulted in an average fitness of
+% aaaa (+- bbbbb).  The best solution has a rating of ccccccc and a Film DNA with the following tropes.
 
-% It would be far more important to prove that the surrogate model works.
-\section{Discussion} \label{sec:discussion}
+
+% % <TO ADD> (show original tropes in one color and the new in other)
+
+% The films that better matches the added tropes are:
+
+% This results are interesting
+
+% % It would be far more important to prove that the surrogate model works.
+% \section{Discussion} \label{sec:discussion}
 
 \section{Conclusions} \label{sec:conclusions}
 % TODO: Objetivo ha sido ...
