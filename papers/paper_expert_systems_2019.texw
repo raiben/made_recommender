@@ -220,7 +220,7 @@ Some authors have proposed the use of tropes, defined in the introduction,
 as a way of structuring a story in a consistent and reusable way.
 In the work of \cite{Thompson18NarrativeEvents}, a system of agents relies on tropes to obtain a consistent narrative,
 to describe the social norms that model the world in which they live.
-The authors, as in this work, use tropes available on TVTropes as a base
+The authors, as in this work, use tropes available on TV Tropes as a base
 and translate them into logic statements that express duty or obligation,
 using TropICAL language, which are the input for a logic programming solver;
 however, they do not use all the tropes,
@@ -298,34 +298,6 @@ and use it to evaluate the subjective quality of a story from a set of tropes.
 
 Our methodology is divided in four main steps, explained below and described
 in the figure~\ref{fig:main_workflow_extended}:
-\begin{itemize}
-    \item[Step 1] Extract/scrape the tropes for every film
-    and codify them as \textit{Film DNAs}.
-    As we will see, our dataset will have limitations derived
-    from the fact that is fed from
-    the community, finding that popular films are broadly described in terms of tropes
-    and unpopular films poorly described or directly missing. % Explain variability - JJ
-    \item[Step 2] % Disambiguation of film names needs to be at least mentioned - JJ
-    % Or rather you should change "map" to disambiguation, which seems the best
-    % description for this step - JJ
-    Map the films' features such as the rating and genres to the previously built
-    \textit{Film DNAs}. This \textit{extended dataset}  will show limitations as well
-    based on the original one
-    and the automatic matching based on different heuristics.
-    As we will see, a trope that is widely used doesn't need to be linked to good ratings,
-    tropes that are present in bad films can become good in different combinations and vice-versa.
-% Need to explain that this will cull the initial TVtropes database to only a subset - JJ
-    \item[Step 3] % Train a surrogate model
-    Build a Neural Network to predict the rating from a \textit{Film DNA}.
-    We will follow different \textit{rules of thumb}
-    to achieve a moderately good solution that serves our purposes.
-    The neural network will handle the unknown relations between tropes and their combinations.
-    \item[Step 4] % Don't say what you do, say your objective
-    % → Optimize the "trope bag" with respect to ratings or box office. - JJ
-    Build a Genetic Algorithm with specific operators
-    that relies in the Neural Network as surrogate model
-    to build new constrained \textit{Film DNAs} that optimize the expected rating.
-\end{itemize}
 
 <<echo=False>>=
 workflow = f'''
@@ -338,8 +310,8 @@ digraph {{
     graph [ resolution=128, fontsize=30];
 
     node [margin=0 fontcolor=black fontsize=10 width=1];
-    tvtropes[label="TVTropes\nwebsite\n\ntvtropes.org\n " type="database"];
-    scrape_tropes[label="Step 1:\nScrape tropes\n\nPython+\nrequests+\nlxml+bz2\n~11.900 pages" type="process"];
+    tvtropes[label="TV Tropes\nwebsite\n\ntvtropes.org\n " type="database"];
+    scrape_tropes[label="Step 1:\nScrape tropes\n\nPython+\nrequests+\nlxml+\nbz2 (blocksize 900k)+\ndisk cache\n~11.900 pages" type="process"];
     dataset[label="Dataset\n\nfilms->tropes\n({n_films}->{n_tropes})\n " type="data"];
     imdb[label="IMDB\ndatasets:\nimdb.com/\ninterfaces/" type="database"];
     map_rating[label="Step 2:\nDisambiguate\nfilms\n\nPython+\nHeuristics+\nbz2" type="process"];
@@ -365,50 +337,44 @@ digraph {{
 draw_graphviz(workflow, "main_workflow_extended.pdf")
 @
 
+\begin{itemize}
+    \item[Step 1] Extract/scrape the tropes for every film
+    and codify them as \textit{Film DNAs}.
+    As we will explain, our dataset will have limitations derived
+    from the fact that is fed from
+    the community, finding that popular films are broadly described in terms of tropes
+    and unpopular films poorly described or directly missing.
+    We will analyze this variability and how it could affect the performance of the prediction model.
+    \item[Step 2] Extract ratings and genres from an external Film Database finding the unequivocal film names
+    and cull the original TV Tropes dataset.
+    This \textit{extended dataset}  will show limitations as well
+    based on the original one
+    and the automatic matching based on different heuristics.
+    As we will see, a trope that is widely used doesn't need to be linked to good ratings,
+    tropes that are present in bad films can become good in different combinations and vice-versa.
+    \item[Step 3] Build and train a surrogate model to predict the rating from a \textit{Film DNA}.
+    We will follow different \textit{rules of thumb}
+    to achieve a moderately good solution that serves our purposes.
+    A multi-layer preceptron will handle the unknown relations between tropes and their combinations.
+    \item[Step 4] Optimize the Film DNA with respect to ratings by
+    building a Genetic Algorithm with specific operators
+    that relies in the surrogate model previously built.
+\end{itemize}
+
 \begin{figure}
 \centering
 \includegraphics[width=\textwidth]{figures/main_workflow_extended.pdf}
 \caption[Methodology]{Methodology to generate constrained optimal Film DNAs using Genetic Algorithms with Neural
-Networks as surrogate models, fed from TVTropes and IMDb.\label{fig:main_workflow_extended}}
+Networks as surrogate models, fed from TV Tropes and IMDb.\label{fig:main_workflow_extended}}
 \end{figure}
 
 
-% TODO: Extracción de tropos: Explicar brevemente el tema de TVTRopes, DBTropes y nuetsro scraper + explicar los datos (Gráficas y tops)
+% TODO: Extracción de tropos: Explicar brevemente el tema de TV Tropes, DBTropes y nuetsro scraper + explicar los datos (Gráficas y tops)
 
 \subsection{Step 1: Extract the tropes} \label{sec:methodology_scraper}
 % Don't need to devote much time to this except if it's extraordinarily novel
 % Refer to former report (PicTropes) and the upcoming one - JJ
-We are going to use tropes as described in a live wiki called \cite{tvtropes_2}, that is
-collecting thousand of descriptions and examples of tropes from 2014 until now. As the data is fed by a community
-of users, we could find the bias that popular films are better described and analysed in terms of the tropes than independent
-films, and that popular tropes are more recognised than very specific ones. % REFERENCE NEEDED - JJ
-% Which means that... (tropes cound be under/overrepresented|false positives and negatives are possible) - JJ
-The semantic network of knowledge behind \textit{TVTropes.org} is huge and complex; it massively links hierarchies of tropes
-to their usage in creations for digital entertainment. The data, however, is only available through its web interface,
-which is why, in order to make it usable by the scientific community, \cite{maltekiesel_2} extracted all
-their data to a database so-called \textit{DBTropes.org}.\\
-% But we are not using it... And that Db is outdated - JJ
-As the base of the research on automatic trope generation, we begun with a dataset based in the
-latest version of DBTropes, called PicTropes\cite{garcia2018overview} that included 5,925 films with 18,270 tropes.
-However, the last version of BDTropes is from 2016, and the community of users of TVTropes has tripled the size
-of the database since then; if we work with the latest data from TVTropes our machine learning algorithms
-would benefit from having much entries and hence, provide better results. That's why our first step is to
-extract the data directly from TVTropes. % and made this dataset available to the public... - JJ
 
-
-% You need to mention it's been released in Pypi and GitHub - JJ
-Our scraper extracts all the categories from the main
-categories page (\href{https://tvtropes.org/pmwiki/pmwiki.php/Main/Film}{https://tvtropes.org/pmwiki/pmwiki.php/Main/Film})
-and for each category page, it extracts all the film identifiers assigned to it.
-Finally, for every film page, it extracts all the trope identifiers.
-As result, it builds a dictionary of films and tropes.
-In order to ease the execution, it can be stopped and re-launched at any time
-because it makes use of a local permanent cache compressed in bzip2 with a block size of 900k,
-the highest compression available.
-% You use like 3 different forms for TvTropes (with or without caps).
-% Settle on just 1! - JJ
-In order to avoid hurting the TvTropes servers, the process inserts waits between each two consecutive calls.
-As result, the executions retrieved around 12K pages in 3 to 4 hours.
 
 <<echo=False>>=
 tropes_summary_dictionary = {}
@@ -449,14 +415,7 @@ plot.set_xlabel("Films by number of tropes")
         \caption{}
         \label{fig:top_tropes_films}
     \end{subfigure}
-    \caption{\textbf{(a)} Descriptive analysis of the Tropes by appearance in films.
-    \textbf{(b)} Histogram of number of tropes by film.
-    \textbf{(c)} Top films by number of tropes}
-    \label{fig:tropes_analysis}
-\end{figure}
 
-\begin{figure}
-    \centering
     \begin{subfigure}[b]{0.15\textwidth}
         \centering
         <%=print(get_table_for_dataframe(films_summary_dataframe.describe([.1,.2,.3,.4,.5,.6,.7,.8,.9]), fixed_width=True))%>
@@ -467,7 +426,7 @@ plot.set_xlabel("Films by number of tropes")
     \begin{subfigure}[b]{0.4\textwidth}
         \centering
 <<width="\\linewidth",echo=False, results='hidden'>>=
-plot = films_summary_dataframe.plot.hist(log=True, color='#cccccc', figsize=(5, 5.2), ec="k", zorder=2, rwidth=0.5)
+plot = films_summary_dataframe.plot.hist(log=True, color='#1E77B4', figsize=(5, 5.2), zorder=2, rwidth=0.5)
 plot.set_xlabel("Tropes by number of films")
 @
         \caption{}
@@ -480,53 +439,99 @@ plot.set_xlabel("Tropes by number of films")
         \caption{}
         \label{fig:top_films_tropes}
     \end{subfigure}
-    \caption{\textbf{(a)} Descriptive analysis of the tropes by number of films in which they appear.
-    \textbf{(b)} Histogram of number of films by tropes. Please note the logarithmic $y$ axis.
-    \textbf{(c)} Top tropes by number of films}
+    \caption{
+    \textbf{(a)} Descriptive analysis of the Tropes by appearance in films.
+    \textbf{(b)} Histogram of number of tropes by film.
+    \textbf{(c)} Top films by number of tropes.
+    \textbf{(d)} Descriptive analysis of the tropes by number of films in which they appear.
+    \textbf{(e)} Histogram of number of films by tropes. Please note the logarithmic $y$ axis.
+    \textbf{(f)} Top tropes by number of films.}
     \label{fig:films_analysis}
 \end{figure}
 
-% TODO: Explicar los datasets
+We are going to use tropes as described in a live wiki called \cite{tvtropes_2}, that is
+collecting thousand of descriptions and examples of tropes from 2014 until now.
+As the data is fed by a community
+of users, we could find the bias that popular films are better described and analysed in terms of the tropes
+than older or independent films, and that popular tropes are more recognised than very specific ones. % REFERENCE NEEDED - JJ
+Which means that, during the automatic generation of Film DNAs, tropes cound be under/overrepresented,
+and that false positives and negatives are possible.
+The semantic network of knowledge behind \textit{TVTropes.org} is huge and complex; it massively links hierarchies of tropes
+to their usage in creations for digital entertainment. The data, however, is only available through its web interface,
+which is why, in order to make it usable by the scientific community, \cite{maltekiesel_2} extracted all
+their data to a database so-called \textit{DBTropes.org}.
+As the base of the research on automatic trope generation, we begun with a dataset based in the
+latest version of DBTropes, called PicTropes~\citep{garcia2018overview} that included 5,925 films with 18,270 tropes.
+However, the last version of BDTropes is from 2016, and the community of users of TV Tropes has tripled the size
+of the database since then; in other words, we are not using it because it is outdated.
+If we work with the latest data from TV Tropes our machine learning algorithms
+would benefit from having much entries and hence, provide better results. That's why our first step is to
+extract the data directly from TV Tropes while making it available to the public and the researchers,
+in the context of the Open Science.
 
-% DONE: Mapeo con nota: Explicar brevemente el tema de iMDb y el mapeo + explicar los datos y correlaciones (gráficas)
+Our scraper %cite scraper
+extracts all the categories from the main
+categories page and, for each category page, it extracts all the film identifiers assigned to it.
+Finally, for every film page, it extracts all the trope identifiers.
+As result, it builds a dictionary of films and tropes.
+Trope identifiers are written in \textit{CamelCase} and can include the year to avoid ambiguity.
+Some technical details are listed in Figure\ref{fig:main_workflow_extended}.
 
-\subsection{Step 2: Map genres and rating} \label{sec:methodology_mapper}
+The resulting dataset includes <%=n_films%> \textit{Film DNAs} and <%=n_tropes%> tropes.
+In both cases, the number of tropos by film and film by tropes follow long tail distributions, where
+a large number of occurrences are far from the "head" or central part of the distribution,
+as shown in Figure\ref{fig:films_analysis}.
+Most of the films have 30 tropes, the median, but there are films with more than 800 tropes.
+On the other hand, most tropes appear in 6 films, but there are tropes with more than 3000 occurrences in films.
 
-TVTropes is a huge yet very specific database of tropes but it doesn't include a rating
+It is part of the current research to analyze the expected effect of this distribution
+in the results of applying our methodology.
+The first conclusion is that we have much more samples with a small number of tropes than with big ones;
+however, at this step we do not have enough information to elucidate if this situation is explained
+by the fact that it is user-generated data and the popularity
+defines how well described are the films in terms of tropes.
+Furthermore, we cannot make a relation yet between the number of tropes in a film and its rating.
+However, as the next section complements the tropes with information per film,
+such as the rating, the genres or the number of votes,
+we will be in a position where we can find correlations
+that help us explain the possible results of the methodology in a better way.
+
+\subsection{Step 2: Disambiguation of films to get the rating} \label{sec:methodology_mapper}
+
+TV Tropes is a huge yet very specific database of tropes but it doesn't include a rating
 or links to an external database that we could use as a rating source;
-on the other hand, IMDb offers their database for non-commercial use and they provide datasets with lots of interesting features,
-including the rating and the popularity. % What's the difference? - JJ
-Our research just needs a way to map both tropes and ratings in order to build an extended dataset
-that will ultimately help us train a surrogate model. % Not clear. You want to identify a movie in TVTropes with another in IMdb. Just say so - JJ
+on the other hand, IMDb offers their database for non-commercial use and they provide
+datasets with lots of interesting features,
+including the rating and the number of votes.
+Our research just needs a way identify a movie in TV Tropes with another in IMDb.
 
 IMDb Datasets are a compendium of information that IMDb offers for personal and
 non-commercial use. Both conditions of use and dataset descriptions are explained in
 https://www.imdb.com/interfaces/. % Best as a reference. - JJ
 
-Our current research will make use of these datasets to extend the film information from TVTropes, in particular,
+Our current research will make use of these datasets to extend the film information from TV Tropes, in particular,
 {\tt title.basics.tsv}, % filename is unneeded. Use dataset name - JJ
  which contains metadata from the films such as the title, the year, the genres
 and the duration, and {\tt title.ratings.tsv}, which contains the rating and the number of votes.
 
 Items in IMDb that don't relate to films are excluded (tvEpisode, tvSeries, tvSpecial, tvShort, videoGame,
-tvMiniSeries, titleType) because they are not in our TVTropes scraped dataset and they would only increase
-ambiguity as more films might match the same name. % Maybe you're devoting too much time to
-% this. I think this should better go to a separate technical report. In a
-% journal paper you need to focus on what's innovative, not so much on the mechanics
-% - JJ
+tvMiniSeries, titleType) because they are not in our TV Tropes scraped dataset and they would only increase
+ambiguity as more films might match the same name.
 In order to be able to map the film names,
-films names are normalized in both cases, TVTropes and IMDb, converting camel-case to Title case, removing
-non-alphanumerical values and extra blanks, splitting name and year when required, and converting to lowercase.
-Normalized names in TvTropes and IMDb are matched, ideally \{1->1\}.
-In order to reduce ambiguity, if the year is present in TvTropes's identifier,
-we reduce the search to the specific year in IMDb.
-If there are more than one match for a tvTropes's identifier in IMDb,
-we just choose the one with the highest number of votes. % Present this as a problem, then your solution - JJ
+films names are normalized in both cases, TV Tropes and IMDb, converting camel-case to Title case, removing
+non-alphanumerical values and extra blanks, splitting name and year when required, and converting to lowercase,
+considering the original title and the English title.
+Normalized names in TV Tropes and IMDb are matched, ideally \{1->1\}, but
+in practice, especially when the year is not declared, we tend to find a big list of candidates
+for every single film in TV Tropes.
+In order to reduce ambiguity, if the year is present in TV Tropes's identifier,
+we reduce the search to the specific year in IMDb, and, in any case,
+we select the candidate with the highest number of votes.
+
 This heuristic relies in the fact that both data sources (tropes and votes)
 are maintained by different communities of users, enthusiasts in both cases,
-so if there is a film in TVTropes and there are many films with the same name in IMDb,
+so if there is a film in TV Tropes and there are many films with the same name in IMDb,
 it will probably be the one with highest popularity, that is reflected in the number of votes.
-We decided to include the original title so that non-English titles can be handled as well.
 
 
 <<echo=False>>=
@@ -545,8 +550,11 @@ coefficient_year_ntropes, p_value_year_ntropes = stats.pearsonr(extended_datafra
     \begin{subfigure}[b]{0.3\textwidth}
         \centering
 <<width="\\linewidth",echo=False, results='hidden'>>=
-extended_dataframe.plot.scatter(x='Number of tropes', y='Rating', color='darkgray', label='Films', figsize=(4, 4))
+extended_dataframe.plot.scatter(x='Number of tropes', y='Rating', color='#1E77B4', label='Films', figsize=(4, 4))
 plot_regression(extended_dataframe, 'Number of tropes', 'Rating', 'black')
+#plt.grid(b=True, which='major', color='#666666', linestyle='-')
+#plt.minorticks_on()
+#plt.grid(b=True, which='minor', color='#999999', linestyle='-', alpha=0.2)
 @
         \caption{\begin{tabularx}{\textwidth}{lX} coefficient: & <%=coefficient_rating_ntropes%> \\ p-value & <%=p_value_rating_ntropes%> \end{tabularx}}
         \label{fig:rating_ntropes}
@@ -556,8 +564,11 @@ plot_regression(extended_dataframe, 'Number of tropes', 'Rating', 'black')
     \begin{subfigure}[b]{0.3\textwidth}
         \centering
 <<width="\\linewidth",echo=False, results='hidden'>>=
-extended_dataframe.plot.scatter(x='Votes', y='Number of tropes', color='darkgray', label='Films', figsize=(4, 4))
+extended_dataframe.plot.scatter(x='Votes', y='Number of tropes', color='#1E77B4', label='Films', figsize=(4, 4))
 plot_regression(extended_dataframe, 'Votes', 'Number of tropes', 'black')
+#plt.grid(b=True, which='major', color='#666666', linestyle='-')
+#plt.minorticks_on()
+#plt.grid(b=True, which='minor', color='#999999', linestyle='-', alpha=0.2)
 @
         \caption{\begin{tabularx}{\textwidth}{lX} coefficient: & <%=coefficient_votes_ntropes%> \\ p-value & <%=p_value_votes_ntropes%> \end{tabularx}}
         \label{fig:votes_ntropes}
@@ -567,8 +578,11 @@ plot_regression(extended_dataframe, 'Votes', 'Number of tropes', 'black')
     \begin{subfigure}[b]{0.3\textwidth}
         \centering
 <<width="\\linewidth",echo=False, results='hidden'>>=
-extended_dataframe.plot.scatter(x='Year', y='Number of tropes', color='darkgray', label='Films', figsize=(4, 4))
+extended_dataframe.plot.scatter(x='Year', y='Number of tropes', color='#1E77B4', label='Films', figsize=(4, 4))
 plot_regression(extended_dataframe, 'Year', 'Number of tropes', 'black')
+#plt.grid(b=True, which='major', color='#666666', linestyle='-')
+#plt.minorticks_on()
+#plt.grid(b=True, which='minor', color='#999999', linestyle='-', alpha=0.2)
 @
         \caption{\begin{tabularx}{\textwidth}{lX} coefficient: & <%=coefficient_year_ntropes%> \\ p-value & <%=p_value_year_ntropes%> \end{tabularx}}
         \label{fig:year_ntropes}
@@ -579,20 +593,32 @@ plot_regression(extended_dataframe, 'Year', 'Number of tropes', 'black')
     \label{fig:extended_dataset_scatterplots}
 \end{figure}
 
-The resulting dataset includes the identifier in IMDb, in TVTropes, the name of the film, the year, the rating,
+The resulting dataset includes the identifier in IMDb, in TV Tropes, the name of the film, the year, the rating,
 the number of votes, the tropes for the film (0 if not present, 1 if present) and the genre (0 if not present,
 1 if present).
 
-A brief analysis of the new extended dataset,
-consisting in <%=extended_dataframe.shape[0]%> films linked to <%=len(trope_names)%> tropes,
-shows that there are significant positive correlations between the number of tropes
-and the rating, the popularity and the year, as shown in Figure \ref{fig:extended_dataset_scatterplots},
-% DONE: Generación del modelo surrogado: Red Neuronal + descripción de parámetros estándar + decisiones + (en proceso de ver lo mínimo que hay que evaluar)
+Figure \ref{fig:extended_dataset_scatterplots} shows the relations between the number of tropes and
+the rating, the number of votes and the year in the new extended dataset,
+consisting in <%=extended_dataframe.shape[0]%> films linked to <%=len(trope_names)%> tropes.
 
-% These steps 1 and 2 are basically the creation of the training set for
-% the surrogate model, together with some initial analysis which is not relevant
-% to the paper at large. It would be probably much better to publish it separately
-% as a technical report in ArXiV - JJ
+There is a significant positive correlation between the number of tropes and the rating, in other words,
+higher number of tropes are related to higher rating, and vice-versa.
+It is important to remark that the films up to \~53 tropes (the average) or less, show the widest range,
+\{\~1.3-\~9.5\}, for the rating,
+whereas films with more than 600 tropes have a rating in the range \{6-\~9.5\}.
+If we want to test the methodology, choosing a fixed number of tropes lower or equal to 53, for example, the median (30),
+would allow us to improve the solution in a wider range.
+
+There is a significant positive correlation between the number of tropes and the votes (popularity) as well.
+That explains the long queue distributions in the previous step, Figure~\ref{fig:films_analysis}, in other words,
+the more popular the film is, the better it is described by the community and the more tropes are found.
+
+Finally, there is a significant positive correlation between the number of tropes and the year,
+according to the scatter plot, the year of the film limitates the maximum number of tropes that describe the films
+in our dataset.
+
+The three outcomes will help us unravel the limitations of a surrogate model fed from the extended dataset
+and used to predict the rating from a set of tropes.
 
 \subsection{Step 3: Training the surrogate model}  \label{sec:methodology_surrogate_model}
 
@@ -630,7 +656,7 @@ it is recommended to do a hyper-parameters evaluation. % cite required
 
 We selected the Multi-layer perceptron (MLP), the most widespread neural network architecture,
 because it has been proven to be able to approximate any function that we require,
-the so calles universal approximation theorem.
+the so called \textit{Universal Approximation Theorem}.
 
 In order to choose hyper-parameters that get along with the nature of our problem
 we did a preliminary search with all the combinations in a domain of possible values
@@ -645,6 +671,12 @@ We applied 3-fold cross validation and got the average and the standard deviatio
 iterations_evaluator = extract_iterations_from_log(log_file_name=EVALUATOR_BUILDER_LOG_FILE)
 gridsearch_dataframe = extract_grid_parameters_from_log_and_results(log_file_name=EVALUATOR_HYPER_PARAMETERS_LOG_FILE)
 @
+\begin{figure}
+    \centering
+<%=print(get_table_for_dataframe(gridsearch_dataframe))%>
+    \caption{Hyper-parameters evaluation using 3-fold cross validation, sorted by validation score}
+    \label{fig:gridsearch_results}
+\end{figure}
 
 The results in figure~\ref{fig:gridsearch_results} show that
 a MLP with the structure <%='/'.join(layers)%>, using ReLu activation,
@@ -653,6 +685,8 @@ After training the MLP using the hyper-parameters, the Extended Dataset as input
 and the rating as output, until it does not improve more than the tolerance for 10 consecutive runs,
 the evaluation converges to a loss of <%=iterations_evaluator['loss'].iloc[-1]%>
 and a validation score of <%=iterations_evaluator['validation'].iloc[-1]%>.
+
+
 
 <<echo=False>>=
 info_file = u'../datasets/evaluator_tests.json.bz2'
@@ -693,11 +727,12 @@ errors_by_tropes_stats.plot.scatter(x='Number of Tropes', y='Standard Deviation'
         \label{fig:average_std}
     \end{subfigure}
     \caption{\textbf{(a)} Hexagonal binning plot of the evaluation errors for all the films (color in logaritmic scale).
-    \textbf{(b)} Average value of the error by number of tropes.
-    \textbf{(c)} Standard deviation of the error by number of tropes}
+    \textbf{(b)} Average absolute value of the error by number of tropes.
+    \textbf{(c)} Standard deviation of the absolute error value by number of tropes}
     \label{fig:errors}
 \end{figure}
 
+The trained Multi-layer Perceptron ...
 % Análisis de error promedio por número de tropos
 % Ejemplos de pelis conocidas con muchos y pocos tropos
 % probar 1 género y ver qué sale
