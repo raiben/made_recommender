@@ -45,7 +45,9 @@ class EvaluatorTests(object):
             error = film['rating'] - film['evaluation']
             abserror = abs(error)
             errors_by_tropes[key].append(abserror)
-            self.test_results['errors_by_tropes'].append({'Number of Tropes':key, 'Error':error, 'AbsError':abserror})
+            self.test_results['errors_by_tropes'].append({'Number of Tropes':key, 'Rating':film['rating'],
+                                                          'Evaluation':film['evaluation'],'Error':error,
+                                                          'AbsError':abserror})
 
         self.test_results['errors_by_tropes_stats'] = []
         for key, values in errors_by_tropes.items():

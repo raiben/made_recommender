@@ -607,7 +607,8 @@ It is important to remark that the films up to \~53 tropes (the average) or less
 \{\~1.3-\~9.5\}, for the rating,
 whereas films with more than 600 tropes have a rating in the range \{6-\~9.5\}.
 If we want to test the methodology, choosing a fixed number of tropes lower or equal to 53, for example, the median (30),
-would allow us to improve the solution in a wider range.
+would allow us to improve the solution in a wider range. At the same time, a number of tropes in this range
+will be prone to have a rating in a range \{6-6.5\}, according to the regression function.
 
 There is a significant positive correlation between the number of tropes and the votes (popularity) as well.
 That explains the long queue distributions in the previous step, Figure~\ref{fig:films_analysis}, in other words,
@@ -732,12 +733,39 @@ errors_by_tropes_stats.plot.scatter(x='Number of Tropes', y='Standard Deviation'
     \label{fig:errors}
 \end{figure}
 
-The trained Multi-layer Perceptron ...
-% Análisis de error promedio por número de tropos
-% Ejemplos de pelis conocidas con muchos y pocos tropos
-% probar 1 género y ver qué sale
+The multi-layer perceptron will be used as a surrogate model in a specific experiment in further sections,
+so, in order to anticipate the results, we need to analyze how well it predicts the ratings grouped by the number of tropes.
+We calculate the error for every sample of our extended dataset and as show it in Figure~\ref{fig:errors}(a) as a hexagonal binning plot,
+and we can observe that most of the cases are close to the 0 (note the logaritmic scale of the color gradient that helps us see more details).
+There are under and over-estimations, especially in the range of tropes with more occurrences \{0-100\},
+but the under-estimation error is bigger, that means that the Neural Network will tend to under-estimate for a small number of tropes.
 
-% DOING: Generación de conjuntos de tropos mediante GAs: Descripción del algoritmo + operadores + parámetros
+Figure~\ref{fig:errors}(b) and (c) shows the average absolute error and absolute standard deviation by the number of tropes.
+Again, we can observe that a small number of tropes (less than 200) implies higher errors and higher deviations than
+a bigger number of tropes. That is explained because we are working with user-generated content
+and less popular films are poorly described in terms of number of tropes, hence their rating is harder to predict.
+At the same time, it points out that the number of tropes is a good predictor,
+and, if the films were described with an equal level of detail, it would imply more tropes and less errors.
+
+<<echo=False>>=
+mean_1_genre = statistics.mean([item['Estimated rating'] for item in test.test_results['evaluations_1_genre']])
+#Out[9]: 5.511383624560505
+stdev_1_genre = statistics.stdev([item['Estimated rating'] for item in test.test_results['evaluations_1_genre']])
+#Out[10]: 0.010139587722208073
+genres = [item['Genre'].replace('[GENRE]','') for item in test.test_results['evaluations_1_genre']]
+@
+
+Analysing the weight of the genre on the rating is also a good outcome in order to know if there are rating biases
+regarding the genre. We did the evaluation of all the Film DNAs that contain only one genre out of the <%=len(genres)%>,
+getting an average value of <%=mean_1_genre%>(+-<%=stdev_1_genre%>), so, in principle,
+choosing one genre or another does not seem to be a rating limiter. Intuitively, that tells us
+that all the genres have good and bad films in the same proportion and our synthetic Film DNA will not suffer
+from strong biases due the genre.
+
+% Añadir tb si hay pelis que tengan más de 10 y menos de 0. Tmabién explicar que puede ser mayor que el rango
+% comprobado, no hay ninguna peli con más de 10 o menos de 0. La peli que más tiene es 9.945584884763836
+
+
 \subsection{Film DNA builder}  \label{sec:methodology_ga}
 
 % explicar el paso

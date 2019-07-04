@@ -10,6 +10,7 @@ import pandas as pd
 import pygraphviz as pgv
 from tabulate import tabulate
 import requests
+import statistics
 
 import sys
 sys.path.append("..")
