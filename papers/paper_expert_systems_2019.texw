@@ -371,7 +371,7 @@ Networks as surrogate models, fed from TV Tropes and IMDb.\label{fig:main_workfl
 
 % TODO: Extracción de tropos: Explicar brevemente el tema de TV Tropes, DBTropes y nuetsro scraper + explicar los datos (Gráficas y tops)
 
-\subsection{Step 1: Extract the tropes} \label{sec:methodology_scraper}
+\subsection{Step 1: Extraction of the tropes} \label{sec:methodology_scraper}
 % Don't need to devote much time to this except if it's extraordinarily novel
 % Refer to former report (PicTropes) and the upcoming one - JJ
 
@@ -621,7 +621,7 @@ in our dataset.
 The three outcomes will help us unravel the limitations of a surrogate model fed from the extended dataset
 and used to predict the rating from a set of tropes.
 
-\subsection{Step 3: Training the surrogate model}  \label{sec:methodology_surrogate_model}
+\subsection{Step 3: The surrogate model}  \label{sec:methodology_surrogate_model}
 
 <<echo=False>>=
 input, output = get_experiment_execution_information(EVALUATOR_BUILDER_LOG_FILE)
@@ -766,84 +766,74 @@ from strong biases due the genre.
 % comprobado, no hay ninguna peli con más de 10 o menos de 0. La peli que más tiene es 9.945584884763836
 
 
-\subsection{Film DNA builder}  \label{sec:methodology_ga}
+\subsection{The Genetic Algorithm} \label{sec:methodology_ga}
 
-% explicar el paso
 At this step we already have a set of candidate tropes for the Film DNA and a model
 that allows its evaluation, so our goal is to use a device that allows us to generate a Film DNA that optimizes the rating.
 
-% Que es un GA y por qué es interesante
 We chose to use a Genetic Algorithm because it is a mechanism that allows us to explore the domain of Film DNAs,
 in other words, of combinations of tropes, getting high-quality solutions and dealing with global optimization problems.
 % cite
 
-% Trabajamos con tropos, que es un cromosoma
 Our chromosome will be the DNA film, that is, a set of tropes.
 In practice it will be encoded as an array of different indices on a dictionary of the total set of tropes available
 without value repetitions, given that, \textit{a priori}, the order of the tropes is irrelevant
 (according to their nature, they can refer to specific moments, but also to narrative structures and general settings)
 and also, our rating evaluator does not consider weights or multiple occurrences of the trope in the movie
-(both, training data and model do not consider multiple occurrendes of a trope in a single Film, in other words,
+(both, training data and model do not consider multiple occurrences of a trope in a single Film, in other words,
 the trops appears or does not appear).
 
-% La Mutación
 The mutation operator changes a trope of the Film DNA by another that is randomly chosen
 from the set of tropes ou of the Film DNA. By doing this, the Film DNA keeps complying with its restrictions,
 mentioned above, and allows an exploration of new tropes.
 
-% El cruzamiento
 The crossover operator will make a superset of tropes from the parents' Film DNAs
 and randomly selects two subsets for the offspring.
 This way, the offspring will have Film DNAs whose tropes are exclusively from their parents, allowing
 the exploitation of the data.
 
-
-% La función fitness y el modelo surrogado
 As we explained above, we have to rely on a surrogate model for the evaluation of Film DNAs, and our approach uses
 a neural network trained with existing movies. The fitness of our GA will be the result of evaluating a DNA trope with
 the neural network.
 
 According to pour tests, the genetic algorithm has proven to converge towards optimal solutions efficiently,
 given the simplicity of the operators based on set algebra, and fitness calculation, in this case, a trained neural network.
+It is important to remark that the Genetic Algorithm is interesting for the research  as far as it leads us to our goal,
+that is to prove that the methodology works, and hence,
+an exploratory analysis of the parameters of the Genetic Algorithm is reasonable in this context,
+as we will see in the next section, \ref{sec:experimental_setup}.
+
 
 \section{Experimental setup} \label{sec:experimental_setup}
 
-The evaluation of the methodology is performed unequivocally through its testing in different scenarios
-and the analysis of results.
-In this case, different applications of the methodology have been chosen,
-which will help us answer the following questions:
-Can we try to generate the optimal Trope DNA for a standard movie?
-Could we fix the number of genres while maximizing the rating? % this question is not in the Introduction
-% And it's not clear why this should be a problem (or why it's mentioned in the experimental setup) - JJ
-Could we use this methodology to improve an existing Trope DNA?
-% I don't think this should go in this paper either - JJ
-How much do our results resemble existing films?
-
+The evaluation of the methodology is performed unequivocally through its testing and a further
+analysis of the results. In this research, we want to know if the methodology
+can be used to synthesise an optimal Trope DNA for a standard movie in terms of potential rating.
 
 Our experiment will use a fixed size Film DNA of 30 tropes, which is the median of tropes per film
-in the original dataset.
+in the original dataset and therefore, a candidate for a 'standard' film.
+As benefits, a Film DNA of size 30 is easier to interpret in natural language than one of size 200.
+Furthermore, as we saw in the Section~\ref{sec:methodology_mapper}, this number of tropes is a good candidate
+because it can lead to a wide range of ratings, good and bad,
+and the GA will have a better chance to evolve solution from bad cases;
+however, as we saw in the Section~\ref{sec:methodology_surrogate_model}, a Film os size 30 implies
+more chances to under or over-evaluate, and the rating will be less accurate.
 
 The most suitable parameters to solve a specific problem require an extensive calibration, which is outside
 of the scope of this paper. However, to choose the set of parameters that we will use in all the experiments
-in this paper, we have made a preliminary selection executing all possible combinations of Population (P) = \{50, 100, 200\},
+in this paper, we have made a preliminary selection executing 30 times every possible combination of Population (P) = \{50, 100, 200\},
 Mutation probability (Mp) = \{\(2\div size_{dna}\), \(1\div size_{dna}\), \(0.5\div size_{dna}\)\}
 and Crossover Probability (Cp) = \{0.25, 0.5, 0.75\}
 and we have chosen the combination P = 200, Mp = \(1\div size_dna\) , Cp = 0.5, because it obtains better results on average.
 
 In the experiments we have set the stop criterion to a minimum of 3000 evaluations and
 until the best generation does not improve during 10000 evaluations.
+We will run the genetic Algorithm 30 times with different random seeds and
+we will select the run that gives the highest fitness.
 
-% Say something about the results: we will use the best X out of every run, the best
-% in the run with the best fitness... - JJ
-
-% "A trope is not a full-fledged film, so we need to have an idea of what a movie
-% with that set of tropes would look like. This is why ... " - something like this
-% But also it would be interesting to show simply the score the surrogate assigns to some movies
-% In fact, it would be better. Since the similarity is small, that means that
-% comparing it with known films shows you what our generated movies _do not_ look
-% like, not what they look like
-% Anyway, it's important to motivate this and tell why we are doing it - JJ
-As tools to interpret the results, we will use two metrics of similarity between finite sample sets.
+A trope is not a full-fledged film, so we need to have an idea of what a movie
+with that set of tropes would look like. This is why, as tools to interpret the results,
+we will use two metrics of similarity between finite sample sets.
 The first one is a metric called \textit{Jaccard coefficient}
 and is defined as the cardinality of the intersection of Film DNAs divided by the cardinality of the union of the Film DNAs.
 The second one is called \textit{Overlap coefficient}
@@ -851,10 +841,9 @@ and is defined as the cardinality of the intersection of Film DNAs divided by th
 Both metrics are interesting because we are dealing with incomplete data and we cannot assume that a a Film that has few tropes in its DNA
 is actually extensively defined and described by the wisdom of crowds in our Extended Dataset as well as other popular films.
 % TODO Citar las métricas
-% More important, show references why this makes sense - JJ
 \section{Results}
 
-\subsection{Finding the best Trope DNA without genre limitations}
+The goal of this specific experiment if to find the best Film DNA possible with a fixed small length.
 
 The repetition of the Genetic Algorithm 30 times has resulted in an average fitness of 9.783487634688873 (+- 0.4307202616394516).
 The best solution has a rating of 10.313031174658876 and a Film DNA with the following tropes.
@@ -881,7 +870,7 @@ tropes_list = ['ActionHeroBabysitter', 'DeathByFlashback', 'DisneyVillainDeath',
 top_overlap_exp1_1, top_jaccard_exp1_1 = checker.get_top_films_by_simmilarity(tropes_list, 5)
 @
 
-The syntethic Film DNA belongs to a multi-genre film (historical documentary romantic drama set during a war that includes
+The synthetic Film DNA belongs to a multi-genre film (historical documentary romantic drama set during a war that includes
 western and mistery settings, not comedy).
 However, according to one of the tropes, even if it is historical/documentary,
 it is completely an adaptation from the author with clear differences with the overall known story for pragmatic reasons (PragmaticAdaptation).
