@@ -93,9 +93,9 @@ and, ultimately, for supporting the automatic generation of stories, for example
 \keywords{Content Generation; Tropes; Narrative; Deep Learning; Genetic Algorithms}
 
 \jnlcitation{\cname{%
-\author{R.H. García-Ortega},
+\author{R.H. Garc\'ia-Ortega},
 \author{J.J. Merelo},
-\author{P. García-Sánchez}} (\cyear{2019}),
+\author{P. Garc\'ia-S\'anchez}} (\cyear{2019}),
 \ctitle{Chasing compelling stories using computational intelligence and tropes}, \cjournal{}, \cvol{}.}
 
 \maketitle
