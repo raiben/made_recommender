@@ -8,7 +8,7 @@ from operator import attrgetter
 import pandas as pd
 from pandas._libs import json
 
-TropesSimilarityEntity = namedtuple('TropesSimilarityEntity', 'name rating n_tropes overlap jaccard common_tropes')
+TropesSimilarityEntity = namedtuple('TropesSimilarityEntity', 'name rating n_tropes overlap jaccard common_tropes common_tropes_count')
 
 
 class TropesSimilarityChecker(object):
@@ -58,25 +58,27 @@ class TropesSimilarityChecker(object):
 
                 overlap = self.get_overlap_similarity(original_trope_set, compared_trope_set)
                 jaccard = self.get_jaccard_similarity(original_trope_set, compared_trope_set)
+                common_tropes = original_trope_set.intersection(compared_trope_set)
                 film = TropesSimilarityEntity(film_dictionary['name'], film_dictionary['rating'],
                                               len(compared_trope_set), overlap, jaccard,
-                                              original_trope_set.intersection(compared_trope_set))
+                                              common_tropes, len(common_tropes))
                 films.append(film)
                 #if len(films) % 100 == 0:
                 #    print(len(films))
 
             top_overlap = sorted(films, key=attrgetter('overlap', 'rating'), reverse=True)[0:number_of_results]
-            overlap_dataframe = pd.DataFrame([{'Similarity (Overlap)': "{:.2f}".format(film.overlap * 100) + '%',
-                                               'Film': film.name, 'Rating': film.rating, 'N. tropes': film.n_tropes,
-                                               'Common tropes': ', '.join(list(film.common_tropes))}
-                                              for film in top_overlap])
+            #overlap_dataframe = pd.DataFrame([{'Similarity (Overlap)': "{:.2f}".format(film.overlap * 100) + '%',
+            #                                   'Film': film.name, 'Rating': film.rating, 'N. tropes': film.n_tropes,
+            #                                   'Common tropes': ', '.join(list(film.common_tropes))}
+            #                                  for film in top_overlap])
 
             top_jaccard = sorted(films, key=attrgetter('jaccard', 'rating'), reverse=True)[0:number_of_results]
-            jaccard_dataframe = pd.DataFrame([{'Similarity (Jaccard)': "{:.2f}".format(film.jaccard * 100) + '%',
-                                               'Film': film.name, 'Rating': film.rating, 'N. tropes': film.n_tropes,
-                                               'Common tropes': ', '.join(list(film.common_tropes))}
-                                              for film in top_jaccard])
-            return overlap_dataframe, jaccard_dataframe
+            #jaccard_dataframe = pd.DataFrame([{'Similarity (Jaccard)': "{:.2f}".format(film.jaccard * 100) + '%',
+            #                                   'Film': film.name, 'Rating': film.rating, 'N. tropes': film.n_tropes,
+            #                                   'Common tropes': ', '.join(list(film.common_tropes)),}
+            #                                  for film in top_jaccard])
+            top_common_tropes = sorted(films, key=attrgetter('common_tropes_count', 'rating'), reverse=True)[0:number_of_results]
+            return top_overlap, top_jaccard, top_common_tropes
 
         all_tropes = list(self.extended_dataframe.columns)[6:]
         for record in self.extended_dataframe.itertuples():
@@ -135,8 +137,9 @@ class TropesSimilarityChecker(object):
 
 
 if __name__ == '__main__':
+    FILM_EXTENDED_DATASET_DICTIONARY_BZ2_FILE = '../datasets/extended_dataset.json.bz2'
     checker = TropesSimilarityChecker()
-    checker.load_extended_dataset_json('/Users/phd/workspace/made/made_recommender/datasets/extended_dataset.json.bz2')
+    checker.load_extended_dataset_json(FILM_EXTENDED_DATASET_DICTIONARY_BZ2_FILE)
     tropes_list = ['ActionHeroBabysitter', 'DeathByFlashback', 'DisneyVillainDeath', 'DuelToTheDeath',
                    'EarlyBirdCameo', 'FightingFromTheInside', 'HandsOffParenting', 'Homage', 'ImNotAfraidOfYou',
                    'JumpCut', 'MouthingTheProfanity', 'NoSympathy', 'OminousFog', 'OneHeadTaller',
@@ -144,4 +147,15 @@ if __name__ == '__main__':
                    'SpitefulSpit', 'TalkingHeads', 'TitledAfterTheSong', 'WeaponOfXSlaying', '[GENRE]Animation',
                    '[GENRE]Documentary', '[GENRE]Drama', '[GENRE]History', '[GENRE]Mystery', '[GENRE]Romance',
                    '[GENRE]War', '[GENRE]Western']
-    films = checker.get_top_films_by_simmilarity(tropes_list, 10)
+    top_overlap, top_jaccard, top_common = checker.get_top_films_by_simmilarity(tropes_list, 10)
+
+    highest_overlap = top_overlap[0].overlap
+    top_overlap = [film for film in top_overlap if film.overlap==highest_overlap]
+
+    highest_jaccard = top_jaccard[0].jaccard
+    top_jaccard = [film for film in top_jaccard if film.jaccard == highest_jaccard]
+
+    # total = []
+    # [total.extend(film.common_tropes) for film in top_common[0:6]]
+    # from collections import Counter
+    # Counter(total)
