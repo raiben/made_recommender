@@ -996,6 +996,9 @@ is still required, not part of the scope of the research and, as far as we know,
 
 % TODO: Esto puede ser la base para una futura linea...
 
+\section*{Acknowledgements}
+This work has been partially funded by projects EphemeCH (TIN2014-56494-C4-3-P), DeepBio (TIN2017-85727-C4-2-P) and TEC2015-68752 and ``Ayuda del Programa de Fomento e Impulso de la actividad Investigadora de la Universidad de C\'adiz''.
+
 \section{Bibliography}
 \bibliography{report}
 
