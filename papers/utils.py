@@ -201,40 +201,23 @@ def extract_grid_parameters_from_log_and_results(log_file_name):
     dataframe = dataframe.sort_values(by='mean', ascending=False).reset_index(drop=True)
     return dataframe
 
+def human_readable(value):
+    if isinstance(value, float):
+        print ("{0:.3f}".format(value))
+        return
+
+    print (str(value))
 
 if __name__=='__main__':
-    workflow = f'''
-    digraph {{
-        splines=polyline
-        rankdir=LR
-        ranksep=0.25;
-        margin=0;
-        nodesep=0.3;
-        graph [ resolution=128, fontsize=30];
-
-        node [margin=0 fontcolor=black fontsize=10 width=1];
-        tvtropes[label="TVTropes\nwebsite\n\ntvtropes.org\n " type="database"];
-        scrape_tropes[label="Step 1:\nScrape tropes\n\nPython+\nrequests+\nlxml+bz2\n~11.900 pages" type="process"];
-        dataset[label="Dataset\n\nfilms->tropes\n({12}->{132})\n " type="data"];
-        imdb[label="IMDB\ndatasets:\nimdb.com/\ninterfaces/" type="database"];
-        map_rating[label="Step 2:\nDisambiguate\nfilms\n\nPython+\nHeuristics+\nbz2" type="process"];
-        extended_dataset[label="Extended\nDataset\n\nFilm DNA+genres->\nrating" type="data"];
-        build_evaluator[label="Step 3:\nBuild\nSurrogate\nModel\n\npandas+\nsklearn\n " type="process"];
-        evaluator[label="Surrogate model\n\nFilm DNA+genres->\nExpected\nRating\n\nMulti-layer\nPerceptron" type="tool"];
-        user[label="User's\nconstraints\nfor the\nSynthetic\nFilm DNA" type="data"];
-        dna_builder[label="Step 4:\nGenetic Algorithm\n\ninspyred+\ncachetools" type="process"];
-        trope_sequence[label="Optimal\nSynthetic\nFilm DNA" type="data"];
-
-        tvtropes -> scrape_tropes[minlen=0];
-        scrape_tropes -> dataset[minlen=1];
-        dataset -> map_rating;
-        imdb -> map_rating[minlen=0];
-        map_rating -> extended_dataset;
-        extended_dataset -> build_evaluator;
-        build_evaluator -> evaluator;
-        evaluator -> dna_builder;
-        user -> dna_builder[minlen=0];
-        dna_builder -> trope_sequence;
-    }}'''
-
-    draw_graphviz(workflow, "main_workflow_extended.pdf")
+    FILM_EXTENDED_DATASET_DICTIONARY_BZ2_FILE = '../datasets/extended_dataset.json.bz2'
+    checker = TropesSimilarityChecker()
+    checker.load_extended_dataset_json(FILM_EXTENDED_DATASET_DICTIONARY_BZ2_FILE)
+    tropes_list = ['ActionHeroBabysitter', 'DeathByFlashback', 'DisneyVillainDeath', 'DuelToTheDeath',
+                   'EarlyBirdCameo', 'FightingFromTheInside', 'HandsOffParenting', 'Homage', 'ImNotAfraidOfYou',
+                   'JumpCut', 'MouthingTheProfanity', 'NoSympathy', 'OminousFog', 'OneHeadTaller',
+                   'PoorMansSubstitute', 'PragmaticAdaptation', 'RichIdiotWithNoDayJob', 'SomeoneToRememberHimBy',
+                   'SpitefulSpit', 'TalkingHeads', 'TitledAfterTheSong', 'WeaponOfXSlaying', '[GENRE]Animation',
+                   '[GENRE]Documentary', '[GENRE]Drama', '[GENRE]History', '[GENRE]Mystery', '[GENRE]Romance',
+                   '[GENRE]War', '[GENRE]Western']
+    top_overlap, top_jaccard, top_common = checker.get_top_films_by_simmilarity(tropes_list, 6)
+    pass

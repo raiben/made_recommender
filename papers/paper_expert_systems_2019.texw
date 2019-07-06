@@ -79,7 +79,7 @@ T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
 \abstract[Abstract]{
 Designing a story is widely considered a crafty yet critical task that requires deep specific human knowledge
 in order to reach a minimum quality and originality. This includes designing at a high
-level different elements of the film; these high-level elements are called tropes.
+level different elements of the film; these high-level elements are called tropes when they become patterns.
 The present paper proposes and evaluates a methodology to automatically synthesise sets of tropes
 in a way that they maximize the potential rating of a film that conforms to them.
 We use deep learning to create a surrogate model mapping film ratings from tropes,
@@ -149,19 +149,19 @@ which grow as they are discovered as common
 patterns in other stories, the \textit{Film DNA} is, by definition, incomplete and evolving,
 yet it is still interesting to define stories, categorize them
 and model them from a mathematical perspective.
-The challenge of our research if to build original synthetic Film DNAs
+The challenge of our research is to build original synthetic Film DNAs
 based on a huge corpus of film-tropes, and through computational intelligence,
 in a way that they have an intrinsic potential quality when reflected together in a film.
 
 At the same time, we need to be able to associate a measure of quality to the \textit{Film DNA}
-and it is a complex metric that summarizes many factors, at last, perceived and evaluated by humans.
+and it needs to summarize many factors, at last, perceived and evaluated by humans.
 Luckily we have access to databases with films' information
 that includes the genres of the films and their human evaluated ratings,
-provided by the community of fans; we add this information to our knwoledge base
-to build a \textit{Extended Dataset}, that includes \textit{Film DNAs}, their genres and their rating,
-and we rely on the ratings as a measure of quality and add it to our model,
-in order to process them, make new evaluations and suggestions.
-Furthermore, even though intuitively
+provided by the community of fans.
+If we are able to construct a knowledge base of films, including the Film DNAs that we mentioned previously, the genres and the rating,
+in a huge \textit{extended dataset}, we would be able to process them in order to make suggestions of tropes
+that optimize the predicted rating;
+however, even though intuitively
 the \textit{Film DNA} is a profound way to describe a story
 from many different perspectives, following the analogy of the DNA,
 there are epigenetic factors that could deeply affect the performance of the story as well.
@@ -174,9 +174,10 @@ most probable implementation based on the universe of currently analyzed films.
 Our approach extracts <%=n_films%> \textit{Film DNAs} that contain in sum <%=n_tropes%> different tropes
 from external Data Sources
 and maps it to a database of film ratings and genres, dealing with disambiguation heuristics
-in order to build what we have called the \textit{Extended Dataset}.
+in order to build what we have called the \textit{extended dataset}.
 However, submitting a set of tropes to the box office is impossible, which is
-why we use deep learning to create a surrogate model that is able
+why we use deep learning % TODO cite
+to create a surrogate model that is able
 to infer the rating from any combination of tropes.
 We perform different analysis in order to determine the quality
 of the predictions and the parameters that could affect them.
@@ -185,11 +186,11 @@ that the trope combinations, formerly Film DNAs, are evolved relying in the surr
 maximize the rating.
 
 The remaining of this work is organized as follows:
-in the Section~\ref{sec:state_of_the_art} we explore the current state-of-the-art
+in the Section~\ref{sec:state_of_the_art} we explore the current state of the art
 in plot generation based on tropes, in the Section~\ref{sec:methodology} we deepen the methodology presented above,
-in the Section~\ref{sec:experimental_setup} we describe the experiments carried out to evaluate the methodology,
-in the Section~\ref{sec:discussion} we discuss the results
-and in the Section~\ref{sec:discussion} we summarize the outcomes and future work.
+in the Section~\ref{sec:experimental_setup} we describe the experiments carried out to evaluate the methodology
+and discuss the results,
+and in the Section~\ref{sec:conclusions} we summarize the outcomes and future work.
 
 \section{State of the art} \label{sec:state_of_the_art}
 
@@ -360,7 +361,7 @@ draw_graphviz(workflow, "main_workflow_extended.pdf")
     This \textit{extended dataset}  will show limitations as well
     based on the original one
     and the automatic matching based on different heuristics.
-    As we will see, a trope that is widely used doesn't need to be linked to good ratings,
+    As we will see, a trope that is widely used does not need to be linked to good ratings,
     tropes that are present in bad films can become good in different combinations and vice-versa.
     \item[Step 3] Build and train a surrogate model to predict the rating from a \textit{Film DNA}.
     We will follow different \textit{rules of thumb}
@@ -465,18 +466,19 @@ As the data is fed by a community
 of users, we could find the bias that popular films are better described and analysed in terms of the tropes
 than older or independent films, and that popular tropes are more recognised than very specific ones. % REFERENCE NEEDED - JJ
 Which means that, during the automatic generation of Film DNAs, tropes cound be under/overrepresented,
-and that false positives and negatives are possible.
-The semantic network of knowledge behind \textit{TVTropes.org} is huge and complex; it massively links hierarchies of tropes
+and that positive and negative estimation errors are possible.
+The semantic network of knowledge behind TV Tropes is huge and complex; it massively links hierarchies of tropes
 to their usage in creations for digital entertainment. The data, however, is only available through its web interface,
 which is why, in order to make it usable by the scientific community, \cite{maltekiesel_2} extracted all
 their data to a database so-called \textit{DBTropes.org}.
 As the base of the research on automatic trope generation, we begun with a dataset based in the
 latest version of DBTropes, called PicTropes~\citep{garcia2018overview} that included 5,925 films with 18,270 tropes.
-However, the last version of BDTropes is from 2016, and the community of users of TV Tropes has tripled the size
+However, the last version of DBTropes is from 2016, and the community of users of TV Tropes has tripled the size
 of the database since then; in other words, we are not using it because it is outdated.
 If we work with the latest data from TV Tropes our machine learning algorithms
-would benefit from having much entries and hence, provide better results. That's why our first step is to
-extract the data directly from TV Tropes while making it available to the public and the researchers,
+would benefit from having much entries and hence, provide better results. That is why our first step is to
+extract the data directly from TV Tropes while making it available to the public % TODO cite
+and the researchers,
 in the context of the Open Science.
 
 Our scraper %cite scraper
@@ -484,13 +486,13 @@ extracts all the categories from the main
 categories page and, for each category page, it extracts all the film identifiers assigned to it.
 Finally, for every film page, it extracts all the trope identifiers.
 As result, it builds a dictionary of films and tropes.
-Trope identifiers are written in \textit{CamelCase} and can include the year to avoid ambiguity.
-Some technical details are listed in Figure\ref{fig:main_workflow_extended}.
+Trope identifiers are written in \textit{CamelCase} format and can include the year to avoid ambiguity.
+Some technical details are listed in Figure~\ref{fig:main_workflow_extended}.
 
 The resulting dataset includes <%=n_films%> \textit{Film DNAs} and <%=n_tropes%> tropes.
 In both cases, the number of tropes by film and film by tropes follow long tail distributions, where
 a large number of occurrences are far from the "head" or central part of the distribution,
-as shown in Figure\ref{fig:films_analysis}.
+as shown in Figure~\ref{fig:films_analysis}.
 Most of the films have 30 tropes, the median, but there are films with more than 800 tropes.
 On the other hand, most tropes appear in 6 films, but there are tropes with more than 3000 occurrences in films.
 
@@ -508,7 +510,7 @@ that help us explain the possible results of the methodology in a better way.
 
 \subsection{Step 2: Disambiguation of films to get the rating} \label{sec:methodology_mapper}
 
-TV Tropes is a huge yet very specific database of tropes but it doesn't include a rating
+TV Tropes is a huge yet very specific database of tropes but it does not include a rating
 or links to an external database that we could use as a rating source;
 on the other hand, IMDb offers their database for non-commercial use and they provide
 datasets with lots of interesting features,
@@ -528,7 +530,7 @@ Items in IMDb that don't relate to films are excluded (tvEpisode, tvSeries, tvSp
 tvMiniSeries, titleType) because they are not in our TV Tropes scraped dataset and they would only increase
 ambiguity as more films might match the same name.
 In order to be able to map the film names,
-films names are normalized in both cases, TV Tropes and IMDb, converting camel-case to Title case, removing
+films names are normalized in both cases, TV Tropes and IMDb, converting \textit{CamelCase} format to \textit{Title case}, removing
 non-alphanumerical values and extra blanks, splitting name and year when required, and converting to lowercase,
 considering the original title and the English title.
 Normalized names in TV Tropes and IMDb are matched, ideally \{1->1\}, but
@@ -614,17 +616,17 @@ plot_regression(extended_dataframe, 'Year', 'Number of tropes', 'black')
 % it. "First, we need to explore if there are significant biases in the original
 % set, since it's generated by the user... " - JJ
 Figure \ref{fig:extended_dataset_scatterplots} shows the relations between the number of tropes and
-the rating, the number of votes and the year in the new extended dataset,
+the rating, the number of votes and the year in the new \textit{extended dataset},
 consisting in <%=extended_dataframe.shape[0]%> films linked to <%=len(trope_names)%> tropes.
 %
 The Figure shows that there is a significant positive correlation between the number of tropes and the rating, in other words,
 higher number of tropes are related to higher rating, and vice-versa.
-It is important to remark that the films up to \~53 tropes (the average) or less, show the widest range,
-\{\~1.3-\~9.5\}, for the rating,
-whereas films with more than 600 tropes have a rating in the range \{6-\~9.5\}.
-If we want to test the methodology, choosing a fixed number of tropes lower or equal to 53, for example, the median (30),
+It is important to remark that the films up to $\sim53$ tropes (the average) or less, show the widest range,
+$\{\sim 1.3-\sim9.5\}$, for the rating,
+whereas films with more than 600 tropes have a rating in the range $\{6-\sim9.5\}$.
+If we want to test the methodology, choosing a fixed number of tropes lower or equal to $53,$ for example, the median (30),
 would allow us to improve the solution in a wider range. At the same time, a number of tropes in this range
-will be prone to have a rating in a range \{6-6.5\}, according to the regression function.
+will be prone to have a rating in a range $\{6-6.5\}$, according to the regression function.
 
 There seems to be also a significant positive correlation between the number of tropes and the votes (popularity) as well.
 That explains the long queue distributions in the previous step, Figure~\ref{fig:films_analysis}, in other words,
@@ -635,7 +637,7 @@ Finally, there is a significant positive correlation between the number of trope
 according to the scatter plot, the year of the film limitates the maximum number of tropes that describe the films
 in our dataset.
 
-The three outcomes will help us unravel the limitations of a surrogate model fed from the extended dataset
+The three outcomes will help us unravel the limitations of a surrogate model fed from the \textit{extended dataset}
 and used to predict the rating from a set of tropes. % But you need to conclude
 % something, about the number of tropes and the type of movies it will generate - JJ
 
@@ -646,14 +648,14 @@ input, output = get_experiment_execution_information(EVALUATOR_BUILDER_LOG_FILE)
 layers = output[output['parameter']=='Layer sizes']['value'][0].split(', ')
 @
 
-Given our \textit{Extended Dataset}, % Better name pending, any ideas?
+Given our \textit{extended dataset}, % Better name pending, any ideas?
 our goal is to build a trope-to-rating approximator
 that can be then used as a surrogate model by the Genetic Algorithm.
 
 % Say how representation of tropes is important. Never present anything as the
 % only option, but as a result of a thought process or comparison that leaves
 % room for improvement in subsequent iterations - JJ
-The inputs to the model will be binary values for every trope and genre defined in the Extended Dataset
+The inputs to the model will be binary values for every trope and genre defined in the \textit{extended dataset}
 and the output is a continuous numeric value that represents the rating of the film, theorically from 0 to 10.
 As the average number of tropes by film is 53, and the possible number of tropes is <%=n_tropes%>,
 99\% of the cells in the matrix will have a value of 0, in other words, it will be very sparse,
@@ -661,24 +663,23 @@ with a small representation of the tropes in the catalogued films.
 The deep learning technique most suitable in this context needs to expose feature-extraction capabilities
 in order to deal with unknown and unbalanced relations between tropes to achieve a specific rating.
 Although there are different candidates that could perform properly under these circumstances,
-in our current research, we choose a Neural Network
+in our current research, we choose a Neural Network. % TODO cite
 
 The goal of this research is to evaluate a methodology, so
 it is out of the scope to focus on the fine tuning of the surrogate model,
 as far as it suits the needs in terms of quality of the estimations,
-with reasonable performance, a number of false positives and
-false negatives.
+with reasonable performance and a low error rate.
 
 There are many decisions that can define the quality of the model;
 some of them will be made based on the state of the art
 and, for others, we will have to make hyper-parameters search.
 In general, although there are many rules of the thumb to build acceptable neural networks,
 results may differ drastically depending on the nature of the problem and
-it is recommended to do a hyper-parameters evaluation. % cite required
+it is recommended to do a hyper-parameters evaluation. % TODO cite
 
 We selected the Multi-layer perceptron (MLP), the most widespread neural network architecture,
 because it has been proven to be able to approximate any function that we require,
-the so called \textit{Universal Approximation Theorem}.
+the so called \textit{Universal Approximation Theorem}. % TODO cite
 
 In order to choose hyper-parameters that get along with the nature of our problem
 we did a preliminary search with all the combinations in a domain of possible values
@@ -693,20 +694,20 @@ We applied 3-fold cross validation and got the average and the standard deviatio
 iterations_evaluator = extract_iterations_from_log(log_file_name=EVALUATOR_BUILDER_LOG_FILE)
 gridsearch_dataframe = extract_grid_parameters_from_log_and_results(log_file_name=EVALUATOR_HYPER_PARAMETERS_LOG_FILE)
 @
-\begin{figure}
+\begin{table}
     \centering
 <%=print(get_table_for_dataframe(gridsearch_dataframe))%>
     \caption{Hyper-parameters evaluation using 3-fold cross validation, sorted by validation score}
     \label{fig:gridsearch_results}
-\end{figure}
+\end{table}
 %
-The results in Figure~\ref{fig:gridsearch_results} show that
+The results in Table~\ref{fig:gridsearch_results} show that
 a MLP with the structure <%='/'.join(layers)%>, using ReLu activation,
 constant learning rate and SGD solver provides the best validation score.
-After training the MLP using the hyper-parameters, the Extended Dataset as input
+After training the MLP using the selected hyper-parameters, the \textit{extended dataset} as input
 and the rating as output, until it does not improve more than the tolerance for 10 consecutive runs,
-the evaluation converges to a loss of <%=iterations_evaluator['loss'].iloc[-1]%>
-and a validation score of <%=iterations_evaluator['validation'].iloc[-1]%>.
+the evaluation converges to a loss of <%=human_readable(iterations_evaluator['loss'].iloc[-1])%>
+and a validation score of <%=human_readable(iterations_evaluator['validation'].iloc[-1])%>.
 
 
 
@@ -757,7 +758,7 @@ errors_by_tropes_stats.plot.scatter(x='Number of Tropes', y='Standard Deviation'
 
 The multi-layer perceptron will be used as a surrogate model in a specific experiment in further sections,
 so, in order to anticipate the results, we need to analyze how well it predicts the ratings grouped by the number of tropes.
-We calculate the error for every sample of our extended dataset and as show it in Figure~\ref{fig:errors}(a) as a hexagonal binning plot,
+We calculate the error for every sample of our \textit{extended dataset} and as show it in Figure~\ref{fig:errors}(a) as a hexagonal binning plot,
 and we can observe that most of the cases are close to the 0 (note the logaritmic scale of the color gradient that helps us see more details).
 There are under and over-estimations, especially in the range of tropes with more occurrences \{0-100\},
 but the under-estimation error is bigger, that means that the Neural Network will tend to under-estimate for a small number of tropes.
@@ -779,7 +780,7 @@ genres = [item['Genre'].replace('[GENRE]','') for item in test.test_results['eva
 
 Analysing the weight of the genre on the rating is also a good outcome in order to know if there are rating biases
 regarding the genre. We did the evaluation of all the Film DNAs that contain only one genre out of the <%=len(genres)%>,
-getting an average value of <%=mean_1_genre%>(+-<%=stdev_1_genre%>), so, in principle,
+getting an average value of <%=human_readable(mean_1_genre)%>(+-<%=human_readable(stdev_1_genre)%>), so, in principle,
 choosing a single genre or another does not seem to limit the rating. Intuitively, that tells us
 that all the genres have good and bad films in the same proportion and our synthetic Film DNA will not suffer
 from strong biases due the genre. However, it is the combination of genres what
@@ -794,11 +795,12 @@ comes into play.
 At this step we already have a set of candidate tropes for the Film DNA and a model
 that allows its evaluation, so our goal is to use a device that allows us to generate a Film DNA that optimizes the rating.
 
-We chose to use a Genetic Algorithm because it is a mechanism that allows us to explore the domain of Film DNAs,
+We chose to use a Genetic Algorithm % TODO cite
+because it is a mechanism that allows us to explore the domain of Film DNAs,
 in other words, of combinations of tropes, getting high-quality solutions and dealing with global optimization problems.
 % cite
 
-Our chromosome will be the DNA film, that is, a set of tropes.
+Our chromosome will be the a Film DNA, that is, a set of tropes.
 In practice it will be encoded as an array of different indices on a dictionary of the total set of tropes available
 without value repetitions, given that, \textit{a priori}, the order of the tropes is irrelevant
 (according to their nature, they can refer to specific moments, but also to narrative structures and general settings)
@@ -807,7 +809,7 @@ and also, our rating evaluator does not consider weights or multiple occurrences
 the trops appears or does not appear).
 
 The mutation operator changes a trope of the Film DNA by another that is randomly chosen
-from the set of tropes ou of the Film DNA. By doing this, the Film DNA keeps complying with its restrictions,
+from the set of tropes out of the Film DNA. By doing this, the Film DNA keeps complying with its restrictions,
 mentioned above, and allows an exploration of new tropes.
 
 The crossover operator will make a superset of tropes from the parents' Film DNAs
@@ -817,15 +819,16 @@ the exploitation of the data.
 
 As we explained above, we have to rely on a surrogate model for the evaluation of Film DNAs, and our approach uses
 a neural network trained with existing movies. The fitness of our GA will be the result of evaluating a DNA trope with
-the neural network.
+the neural network, that is, their predicted rating.
 
-According to pour tests, the genetic algorithm has proven to converge towards optimal solutions efficiently,
-given the simplicity of the operators based on set algebra, and fitness calculation, in this case, a trained neural network.
+According to our tests, the GA has proven to converge towards optimal solutions efficiently,
+given the simplicity of the operators based on set algebra, and fitness calculation.
 It is important to remark that the Genetic Algorithm is interesting for the research  as far as it leads us to our goal,
 that is to prove that the methodology works, and hence,
 an exploratory analysis of the parameters of the Genetic Algorithm is reasonable in this context,
 as we will see in the next section, \ref{sec:experimental_setup}.
 
+%TODO if we are finally using restrictions, we have to explain in (later)
 
 \section{Experimental setup} \label{sec:experimental_setup}
 
@@ -839,7 +842,7 @@ As benefits, a Film DNA of size 30 is easier to interpret in natural language th
 Furthermore, as we saw in the Section~\ref{sec:methodology_mapper}, this number of tropes is a good candidate
 because it can lead to a wide range of ratings, good and bad,
 and the GA will have a better chance to evolve solution from bad cases;
-however, as we saw in the Section~\ref{sec:methodology_surrogate_model}, a Film os size 30 implies
+however, as we saw in the Section~\ref{sec:methodology_surrogate_model}, a Film of size 30 implies
 more chances to under or over-evaluate, and the rating will be less accurate.
 
 The most suitable parameters to solve a specific problem require an extensive calibration, which is outside
@@ -852,9 +855,9 @@ and we have chosen the combination P = 200, Mp = \(1\div size_dna\) , Cp = 0.5, 
 In the experiments we have set the stop criterion to a minimum of 3000 evaluations and
 until the best generation does not improve during 10000 evaluations.
 We will run the genetic Algorithm 30 times with different random seeds and
-we will select the run that gives the highest fitness.
+we will select the run that gives the highest fitness in order to analyse it.
 
-A trope is not a full-fledged film, so we need to have an idea of what a movie
+As previously stated, a trope is not a full-fledged film, so we need to have an idea of what a movie
 with that set of tropes would look like. This is why, as tools to interpret the results,
 we will use metrics of similarity between finite sample sets.
 The first one is a metric called \textit{Jaccard coefficient}
@@ -862,17 +865,18 @@ and is defined as the cardinality of the intersection of Film DNAs divided by th
 The Jaccard coefficient is interesting to measure not only what two sets have in common,
 but also, how different their sizes are, penalizing big differences in length of the sets.
 However, as we will be comparing our Synthetised Film DNA os a fixed size of 30,
-popular films with hundred of tropes will be penalized just because they are too broadly described in comparisson;
-In order to approach this problematic, we will also use a coefficient based only in the common elements
-and is defined as the intersection between the sets divided by the length of our synthetic Film DNA;
+popular films with hundred of tropes will be penalized just because they are too broadly described in comparison;
+In order to address this problematic, we will also use a coefficient based only in the common elements
+and is defined as the intersection between the sets divided by the length of our synthetic Film DNA.
 % TODO Citar las métricas
 
 \section{Results}
 
 The goal of this specific experiment if to find the best Film DNA possible with a fixed small length.
 
-The repetition of the Genetic Algorithm 30 times has resulted in an average fitness of 9.783487634688873 (+- 0.4307202616394516).
-The best solution has a rating of 10.313031174658876 and a Film DNA with the following tropes.\\
+The repetition of the Genetic Algorithm 30 times has resulted in an average fitness of <%=human_readable(9.783487634688873)%>
+(+-<%=human_readable(0.4307202616394516)%>).
+The best solution has a rating of <%=human_readable(10.313031174658876)%> and a Film DNA with the following tropes.\\
 
 
 \begin{align*}
@@ -911,13 +915,13 @@ that has a position of responsibility for children (ActionHeroBabysitter),
 that could be related to the existence of irresponsible parents (HandsOffParenting).
 There are tropes that define the conflicts and how they will develop:
 Someone resisting the controlling influence acting on them ('FightingFromTheInside'),
-a villain is finally fought by the hero when he is 'not afraid of' anymore (ImNotAfraidOfYou),
+a villain is finally fought by the hero when he is \textit{not afraid} anymore (ImNotAfraidOfYou),
 there is a duel (DuelToTheDeath),
 a special weapon is used (WeaponOfXSlaying),
 the villain falls off (DisneyVillainDeath),
-and the hero also dies.
+and the hero also dies, as required by the trope SomeoneToRememberHimBy.
 There are tropes that points to a romantic relation between the hero and a girl,
-that in some scenes is be clearly taller or shorter than him ('OneHeadTaller),
+that in some scenes is be clearly taller or shorter than him (OneHeadTaller),
 and that discovers, in the end, that is pregnant (SomeoneToRememberHimBy).
 There are also tropes that define the setting, in this case, there is fog (OminousFog) as part of the mystery genre
 and a clear 'Homage' to a classic or well known artwork in the same genres is present.
@@ -930,15 +934,15 @@ There is also a scene where terrible things have happened to the main characters
 and there are scenes with no action, just long conversations where people do not move from their place (TalkingHeads).
 The meta-tropes present, on the other hand, include
 an actor or actress that is relatively unknown but looks alike another well known one (PoorMansSubstitute)
-and the film's name is a reference to an existing song.
+and the film's name is a reference to an existing song.\\
 
-Can we find some similarity to existing films in our Dataset?
-We perform a similarity analysis against the whole extended dataset and we found that the coefficients are small:
+As part of the analysis, we need to confirm the originality of the Film DNA, so
+we perform a similarity analysis against the whole \textit{extended dataset} and we find that the coefficients are small:
 According to the Jaccard metric, the most similar films have a value of <%=top_jaccard[0].jaccard %>, in other words,
-they are  <%=top_jaccard[0].jaccard*100 %>\% similar at maximum.
-According to the Common Elements metric, the most similar films have a value of <%=top_common[0].common_tropes_count/30 %>
-that is higher than the Jaccard coefficient because it is not penalizing the different of length os the Film DNAs,
-in other words, the maximum number of common tropes/genres between the whole extended dataset and the
+they are  <%=human_readable(top_jaccard[0].jaccard*100) %>\% similar at maximum.
+According to the Common Elements metric, the most similar films have a value of <%=human_readable(top_common[0].common_tropes_count/30)%>
+that is higher than the Jaccard coefficient because it is not penalizing the difference of length of the Film DNAs,
+in other words, the maximum number of common tropes/genres between the whole \textit{extended dataset} and the
 synthesised Film DNA is <%=top_common[0].common_tropes_count %>. There are only 6 films in the whole dataset
 with that similarity (<%= print(', '.join([f'\'{film.name}\'' for film in top_common[0:5]]) + f' and \'{top_common[5].name}\'') %>),
 presenting all of them the genre Drama and the tropes PragmaticAdaptation, most of them the genre Romance,
@@ -989,7 +993,7 @@ and to a lesser extent the genre Mystery and the trope Homage.
 
 
 Our synthesised Film DNA not only has a very high potential rating but also is very different to the rest of the films
-in our extended dataset.
+in our \textit{extended dataset}.
 
 
 %If we perform the same analysis with the 30 runs of the experiment, the maximum similarity is ... %TODO
@@ -1012,7 +1016,8 @@ in our extended dataset.
 % TODO: Los resultados nos dicen que ...
 
 These results are interesting and directly applicable to the generation of scripts, because every trope or genre
-has a clear description, with examples in a dataset of XXX films; however, putting them together, making them
+has a clear description, with examples in a dataset of XXX films.
+However, putting them together, making them
 be part of a coherent story, filling the gaps and narrating them in a compelling way
 is still required, not part of the scope of the research and, as far as we know, a human responsibility.
 
