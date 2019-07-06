@@ -29,6 +29,7 @@ n_tropes = len(tropes_dictionary.keys())
 @
 
 \documentclass[APA,LATO1COL]{WileyNJD-v2}
+\usepackage[utf8]{inputenc}
 \usepackage{minted}
 %\usepackage{moreverb}
 
@@ -54,7 +55,8 @@ T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
 
 \begin{document}
 
-\title{Chasing compelling stories using deep learning and tropes}
+%\title{Chasing compelling stories using deep learning and tropes}
+\title{StardomTroper, a film trope rating optimizer using Deep Learning and Evolutionary Algorithms}
 
 \author[1]{Rubén Héctor García Ortega}
 
