@@ -714,12 +714,12 @@ the so called \textit{Universal Approximation Theorem}. % TODO cite
 % finetune the architectura? What is it you are really doing? - JJ
 In order to choose hyper-parameters that get along with the nature of our problem
 we did a preliminary search with all the combinations in a domain of possible values
-for the activation (ReLu or tanh),
+for the activation (ReLu or tanh), % define them. - JJ
 the number of hidden layers (1 or 2),
-the number of neurons in each layer (162 or 883/29),
+the number of neurons in each layer (162 or 883/29), % why these numbers? - JJ
 the learning rate (contant or adaptative)
-and the solver (Adam or SGD).
-We applied 3-fold cross validation and got the average and the standard deviation.
+and the solver (Adam or SGD). % No idea what is that. Define it - JJ
+We applied 3-fold cross validation and obtained the average and the standard deviation.
 %
 <<echo=False>>=
 iterations_evaluator = extract_iterations_from_log(log_file_name=EVALUATOR_BUILDER_LOG_FILE)
@@ -739,7 +739,8 @@ After training the MLP using the selected hyper-parameters, the \textit{extended
 and the rating as output, until it does not improve more than the tolerance for 10 consecutive runs,
 the evaluation converges to a loss of <%=human_readable(iterations_evaluator['loss'].iloc[-1])%>
 and a validation score of <%=human_readable(iterations_evaluator['validation'].iloc[-1])%>.
-
+% Which is very good, excellent, or what? Is that high or low? 0.410 is over
+% rating, meaning that on average it will fail by 0.410? - JJ
 
 
 <<echo=False>>=
@@ -788,9 +789,15 @@ errors_by_tropes_stats.plot.scatter(x='Number of Tropes', y='Standard Deviation'
 \end{figure}
 
 The multi-layer perceptron will be used as a surrogate model in a specific experiment in further sections,
-so, in order to anticipate the results, we need to analyze how well it predicts the ratings grouped by the number of tropes.
-We calculate the error for every sample of our \textit{extended dataset} and as show it in Figure~\ref{fig:errors}(a) as a hexagonal binning plot,
-and we can observe that most of the cases are close to 0 (note the logaritmic scale of the color gradient that helps us see more details).
+so, in order to anticipate the results, we need to analyze how well it predicts
+the ratings grouped by the number of tropes, since we will have to limit them
+during the optimization process.
+We calculate the error for every sample of our \textit{extended dataset};
+Figure~\ref{fig:errors}(a) presents it as a hexagonal binning plot. This plot
+shows that most of the cases are close to 0
+(note the logaritmic scale of the color gradient that helps us see more details).
+% The color gradient is not logarithmic. And it's not close to 0, it's simply
+% that there are no cases in that area. - JJ
 There are under and over-estimations, especially in the range of tropes with more occurrences \{0-100\},
 but the under-estimation error is bigger, that means that the Neural Network will tend to under-estimate for a small number of tropes.
 
