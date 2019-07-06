@@ -1041,8 +1041,8 @@ and to a lesser extent the genre Mystery and the trope Homage.
 
 
 Our synthesised Film DNA not only has a very high potential rating but also is very different to the rest of the films
-in our \textit{extended dataset}.
-
+in our \textit{extended dataset}. % This is good or bad? Like Nicholas Cage
+% in Community season 5, good or bad? - JJ
 
 %If we perform the same analysis with the 30 runs of the experiment, the maximum similarity is ... %TODO
 
