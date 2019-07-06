@@ -1,8 +1,14 @@
+#!/usr/bin/env python
+
 import bz2
 import json
 import statistics
 import pandas as pd
 import matplotlib.pyplot as plt
+import sys
+import os
+
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from rating_evaluator.neural_network_tropes_evaluator import NeuralNetworkTropesEvaluator
 
@@ -22,12 +28,12 @@ class EvaluatorTests(object):
 
     def run_tests(self):
         evaluator = NeuralNetworkTropesEvaluator(self.evaluator_file)
-
+        print("Reading file")
         with bz2.open(self.extended_dataset_file, "rb") as f:
             content = f.read()
         json_bytes = content.decode('utf-8')
         films = json.loads(json_bytes)
-
+        print("File read")
         for film in films:
             film['evaluation'] = evaluator.evaluate_just_rating(film['tropes'])[0]
         all_errors = [abs(film['rating'] - film['evaluation']) for film in films]
@@ -68,9 +74,11 @@ class EvaluatorTests(object):
             f.write(json_bytes)
 
 if __name__ == "__main__":
+    print("Getting test files")
     test = EvaluatorTests(
         evaluator_file=u'../datasets/evaluator_[26273, 162, 1].sav',
         extended_dataset_file='../datasets/extended_dataset.json.bz2')
+    print("Files read")
     test.run_tests()
     test.store_json('../datasets/evaluator_tests.json.bz2')
 
