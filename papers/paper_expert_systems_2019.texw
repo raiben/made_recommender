@@ -116,14 +116,14 @@ in the context of authoring tools and Content Generation.
 Crafting film scripts is quite challenging because of the plot complexities and the
 \textit{multiplicative production function of entertainment} ~\citep{Hennig-Thurau2019},
 that promulgate that the elements involved in the development of a media product need to work together
-and a single failing one can provoke a disaster in cascade.
+and a single failing one may provoke a disaster in cascade.
 In order to consider this multiplicative function in the current research, we need to describe the elements of the film
 and how well they combine; our candidates for both mechanisms are the
 tropes that have been discovered in the films, and the massive human-evaluated ratings, respectively.
 We can roughly characterize a film
 by using the set of tropes that we can find in it.
 A trope is as a recurring narrative device or pattern, according to the definition by \cite{baldick2015oxford};
-it can be a technique, a motif, an archetype or a \textit{clich\'e},
+it could be a technique, a motif, an archetype or a \textit{clich\'e},
 used by the script writers, producers and directors
 to achieve specific effects that might vary from interest-increasing
 to surprising through recall familiarity or entertaining,
@@ -137,7 +137,7 @@ name, according to \cite{bitsilli1983chekhov};
 however, there are thousands of not-so-widely used tropes as well, discovered and
 catalogued everyday by professionals and enthusiastic of the storytelling;
 their study is organic, dynamic and extensive, according to~\cite{garcia2018overview}.
-In general, it can be said that the set of tropes defines the overall narrative
+In general, we might say that the set of tropes defines the overall narrative
 architecture over which the narrative layer is eventually set. Tropes do not
 define plot univocally, but constrain it in a number of ways.
 
@@ -166,7 +166,7 @@ the \textit{Film DNA} is a profound way to describe a story
 from many different perspectives, following the analogy of the DNA,
 there are epigenetic factors that could deeply affect the performance of the story as well.
 This method does not guarantee the quality of a film,
-as a film that develops from a \textit{Film DNA} can implement them in infinite ways with very different
+as a film that develops from a \textit{Film DNA} may implement them in infinite ways with very different
 results in terms of quality;
 however, it can be used as an indicator of the \textit{potential of the story} or the
 most probable implementation based on the universe of currently analyzed films.
@@ -279,7 +279,7 @@ the generation of backstories in massive environments.
 A genetic algorithm was used to optimize the parameters of the system, for instance the simulation time,
 the size of the world and the parameters of the behaviour of the agents,
 with respect to the appearance of different archetypes, such as the {\em Hero} or the {\em Villain}.
-These archetypes are defined by the possible actions that an agent can perform:
+These archetypes are defined by the possible actions that an agent may perform:
 for example, the archetype Villain appears when an agent fights against another for food;
 however, this form of evaluation was difficult to justify in order to measure the quality of the generated stories,
 since it was based on an objective decision:
@@ -481,12 +481,14 @@ extract the data directly from TV Tropes while making it available to the public
 and the researchers,
 in the context of the Open Science.
 
-Our scraper %cite scraper
+Our scraper, which is also released as free software in the Python ecosystem under
+the {\tt tropescraper} name, and is also available from GitHub
+(\url{https://github.com/raiben/tropescraper}), %cite scraper
 extracts all the categories from the main
-categories page and, for each category page, it extracts all the film identifiers assigned to it.
-Finally, for every film page, it extracts all the trope identifiers.
-As result, it builds a dictionary of films and tropes.
-Trope identifiers are written in \textit{CamelCase} format and can include the year to avoid ambiguity.
+categories page and, for every one of them, it extracts all the film identifiers assigned to it.
+Finally, for every film page, it extracts all the trope identifiers, building
+a dictionary of films and tropes.
+Trope identifiers are written in \textit{CamelCase} format and may include the year to avoid ambiguity.
 Some technical details are listed in Figure~\ref{fig:main_workflow_extended}.
 
 The resulting dataset includes <%=n_films%> \textit{Film DNAs} and <%=n_tropes%> tropes.
@@ -650,7 +652,7 @@ layers = output[output['parameter']=='Layer sizes']['value'][0].split(', ')
 
 Given our \textit{extended dataset}, % Better name pending, any ideas?
 our goal is to build a trope-to-rating approximator
-that can be then used as a surrogate model by the Genetic Algorithm.
+that can then be used as a surrogate model by the Genetic Algorithm.
 
 % Say how representation of tropes is important. Never present anything as the
 % only option, but as a result of a thought process or comparison that leaves
@@ -759,7 +761,7 @@ errors_by_tropes_stats.plot.scatter(x='Number of Tropes', y='Standard Deviation'
 The multi-layer perceptron will be used as a surrogate model in a specific experiment in further sections,
 so, in order to anticipate the results, we need to analyze how well it predicts the ratings grouped by the number of tropes.
 We calculate the error for every sample of our \textit{extended dataset} and as show it in Figure~\ref{fig:errors}(a) as a hexagonal binning plot,
-and we can observe that most of the cases are close to the 0 (note the logaritmic scale of the color gradient that helps us see more details).
+and we can observe that most of the cases are close to 0 (note the logaritmic scale of the color gradient that helps us see more details).
 There are under and over-estimations, especially in the range of tropes with more occurrences \{0-100\},
 but the under-estimation error is bigger, that means that the Neural Network will tend to under-estimate for a small number of tropes.
 
@@ -803,7 +805,7 @@ in other words, of combinations of tropes, getting high-quality solutions and de
 Our chromosome will be the a Film DNA, that is, a set of tropes.
 In practice it will be encoded as an array of different indices on a dictionary of the total set of tropes available
 without value repetitions, given that, \textit{a priori}, the order of the tropes is irrelevant
-(according to their nature, they can refer to specific moments, but also to narrative structures and general settings)
+(according to their nature, they may refer to specific moments, but also to narrative structures and general settings)
 and also, our rating evaluator does not consider weights or multiple occurrences of the trope in the movie
 (both, training data and model do not consider multiple occurrences of a trope in a single Film, in other words,
 the trops appears or does not appear).
