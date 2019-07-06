@@ -56,7 +56,7 @@ T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
 \begin{document}
 
 %\title{Chasing compelling stories using deep learning and tropes}
-\title{StardomTroper, a film trope rating optimizer using Deep Learning and Evolutionary Algorithms}
+\title{StarTroper, a film trope rating optimizer using Deep Learning and Evolutionary Algorithms}
 
 \author[1]{Rubén Héctor García Ortega}
 
@@ -107,10 +107,12 @@ and, ultimately, for supporting the automatic generation of stories, for example
 
 \section{Introduction}\label{sec1}
 
+% Define context first: what's a trope, what is the overall motivation - JJ
 The goal of the paper is to demonstrate how computational intelligence can be used to generate and improve
 sets of tropes that maximize the potential rating of the films that conforms them,
 in the context of authoring tools and Content Generation.
 
+% Maybe this paragraph should go first - JJ
 Crafting film scripts is quite challenging because of the plot complexities and the
 \textit{multiplicative production function of entertainment} ~\citep{Hennig-Thurau2019},
 that promulgate that the elements involved in the development of a media product need to work together
@@ -120,7 +122,7 @@ and how well they combine; our candidates for both mechanisms are the
 tropes that have been discovered in the films, and the massive human-evaluated ratings, respectively.
 We can roughly characterize a film
 by using the set of tropes that we can find in it.
-A trope is as a recurring narrative device, according to the definition by \cite{baldick2015oxford};
+A trope is as a recurring narrative device or pattern, according to the definition by \cite{baldick2015oxford};
 it can be a technique, a motif, an archetype or a \textit{clich\'e},
 used by the script writers, producers and directors
 to achieve specific effects that might vary from interest-increasing
@@ -135,7 +137,9 @@ name, according to \cite{bitsilli1983chekhov};
 however, there are thousands of not-so-widely used tropes as well, discovered and
 catalogued everyday by professionals and enthusiastic of the storytelling;
 their study is organic, dynamic and extensive, according to~\cite{garcia2018overview}.
-
+In general, it can be said that the set of tropes defines the overall narrative
+architecture over which the narrative layer is eventually set. Tropes do not
+define plot univocally, but constrain it in a number of ways.
 
 Along this paper, we use the analogy of the \textit{Film DNA}
 and define it as the set of tropes that are found in a film
