@@ -691,24 +691,27 @@ with a small representation of the tropes in the catalogued films.
 The deep learning technique most suitable in this context needs to expose feature-extraction capabilities
 in order to deal with unknown and unbalanced relations between tropes to achieve a specific rating.
 Although there are different candidates that could perform properly under these circumstances,
-in our current research, we choose a Neural Network. % TODO cite
+in our current research we choose a neural network. % TODO cite
 
-The goal of this research is to evaluate a methodology, so
+The goal of our research in this initial stag is to evaluate a methodology, so
 it is out of the scope to focus on the fine tuning of the surrogate model,
 as far as it suits the needs in terms of quality of the estimations,
-with reasonable performance and a low error rate.
+with reasonable performance and a low error rate. % You don't say that, but
+% say this in "future work" to make clear it's not in scope - JJ
 
 There are many decisions that can define the quality of the model;
 some of them will be made based on the state of the art
 and, for others, we will have to make hyper-parameters search.
-In general, although there are many rules of the thumb to build acceptable neural networks,
+In general, although there are many rules of thumb to build acceptable neural networks,
 results may differ drastically depending on the nature of the problem and
 it is recommended to do a hyper-parameters evaluation. % TODO cite
 
-We selected the Multi-layer perceptron (MLP), the most widespread neural network architecture,
+We selected the multi-layer perceptron (MLP), the most widespread neural network architecture,
 because it has been proven to be able to approximate any function that we require,
 the so called \textit{Universal Approximation Theorem}. % TODO cite
 
+% First you say you are not fine-tuning the architecture and now you _do_
+% finetune the architectura? What is it you are really doing? - JJ
 In order to choose hyper-parameters that get along with the nature of our problem
 we did a preliminary search with all the combinations in a domain of possible values
 for the activation (ReLu or tanh),
