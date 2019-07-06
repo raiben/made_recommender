@@ -752,6 +752,7 @@ errors_by_tropes_stats.plot.scatter(x='Number of Tropes', y='Standard Deviation'
     \textbf{(b)} Average absolute value of the error by number of tropes.
     \textbf{(c)} Standard deviation of the absolute error value by number of tropes}
     \label{fig:errors}
+    % I have tried to label the y axis better above, but failed - JJ
 \end{figure}
 
 The multi-layer perceptron will be used as a surrogate model in a specific experiment in further sections,
@@ -779,10 +780,11 @@ genres = [item['Genre'].replace('[GENRE]','') for item in test.test_results['eva
 Analysing the weight of the genre on the rating is also a good outcome in order to know if there are rating biases
 regarding the genre. We did the evaluation of all the Film DNAs that contain only one genre out of the <%=len(genres)%>,
 getting an average value of <%=mean_1_genre%>(+-<%=stdev_1_genre%>), so, in principle,
-choosing one genre or another does not seem to be a rating limiter. Intuitively, that tells us
+choosing a single genre or another does not seem to limit the rating. Intuitively, that tells us
 that all the genres have good and bad films in the same proportion and our synthetic Film DNA will not suffer
-from strong biases due the genre.
-
+from strong biases due the genre. However, it is the combination of genres what
+might boost the rating, and this is precisely where the optimization process
+comes into play.
 % Añadir tb si hay pelis que tengan más de 10 y menos de 0. Tmabién explicar que puede ser mayor que el rango
 % comprobado, no hay ninguna peli con más de 10 o menos de 0. La peli que más tiene es 9.945584884763836
 
