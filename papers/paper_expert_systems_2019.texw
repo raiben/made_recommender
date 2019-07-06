@@ -28,6 +28,7 @@ n_films = len(films_dictionary.keys())
 n_tropes = len(tropes_dictionary.keys())
 @
 
+\errorcontextlines=3
 \documentclass[APA,LATO1COL]{WileyNJD-v2}
 \usepackage[utf8]{inputenc}
 \usepackage{minted}
@@ -107,12 +108,6 @@ and, ultimately, for supporting the automatic generation of stories, for example
 
 \section{Introduction}\label{sec1}
 
-% Define context first: what's a trope, what is the overall motivation - JJ
-The goal of the paper is to demonstrate how computational intelligence can be used to generate and improve
-sets of tropes that maximize the potential rating of the films that conforms them,
-in the context of authoring tools and Content Generation.
-
-% Maybe this paragraph should go first - JJ
 Crafting film scripts is quite challenging because of the plot complexities and the
 \textit{multiplicative production function of entertainment} ~\citep{Hennig-Thurau2019},
 that promulgate that the elements involved in the development of a media product need to work together
@@ -120,6 +115,7 @@ and a single failing one may provoke a disaster in cascade.
 In order to consider this multiplicative function in the current research, we need to describe the elements of the film
 and how well they combine; our candidates for both mechanisms are the
 tropes that have been discovered in the films, and the massive human-evaluated ratings, respectively.
+
 We can roughly characterize a film
 by using the set of tropes that we can find in it.
 A trope is as a recurring narrative device or pattern, according to the definition by \cite{baldick2015oxford};
@@ -171,6 +167,10 @@ results in terms of quality;
 however, it can be used as an indicator of the \textit{potential of the story} or the
 most probable implementation based on the universe of currently analyzed films.
 
+The goal of the paper is to demonstrate how computational intelligence can be used to generate and improve
+sets of tropes that maximize the potential rating of the films that conforms them,
+in the context of authoring tools and Content Generation.
+
 Our approach extracts <%=n_films%> \textit{Film DNAs} that contain in sum <%=n_tropes%> different tropes
 from external Data Sources
 and maps it to a database of film ratings and genres, dealing with disambiguation heuristics
@@ -194,87 +194,80 @@ and in the Section~\ref{sec:conclusions} we summarize the outcomes and future wo
 
 \section{State of the art} \label{sec:state_of_the_art}
 
+Film-makers, researchers and software developers are using known narrative patterns to build compelling stories,
+whether through an authoring tool or an Automatic Content Generator.
+Some of these patterns are being studied for decades,
+for example, the Propp's formalism \citep{propp2010morphology}, first edited in 1928
+and based on seven different roles, every one with a list of actions that can take over the course of a story,
+in a fixed sequence of 31 functions.
+Propp's formalisms are currently used by the computer scientists to build systems
+that generates instances of Russian folk tales~\citep{gervs:OASIcs:2013:4156}
+or stories and discourses with characters/places/objects relating to Iwate prefecture in Japan
+through micro/macro story techniques~\citep{6505320}.
+Other example of a popular narrative pattern widely used today is the Hero's Journey,
+proposed by~\cite{campbell2008hero}, first edited in 1949,
+and later on, reviewed from the perspective of the film industry by~\cite{vogler2007writer}.
+The Hero's journey is currently used
+for interactive storytelling in video games~\citep{delmas2007bringing},
+and massive backstories generation~\citep{GarciaOrtega16MADE2}.
 
+The Propp's formalism and The hero's Journey, as well as many other widely used narrative patterns, are included in the definition of trope.
+According to~\cite{mellina2011trope},
+"a trope is a unit of literary currency, recurring in works over time and gaining meaning
+through audience recognition of its connotations and associations".
+Their work, is one of the inspiration sources of our current research, as they use the tropes from
+TV Tropes together with other features from IMDb, including the rating.
+They use the Jaccard coeficient to measure the
+similarity between sets of tropes and discovered that
+this similarity moderately predicts external measures of film acclaim.
+As in their study, in our research we will use the two data sources, TV Tropes and IMDb,
+and we will use the Jaccard coefficient as trope similarity as well.
+However, in spite of having a similar base, their focus is the community detection
+and ours is to use the dataset to predict the rating of Film DNAs.
 
-% Formalismos narrativos y gramáticas
-
-Some of the narrative formalisms that allow film-makers, videogame developers and researchers in computational narrative
-to generate stories in a procedural manner have been proposed almost a century ago;
-for example, the one suggested by \cite{propp2010morphology}, first edited in 1928 and still in use today,
-is based on seven different roles, every one with a list of actions that can take over the course of a story,
-in a fixed sequence of 31 functions; however, it is simply limited to expressiveness,
-as it is not possible to create new functions.
-% limited to expressiveness? Do you mean its expressiveness is limited? - JJ
-% revisits Propp’s morphology to build a system that generates instances of Russian folk tale (http://drops.dagstuhl.de/opus/volltexte/2013/4156/)
-% y otro que tb usa propp grammar https://ieeexplore.ieee.org/abstract/document/6505320
-% y otro https://ieeexplore.ieee.org/abstract/document/6138227
-% tb hay un pollo que usa gramáticas, pero es más que interesante https://ieeexplore.ieee.org/abstract/document/5585934
-
-%... Como ceñirnos a gramáticas de Propp es demasiado limitante,
-Other authors propose the use of agents, each with actions and obligations,
-that allow to guide them through the arc of a story.
-This has advantages, as each agent can be programmed to have different behaviours based on psychological models,
-according to \cite{Thompson18NarrativeEvents}. % but... - JJ
-% Also: cite our MADE work - JJ
-
-%Aunque la aproximación basada en agentes es muy interesante, consideramos que la idea de coger
-
-%Muchos artículos se centran en el uso de de Propp's grammars, y está bien, para nosotros lo interesante
-%es que basarse en Propp grammars es utilizar patrones, y lo que buscamos precisamente. Nuestra filosofía en esta investigación
-%no será bajar a la granularidad de la narración, sino a una generalidad de patrones que permitan definir un guión a diferentes niveles
-%mediante patrones, como el de Propp.
-% But you have to mention it - JJ
-
-
-Some authors have proposed the use of tropes, defined in the introduction,
-as a way of structuring a story in a consistent and reusable way.
+Other authors are using the tropes from TV Tropes in their research as well.
 In the work of \cite{Thompson18NarrativeEvents}, a system of agents relies on tropes to obtain a consistent narrative,
 to describe the social norms that model the world in which they live.
 The authors, as in this work, use tropes available on TV Tropes as a base
 and translate them into logic statements that express duty or obligation,
 using TropICAL language, which are the input for a logic programming solver;
 however, they do not use all the tropes,
-but a small set chosen by hand, whicn means that the range of resulting stories
+but a small set chosen by hand, which means that the range of resulting stories
 is going to be limited.
-
-% Otros autores tb han usado tropes, como por ejemplo Hablar de GHOST: a GHOst STory-writer
-
-% sin embargo, nuestra propuesta implica evitar la selección manual de los tropes y confiar en Hablar de %smarter than even individual experts, according to AAA.%James Surowiecki in his 2004 book, The Wisdom of Crowds
-
-%El tema es que es muy dificil evaluar una historia, mucho más dificil es evaluar un conjunto de tropes que caracterizan una historia
-
+\cite{guarneri2017ghost} built an authoring tool that proposes the use of tropes according to a narration structure,
+and takes the objects from the card Game 'Once upon a time'.
+They selected 94 elements out of 176 present in the Periodic Table of Tropes,
+a subset of the most famous tropes from TV Tropes.
 Nevertheless, it is very complicated to evaluate the content generated by an automatic generator,
 not only because of its non-deterministic behaviour that makes it difficult to predict its outputs,
 but also because of the subjective, diverse and stochastic nature of the audience,
 as stated by \cite{TogeliusCap4Evaluating}.
-
 To evaluate a generator one can use directly the opinion of the designer,
-or indirectly from the audience, for example, using surveys. % por ejemplo https://ieeexplore.ieee.org/abstract/document/5585934
-But another possibility is the use of Artificial Intelligence,
-by simulating and estimating the quality of the content via some metrics.
+or indirectly from the audience, for example, using surveys, as in the work by \cite{guarneri2017ghost}.
+In our research, we are also interested in a smart use of the tropes within a story but,
+unlike \cite{guarneri2017ghost}, that used surveys as well,
+we are relying in Artificial Intelligence techniques
+by simulating and estimating the quality of the content via some metrics,
+while benefiting from The Wisdom of the crowds in IMDb for the rating.
+In their work, \cite{hsu2014predicting} used different prediction models for the film rating
+from features of the films in IMDb and, according to their evaluations, the Neural Network gave the best results,
+in comparison with  linear combinations and multiple linear regressions.
+In our current research, we will apply the same idea of using a Neural Network as predictor,
+but fed from the film's tropes instead of from the film's features such as the director, actors or writers.
 Moreover, through the use of user-generated data, it is possible to obtain a large corpus
-of examples to be used in computational narrative, as in th work of \cite{Guzdial15Crowdsourcing}.
+of examples to be used in computational narrative, as in the work of \cite{Guzdial15Crowdsourcing}.
 In fact, it is possible to extract information about review
 sites, according to \cite{BoPang08OpinionMining}, such as MetaCritic or IMDb,
 to be the input of a model like the one we propose in this article.
 
-% buscar si hay referencias sobre que el uso de tropes ya implica interés
-
-%%HABLAR DE LOS MODELOS SURROGADOS AQUI
-
-% alguien los usa?
-%alguien los usa para medir la calidad?
-%alguien usa neural networks?
-
-% alguien usa GAs para modelar plots o plot devices?
-
-% regular grammar is developed to model various causal relationships inside a given story world. The grammar is then evolved using evolutionary computation techniques to generate novel story plots, i.e. story-based scenarios. (https://ieeexplore.ieee.org/abstract/document/5585934)
-% Otra propone tree adjoining grammar (TAG) to capture semantics of a story with long-distance causal dependency --- using grammar guided genetic programming (GGGP) https://link.springer.com/chapter/10.1007/978-3-642-17298-4_14
-
-
-Our previous work is based on some of the ideas mentioned above.
-In the work by \cite{GarciaOrtega15MADE}, we proposed the MADE framework:
-a parametrizable multi-agent system that allowed
+The last element of our research is the optimization of the sets of tropes.
+Some authors as \cite{bui2010evolving} have addressed the problem of the optimization of stories
+by applying evolutionary computation. In their work, they developed a regular grammar model with causal relationships
+and they evolve it, demonstrating that evolutionary computation can potentially contribute
+significantly to story generations.
+Our previous work also relies in Evolutionary Computation as a mechanism to optimize stories:
+In \citep{GarciaOrtega15MADE}, we proposed the MADE framework:
+a parameterizable multi-agent system that allowed
 the generation of backstories in massive environments.
 A genetic algorithm was used to optimize the parameters of the system, for instance the simulation time,
 the size of the world and the parameters of the behaviour of the agents,
@@ -285,24 +278,23 @@ however, this form of evaluation was difficult to justify in order to measure th
 since it was based on an objective decision:
 just the number of different character archetypes that emerge during the run of the world.
 Also, the list of possible actions for the agents was very limited.
-That is the reason that, later on, we proposed in the work by \cite{GarciaOrtega16MADE2},
-a more advanced model, with more complex agents and the possibility of extracting knowledge from a logical reasoner.
+That is the reason that, later on, we proposed a more advanced model,
+with more complex agents and the possibility of extracting knowledge from a logical reasoner \citep{GarciaOrtega16MADE2}.
 On this occasion we used as quality metric the appearance of the archetype of the Monomyth, also known as The Hero's Journey,
 and the different archetypes that compose it.
 In order to do this, logical reasoning was applied based on the predicates produced by the different events
 that emerged in the system; however, as in previous work, the mere appearance of the monomyth does not fully serve
-as a measure the interest of the stories generated by the system.
+as a measure of the interest of the stories generated by the system.
 
 That is why in this work we propose the combination of the previous ideas:
-% usar tropes como medida de elementos interesantes
-% confiar en el wisdom of the crowd de tvtropes
-% confiar en la nota de IMDb
-% confiar en modelos surrogados para la evaluación, específicamente, redes neuronales
-% confiar en un GA como modelo para la generación de tropes
-to use user-generated data that describes the film and film scores to build a surrogate computational model
-and use it to evaluate the subjective quality of a story described by a set of tropes.
+Following the ideas of \cite{Thompson18NarrativeEvents} and \cite{guarneri2017ghost}, we will think of tropes as a way
+to model stories, in our case, films.
+As ~\cite{mellina2011trope}, we will have a dataset with tropes from TV Tropes and features from IMDb, including the rating.
+In order to optimize the candidate tropes (our Film DNA), we will use Evolutionary Computation,
+a technique also used by \cite{bui2010evolving} to improve stories as well.
+Finally, as \cite{hsu2014predicting}, we will use a Neural Network as rating predictor
+trained with the rating from IMDB.
 
-% TODO: conclusión: lo que vamos a hacer es mejor
 
 \section{Methodology} \label{sec:methodology}
 
