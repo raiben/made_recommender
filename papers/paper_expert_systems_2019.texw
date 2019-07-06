@@ -500,18 +500,22 @@ Most of the films have 30 tropes, the median, % this is not true.
 % films have 40 or less tropes - JJ
 but there are films with more than 800 tropes.
 On the other hand, most tropes appear in 6 films, but there are tropes with more than 3000 occurrences in films.
+% Conclude with something that relates to the paper objectives. "These figures
+% will have to be taken into account when... "
 
 It is part of the current research to analyze the expected effect of this distribution
 in the results of applying our methodology.
-The first conclusion is that we have much more samples with a small number of tropes than with big ones;
+The first conclusion is that we have many more samples with a small number of tropes than with many;
 however, at this step we do not have enough information to elucidate if this situation is explained
 by the fact that it is user-generated data and the popularity
 defines how well described are the films in terms of tropes.
-Furthermore, we cannot make a relation yet between the number of tropes in a film and its rating.
-However, as the next section complements the tropes with information per film,
+% "But we can assume that, in general..." - JJ
+Furthermore, we cannot make out yet a relationship between the number of tropes
+in a film and its rating. % "But the figure xxx says..." - JJ
+However, as the next section complements the tropes with additional information,
 such as the rating, the genres or the number of votes,
 we will be in a position where we can find correlations
-that help us explain the possible results of the methodology in a better way.
+that help us explain the possible results of the experiments in a better way.
 
 \subsection{Step 2: Disambiguation of films to get the rating} \label{sec:methodology_mapper}
 
