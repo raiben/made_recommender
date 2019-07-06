@@ -659,9 +659,12 @@ Finally, there is a significant positive correlation between the number of trope
 according to the scatter plot, the year of the film limitates the maximum number of tropes that describe the films
 in our dataset.
 
-The three outcomes will help us unravel the limitations of a surrogate model fed from the \textit{extended dataset}
+These three results will help us unravel the limitations of a surrogate model fed from the \textit{extended dataset}
 and used to predict the rating from a set of tropes. % But you need to conclude
 % something, about the number of tropes and the type of movies it will generate - JJ
+
+% Say something here about including genres in the extended dataset and why
+% you do that - JJ
 
 \subsection{Step 3: The surrogate model}  \label{sec:methodology_surrogate_model}
 
@@ -670,14 +673,17 @@ input, output = get_experiment_execution_information(EVALUATOR_BUILDER_LOG_FILE)
 layers = output[output['parameter']=='Layer sizes']['value'][0].split(', ')
 @
 
-Given our \textit{extended dataset}, % Better name pending, any ideas?
-our goal is to build a trope-to-rating approximator
+We will use the \textit{extended dataset}, % Better name pending, any ideas?
+to build a trope-to-rating approximator
 that can then be used as a surrogate model by the Genetic Algorithm.
-
+%
 % Say how representation of tropes is important. Never present anything as the
 % only option, but as a result of a thought process or comparison that leaves
 % room for improvement in subsequent iterations - JJ
-The inputs to the model will be binary values for every trope and genre defined in the \textit{extended dataset}
+The inputs to the model will be binary values for every trope and genre
+% All of a sudden you're talking about genres, and  you don't say why you're
+% doing that. You should justify why you're doing that. - JJ
+defined in the \textit{extended dataset}
 and the output is a continuous numeric value that represents the rating of the film, theorically from 0 to 10.
 As the average number of tropes by film is 53, and the possible number of tropes is <%=n_tropes%>,
 99\% of the cells in the matrix will have a value of 0, in other words, it will be very sparse,
