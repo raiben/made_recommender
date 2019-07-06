@@ -260,7 +260,7 @@ In fact, it is possible to extract information about review
 sites, according to \cite{BoPang08OpinionMining}, such as MetaCritic or IMDb,
 to be the input of a model like the one we propose in this article.
 
-The last element of our research is the optimization of the sets of tropes.
+The last step of our methodology is the optimization of the sets of tropes.
 Some authors as \cite{bui2010evolving} have addressed the problem of the optimization of stories
 by applying evolutionary computation. In their work, they developed a regular grammar model with causal relationships
 and they evolve it, demonstrating that evolutionary computation can potentially contribute
@@ -444,10 +444,10 @@ plot.set_xlabel("Tropes by number of films")
     \end{subfigure}
     \caption{
     \textbf{(a)} Descriptive analysis of the Tropes by appearance in films.
-    \textbf{(b)} Histogram of number of tropes by film.
+    \textbf{(b)} Histogram of number of tropes by film (with logarithmic $y$ axis).
     \textbf{(c)} Top films by number of tropes.
     \textbf{(d)} Descriptive analysis of the tropes by number of films in which they appear.
-    \textbf{(e)} Histogram of number of films by tropes. Please note the logarithmic $y$ axis.
+    \textbf{(e)} Histogram of number of films by tropes (with logarithmic $y$ axis).
     \textbf{(f)} Top tropes by number of films.}
     \label{fig:films_analysis}
 \end{figure}
@@ -1051,17 +1051,47 @@ in our \textit{extended dataset}. % This is good or bad? Like Nicholas Cage
 
 
 \section{Conclusions} \label{sec:conclusions}
-% You need to write this now, ASAP. We can't really submit this with a
-% single day of revisions - JJ
-% TODO: Objetivo ha sido ...
-% TODO: Para ello hemos realizado tal (metodología y experimentos) ...
-% TODO: Los resultados nos dicen que ...
 
-These results are interesting and directly applicable to the generation of scripts, because every trope or genre
-has a clear description, with examples in a dataset of XXX films.
-However, putting them together, making them
-be part of a coherent story, filling the gaps and narrating them in a compelling way
-is still required, not part of the scope of the research and, as far as we know, a human responsibility.
+The methodology has proved to suit our goal:
+we have been able to extract all the tropes from TV Tropes and the genres and ratings from IMDb,
+joining them in a single extended dataset and dealing with technical challenges as the disambiguation of film names
+or the analysis of distribution of the data, that affects the further steps.
+We did an exploratory search of the hyper-parameters of a Multi-Layer Perceptron and chose the one that reduces
+the average loss with our extended dataset and trained it. We designed the operators of a Genetic Algorithm
+that is able to evolve a set of tropes (Film DNA) maximizing the expected rating and did an exploratory search of the
+best parameters. Finally, we did 30 runs of the Genetic Algorithm and analysed the best candidate, explaining it from
+the narrative perspective and in comparison with the rest of the films of the extended dataset with
+two similarity metrics. Our results show that we are able to evolve a synthetic Film DNA
+in a way that the potential rating is maximized, and that the solution is genuine.
+
+During the research we discovered limitations of the dataset that clearly compromises the quality of the evaluator.
+First of all, due the very nature of the user-generated data, the most popular and new films get a more detailed
+description in terms of tropes, hence the films with less tropes are more prone to be evaluated with errors.
+On the other hand, this is an indicator that the tropes are good estimators of the rating.
+Secondly, the appearance matrix is very sparsed, showing a 99\% os zeroes, hence further analysis would benefit
+from using techniques to reduce the features, for example using feature selection techniques or Principal Components Analysis.
+Thirdly, the neural networks are black boxes, hard to optimize and explain, so further researches could use
+techniques similar to word2vec, assigning a vector in a multi-dimensional space to every trope, in a way that
+the tropes that share common contexts in the corpus are located close in the space.
+That would simplify the aritmetic of tropes in the set and explain hidden relations between the them.
+
+The experiment executed serves as a proof of concept and helps us to find the very basic
+scenario of finding the best possible Film DNA with 30 elements.
+However, further experiments could help us define the
+problems that the methodology can address, for example,
+allowing the generation without trope number restrictions,
+improving an existing Film DNA in a way that some tropes are replaced but a minimum similarity is achieved,
+mixing the tropes of two or more films in a way that the resulting film DNA keeps the essence of them while maximizing the rating,
+or even massively generating film DNAs that share common tropes, leading to backstories that cross in time, and ultimately,
+can help us populate the virtual world of a videogame.
+
+The synthetic Film DNAs are interesting and directly applicable to the generation of films,
+as we shown in the results section, because every trope or genre is implementable within a story:
+it affects to the structure, narration, characters, elements, actions, moments and/or places in a general or specific way.
+However, putting them together, making them be part of a coherent story, filling the gaps and narrating them in a
+compelling way is still required, not part of the scope of the current research and, as far as we know, mostly a human responsibility
+that the final rating depends on. For this reason, any step to automate it is a future line of work and
+a decisive contribution to make the results suitable for a Content Generator of stories.
 
 
 % TODO: Esto puede ser la base para una futura linea...
