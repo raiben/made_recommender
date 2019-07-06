@@ -495,7 +495,10 @@ The resulting dataset includes <%=n_films%> \textit{Film DNAs} and <%=n_tropes%>
 In both cases, the number of tropes by film and film by tropes follow long tail distributions, where
 a large number of occurrences are far from the "head" or central part of the distribution,
 as shown in Figure~\ref{fig:films_analysis}.
-Most of the films have 30 tropes, the median, but there are films with more than 800 tropes.
+Most of the films have 30 tropes, the median, % this is not true.
+% 50% of films have 30 or less; 60% 40 or less, so you can only say that 60%
+% films have 40 or less tropes - JJ
+but there are films with more than 800 tropes.
 On the other hand, most tropes appear in 6 films, but there are tropes with more than 3000 occurrences in films.
 
 It is part of the current research to analyze the expected effect of this distribution
