@@ -647,8 +647,11 @@ of tropes. % Please check this out. You always have to specify conclusions and
 % relation to paper objectives, for every piece of data or decision you explain
 % - JJ
 
-There seems to be also a significant positive correlation between the number of tropes and the votes (popularity) as well.
-That explains the long queue distributions in the previous step, Figure~\ref{fig:films_analysis}, in other words,
+There seems to be also a significant positive correlation between the number of
+tropes and the votes (popularity) as well, which
+might explain the long queue distributions in the previous step, Figure~\ref{fig:films_analysis};
+% You should learn to use the semicolon - JJ
+in other words,
 the more popular the film is, the better it is described by the community and the more tropes are found.
 % Say something about what this implies for your paper - JJ
 
