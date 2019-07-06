@@ -307,7 +307,7 @@ and use it to evaluate the subjective quality of a story described by a set of t
 
 
 Our methodology is divided in four main steps, explained below and described
-in the figure~\ref{fig:main_workflow_extended}:
+in the Figure~\ref{fig:main_workflow_extended}:
 
 <<echo=False>>=
 workflow = f'''
@@ -617,7 +617,7 @@ Figure \ref{fig:extended_dataset_scatterplots} shows the relations between the n
 the rating, the number of votes and the year in the new extended dataset,
 consisting in <%=extended_dataframe.shape[0]%> films linked to <%=len(trope_names)%> tropes.
 %
-The Figure show that there is a significant positive correlation between the number of tropes and the rating, in other words,
+The Figure shows that there is a significant positive correlation between the number of tropes and the rating, in other words,
 higher number of tropes are related to higher rating, and vice-versa.
 It is important to remark that the films up to \~53 tropes (the average) or less, show the widest range,
 \{\~1.3-\~9.5\}, for the rating,
@@ -647,10 +647,13 @@ layers = output[output['parameter']=='Layer sizes']['value'][0].split(', ')
 @
 
 Given our \textit{Extended Dataset}, % Better name pending, any ideas?
-our goal is to build a trope-to-rating mapper
-that can be used as a surrogate model by the Genetic Algorithm, in further steps.
+our goal is to build a trope-to-rating approximator
+that can be then used as a surrogate model by the Genetic Algorithm.
 
-The inputs are binary values for every trope and genre defined in the Extended Dataset
+% Say how representation of tropes is important. Never present anything as the
+% only option, but as a result of a thought process or comparison that leaves
+% room for improvement in subsequent iterations - JJ
+The inputs to the model will be binary values for every trope and genre defined in the Extended Dataset
 and the output is a continuous numeric value that represents the rating of the film, theorically from 0 to 10.
 As the average number of tropes by film is 53, and the possible number of tropes is <%=n_tropes%>,
 99\% of the cells in the matrix will have a value of 0, in other words, it will be very sparse,
@@ -685,7 +688,7 @@ the number of neurons in each layer (162 or 883/29),
 the learning rate (contant or adaptative)
 and the solver (Adam or SGD).
 We applied 3-fold cross validation and got the average and the standard deviation.
-
+%
 <<echo=False>>=
 iterations_evaluator = extract_iterations_from_log(log_file_name=EVALUATOR_BUILDER_LOG_FILE)
 gridsearch_dataframe = extract_grid_parameters_from_log_and_results(log_file_name=EVALUATOR_HYPER_PARAMETERS_LOG_FILE)
@@ -696,8 +699,8 @@ gridsearch_dataframe = extract_grid_parameters_from_log_and_results(log_file_nam
     \caption{Hyper-parameters evaluation using 3-fold cross validation, sorted by validation score}
     \label{fig:gridsearch_results}
 \end{figure}
-
-The results in figure~\ref{fig:gridsearch_results} show that
+%
+The results in Figure~\ref{fig:gridsearch_results} show that
 a MLP with the structure <%='/'.join(layers)%>, using ReLu activation,
 constant learning rate and SGD solver provides the best validation score.
 After training the MLP using the hyper-parameters, the Extended Dataset as input
