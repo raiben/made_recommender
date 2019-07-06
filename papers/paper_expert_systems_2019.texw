@@ -799,7 +799,12 @@ shows that most of the cases are close to 0
 % The color gradient is not logarithmic. And it's not close to 0, it's simply
 % that there are no cases in that area. - JJ
 There are under and over-estimations, especially in the range of tropes with more occurrences \{0-100\},
-but the under-estimation error is bigger, that means that the Neural Network will tend to under-estimate for a small number of tropes.
+but the it's more likely that rating is under-estimated;
+in general, the surrogate model will tend to under-estimate for a small number of tropes,
+and estimation will be increasingly accurate when the number of tropes is increased.
+% Add something like "This is consistent with the fact that movies with more
+% tropes are more popular and they are probably better described" or something
+% like that - JJ
 
 Figure~\ref{fig:errors}(b) and (c) shows the average absolute error and absolute standard deviation by the number of tropes.
 Again, we can observe that a small number of tropes (less than 200) implies higher errors and higher deviations than
@@ -808,6 +813,9 @@ and less popular films are poorly described in terms of number of tropes, hence 
 At the same time, it points out that the number of tropes is a good predictor,
 and, if the films were described with an equal level of detail, it would imply more tropes and less errors.
 
+% Some conclusions related to the quality of the dataset, which is why you are
+% doing this analysis in the first place. Also you need to say something about
+% how that would affect the quality of the surrogate model - JJ
 <<echo=False>>=
 mean_1_genre = statistics.mean([item['Estimated rating'] for item in test.test_results['evaluations_1_genre']])
 #Out[9]: 5.511383624560505
