@@ -838,21 +838,23 @@ comes into play.
 
 \subsection{The Genetic Algorithm} \label{sec:methodology_ga}
 
-At this step we already have a set of candidate tropes for the Film DNA and a model
-that allows its evaluation, so our goal is to use a device that allows us to generate a Film DNA that optimizes the rating.
+At this step we already have a set of candidate tropes for the Film DNA and a
+surrogate model % Say how you obtained the particular one you will be using - JJ
+that allows its evaluation, so our goal is to use a system that allows us to generate a Film DNA that optimizes the rating.
 
-We chose to use a Genetic Algorithm % TODO cite
+We chose to use a genetic algorithm % TODO cite
 because it is a mechanism that allows us to explore the domain of Film DNAs,
 in other words, of combinations of tropes, getting high-quality solutions and dealing with global optimization problems.
 % cite
 
-Our chromosome will be the a Film DNA, that is, a set of tropes.
+Our chromosome will be the Film DNA, that is, a set of tropes.
 In practice it will be encoded as an array of different indices on a dictionary of the total set of tropes available
 without value repetitions, given that, \textit{a priori}, the order of the tropes is irrelevant
 (according to their nature, they may refer to specific moments, but also to narrative structures and general settings)
 and also, our rating evaluator does not consider weights or multiple occurrences of the trope in the movie
 (both, training data and model do not consider multiple occurrences of a trope in a single Film, in other words,
 the trops appears or does not appear).
+% A trope could be repeated, right? What do you do in that case? - JJ
 
 The mutation operator changes a trope of the Film DNA by another that is randomly chosen
 from the set of tropes out of the Film DNA. By doing this, the Film DNA keeps complying with its restrictions,
