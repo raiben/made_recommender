@@ -82,7 +82,7 @@ in order to reach a minimum quality and originality.
 The present paper aims to propose and evaluate a methodology to automatically synthesise sets of tropes,
 defined as high level devices used to describe elements of the films,
 in a way that they maximize the potential rating of a film that conforms to them.
-In order to achieve it, we a Genetic Algorithm that
+In order to achieve it, we use a Genetic Algorithm that
 relies in a surrogate model, trained with the data extracted and processed from huge film databases in Internet.
 In order to evaluate the methodology, we analyse the nature of the tropes and their distributions in existing films,
 the performance of the models and the quality of the sets of tropes synthesised.
@@ -92,22 +92,21 @@ The work has revealed that the methodology and tools developed
 are directly suitable for assisting in the plots generation as an authoring tool
 and, ultimately, for supporting the automatic generation of stories, for example, in massively populated videogames.}
 
-\keywords{Content Generation; Tropes; Narrative; Deep Learning; Genetic Algorithms}
+\keywords{Content Generation; Tropes; Computational Narrative; Deep Learning; Genetic Algorithms}
 
 \jnlcitation{\cname{%
 \author{R.H. Garc\'ia-Ortega},
 \author{J.J. Merelo},
 \author{P. Garc\'ia-S\'anchez}} (\cyear{2019}),
-\ctitle{Chasing compelling stories using computational intelligence and tropes}, \cjournal{}, \cvol{}.}
+\ctitle{Creating compelling stories using computational intelligence and tropes}, \cjournal{}, \cvol{}.}
 
 \maketitle
 
 
 \section{Introduction}\label{sec1}
 
-The goal of the paper is to demonstrate
-how computational intelligence can use film tropes to help on the creation
-and improvement of quality set of tropes
+The goal of the paper is to demonstrate how computational intelligence can be used to generate and improve
+sets of tropes that maximize the potential rating of the films that conforms them,
 in the context of authoring tools and Content Generation.
 
 Crafting film scripts is quite challenging because of the plot complexities and the
