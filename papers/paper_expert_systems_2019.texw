@@ -1051,52 +1051,65 @@ combinations that are far from those already realized in real life % and inferri
 
 \section{Conclusions} \label{sec:conclusions}
 
-The methodology has been proved to suit our goal: % methodology does not prove anything - JJ
-we have been able to extract all the tropes from TV Tropes and the genres and ratings from IMDb,
-% That does not prove anything. That's something you have done to prove your goal - JJ
-joining them in a single \textit{extended dataset} and dealing with technical challenges as the disambiguation of film names
-or the analysis of distribution of the data, that affects the further steps.
-% the main problem here is that you devised a heuristic to merge the two databases
-% You should at least mention it, because it's also a consequence of data analysis - JJ
-We did an exploratory search of the hyper-parameters of a multi-layer perceptron and chose the one that reduces
-the average loss with our extended dataset and trained it. We designed the operators of a GA
-that is able to evolve a set of tropes (Film DNA) maximizing the expected rating and did an exploratory search of the
-best parameters. % Don't mention these details. You should start the conclusions
-% with a summary of what you have done, and that's not interesting - JJ
-Finally, we did 30 runs of the GA and analysed the best candidate, explaining it from
-the narrative perspective and in comparison with the rest of the films of the extended dataset with
-two similarity metrics. Our results show that we are able to evolve a synthetic Film DNA
-in a way that the potential rating is maximized, and that the solution is genuine.
+The goal of the research is to evaluate a methodology to automatically synthesise sets of tropes
+in a way that they maximize the potential rating of a film that conforms to them.
+In order to do so, we have been able to extract all the tropes from TV Tropes and the genres and ratings from IMDb,
+joining them in a single \textit{extended dataset}
+and dealing with technical challenges as the devise of heuristics to disambiguate film names
+and the consequent analysis of distribution of the data, that affects the further steps.
+We used the dataset to train a MLP that predicts the rating from a Film DNA,
+and used it as the surrogate model of a GA.
+Finally, we used the GA to generate a fixed-length Film DNA that maximizes the rating and we
+explained the best candidate after several executions.
+
+The main conclusion that we learned is that the methodology works: a GA that uses a MLP as surrogate model
+is able to find genuine Film DNAs with a very high potential rating.
+However, we had to make decisions for the proof of concept, like including the genres in the Film DNA or
+doing the experiments with 30 elements in the Film DNA,
+that lead to results with a very high rating (9.7 on average) but many genres, 8 in the case of the best one.
+The effect of using a different number of tropes, even unlimited, or limiting the genres, even do not including them at all,
+is unknown and interesting as these changes could affect the expected rating and the applicability of the tropes.
+On the other hand, building a Film DNA might be the most direct application of the methodology,
+and a good fit for a proof of concept but there are other applications that could have explained the
+boundaries of the proposal and the limitations of the surrogate model, such as improving an existing film
+or mixing films;
+
+We also conclude that the tropes and the genres are good estimators of the quality
+and that the MLP works well as rating estimator, with a low error rate that decreases as the number of tropes grow.
+However, a MLP is a black box, hard to optimize and to explain, so we wonder
+how using other techniques could affect the rating and the possible applications.
 
 During the research we discovered limitations of the dataset that could compromise
-the quality of the evaluator.
-% Changed to conditional, because "clearly" is actually saying all you've done is bullshit
-% because if you say this, then you have to say why quality is eventually not compromised - JJ
-First of all, due the very nature of the user-generated data, the most popular and new films get a more detailed
+the quality of the evaluator:
+first of all, due the very nature of the user-generated data, the most popular and new films get a more detailed
 description in terms of tropes, hence the films with less tropes are more prone to be evaluated with errors.
-% But we fixed this by... - JJ
+We decided to add the genres to mitigate this effect on unpopular films, but other techniques
+to reduce the dimensionality could have help us, making the dataset more dense and reducing the time
+to train the surrogate model.
+However, we decided not to use them because they would bring more complexity to the proof of concept.
 
-% These are mainly future work, except the first sentence. Should go last - JJ
-On the other hand, this is an indicator that the tropes are good estimators of the rating.
-Secondly, the occurrence matrix is very sparse, showing a 99\% of zeroes, hence further analysis would benefit
-from using techniques to reduce the features, for example using feature selection or principal components analysis (PCA)).
-% This is future work.
-Thirdly, the neural networks are black boxes, hard to optimize and explain, so further researches could use
-techniques similar to word2vec, assigning a vector in a multi-dimensional space to every trope, in a way that
-the tropes that share common contexts in the corpus are located close in the space.
-That would simplify the arithmetic of tropes in the set and explain hidden relations between the them.
-% -------------------------------------------------------------------------------
+A synthetic Film DNAs directly applicable to help on the
+preparation and design of a film as we shown in the results section,
+because every trope or genre has a different and specific translation according to TV Tropes:
+in some cases, it affects to the structure, narration, characters, elements, actions, moments and/or places in a general or specific way.
+in other cases, it affects to elements out of the story, like the casting, direction guidelines or production.
+So essentially, some tropes and genres will be achievable and other will not, and this brings two new questions:
+what to do if a trope needs to be avoided in a solution and what to do if a trope is required to complement the story.
+Our assumption is that both questions can be tackled through the modification of the GA operators but that would
+also benefit from having explicit dependencies between the tropes and the genres.
+At the same time,  we want to remark that the final application of a Film DNA in the creation process,
+working with the coherence among tropes and genres,
+filling the gaps with elements in the story and narrating them in a compelling way
+is still required, not part of the scope of the current research and,
+as far as we know, mostly a human responsibility
+that the final rating depends on.\\
 
-% Before this paragraph, you need to say what you have proved.
-% Does the surrogate model work? Does the evolutionary algorithm find a movie that
-% could be a blockbuster? What if we need many different options? We should change
-% the surrogate model? Run the algorithm again? Can you obtain better results by
-% using different deep learning models? Running the GA for long? This is actually
-% the discussion: framing the result in the context of all possible options, and
-% pave the way for future work - JJ
-The experiment executed serves as a proof of concept and helps us to find the very basic
-scenario of finding the best possible Film DNA with 30 elements.
-However, further experiments could help us define the
+
+We have addressed different areas that could benefit from future work:
+
+The GA could be improved by implementing constraints such as limiting the genres, dealing with tropes dependencies,
+enforcing the appearance of tropes/genres, penalizing tropes/genres or promoting certain Film DNA similarity.
+This way, further experiments could help us define the
 problems that the methodology can address, for example,
 allowing the generation without trope number restrictions,
 improving an existing Film DNA in a way that some tropes are replaced but a minimum similarity is achieved,
@@ -1106,17 +1119,20 @@ or even massively generating film DNAs that share common tropes, leading to
 backstories that cross in time, and ultimately,
 can help us populate the virtual world of a videogame.
 
-The synthetic Film DNAs are interesting and directly applicable to the
-generation of film architecture, % You need lots of things to generate a film,
-% not only the trope.
-as we shown in the results section, because every trope or genre is implementable within a story:
-% not necessarily. It can be film structure, or even casting - JJ
-it affects the structure, narration, characters, elements, actions, moments and/or places in a general or specific way.
-However, putting them together, making them be part of a coherent story, filling the gaps and narrating them in a
-compelling way is still required, not part of the scope of the current research and,
-as far as we know, mostly a human responsibility
-that the final rating depends on. For this reason, any step to automate it is a future line of work and
-a decisive contribution to make the results suitable for a Content Generator of stories.
+The surrogate model could be improved as well;
+in order to simplify the arithmetic of tropes/genres in the set and explain hidden relations between them,
+further researches could implement a technique
+similar to word2vec, assigning a vector in a multi-dimensional space to every trope/genre, in a way that
+the ones that share common contexts in the corpus are located close in the space.
+
+The datatset could be improved by applying techniques to reduce the dimensionality,
+such as \textit{principal components analysis} and \textit{feature selection},
+improving the performance of the evaluator.
+
+Finally, any further research focused in automating the translation of tropes to
+coherent actions in a virtual world would be a decisive contribution to make the
+results suitable for a content generator of stories.
+
 
 \section*{Acknowledgements}
 This work has been partially funded by projects DeepBio (TIN2017-85727-C4-2-P) and TEC2015-68752
