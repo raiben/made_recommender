@@ -175,12 +175,12 @@ from external Data Sources
 and maps it to a database of film ratings and genres, dealing with disambiguation heuristics
 in order to build what we have called the \textit{extended dataset}.
 However, submitting a set of tropes to the box office is impossible, which is
-why we use deep learning % TODO cite
+why we use Deep Learning \citep{lecun2015deep}
 to create a surrogate model that is able
 to infer the rating from any combination of tropes.
 We perform different analysis in order to determine the quality
 of the predictions and the parameters that could affect them.
-Later on, a Genetic Algorithm and their operators are defined in a way
+Later on, a Genetic Algorithm (GA) \citep{whitley1994genetic} and their operators are defined in a way
 that the trope combinations, formerly Film DNAs, are evolved relying in the surrogate model to
 maximize the rating.
 
@@ -269,9 +269,9 @@ Our previous work also relies in Evolutionary Computation as a mechanism to opti
 In \citep{GarciaOrtega15MADE}, we proposed the MADE framework:
 a parameterizable multi-agent system that allowed
 the generation of backstories in massive environments.
-A genetic algorithm was used to optimize the parameters of the system, for instance the simulation time,
+A GA was used to optimize the parameters of the system, for instance the simulation time,
 the size of the world and the parameters of the behaviour of the agents,
-with respect to the appearance of different archetypes, such as the {\em Hero} or the {\em Villain}.
+with respect to the appearance of different archetypes, such as the ``Hero'' or the ``Villain''.
 These archetypes are defined by the possible actions that an agent may perform:
 for example, the archetype Villain appears when an agent fights against another for food;
 however, this form of evaluation was difficult to justify in order to measure the quality of the generated stories,
@@ -668,7 +668,7 @@ layers = output[output['parameter']=='Layer sizes']['value'][0].split(', ')
 
 We will use the \textit{extended dataset},
 to build a trope-to-rating approximator
-that can then be used as a surrogate model by the Genetic Algorithm.
+that can then be used as a surrogate model by the GA.
 
 Among the different possible representations, we have chosen to use binary values
 because they adapt to our current \textit{extended dataset} in the way that
@@ -826,7 +826,7 @@ comes into play.
 At this step we already have a set of candidate tropes for the Film DNA and the
 surrogate model trained and evaluated in the previous step,
 so our goal is to use a system that allows us to generate a Film DNA that optimizes the rating.
-We determine to use a genetic algorithm % TODO cite
+We determine to use a GA
 because it is a mechanism that allows us to explore the domain of Film DNAs,
 in other words, of combinations of tropes, getting high-quality solutions and dealing with global optimization problems.
 % cite
@@ -855,9 +855,9 @@ the neural network, that is, their predicted rating.
 
 According to our tests, the GA has proven to converge towards optimal solutions efficiently,
 given the simplicity of the operators based on set algebra, and fitness calculation.
-It is important to remark that the Genetic Algorithm is interesting for the research  as far as it leads us to our goal,
+It is important to remark that the GA is interesting for the research  as far as it leads us to our goal,
 that is to prove that the methodology works, and hence,
-an exploratory analysis of the parameters of the Genetic Algorithm is reasonable in this context,
+an exploratory analysis of the parameters of the GA is reasonable in this context,
 as we will see in the next section, \ref{sec:experimental_setup}.
 
 %TODO if we are finally using restrictions, we have to explain in (later)
@@ -887,7 +887,7 @@ and Crossover Probability (Cp) = \{0.25, 0.5, 0.75\}
 and we have chosen the combination P = 200, Mp = \(1\div size_{dna}\) , Cp = 0.5, because it obtains better results on average.
 In the experiments we have set the stop criterion to a minimum of 3000 evaluations and
 until the best generation does not improve during 10000 evaluations.
-We will run the genetic Algorithm 30 times with different random seeds and
+We will run the GA 30 times with different random seeds and
 we will select the run that gives the highest fitness in order to analyse it.
 
 As previously stated, a trope is not a full-fledged film, so we need to have an idea of what a movie
@@ -910,7 +910,7 @@ The goal of this specific experiment if to find the best Film DNA possible with 
 % optimizing tropes. You need to explain why you use that fixed length, as well
 % as other decisions such as adding genre - JJ
 
-The repetition of the Genetic Algorithm 30 times has resulted in an average fitness of <%=human_readable(9.783487634688873)%>
+The repetition of the GA 30 times has resulted in an average fitness of <%=human_readable(9.783487634688873)%>
 (+-<%=human_readable(0.4307202616394516)%>). % average over what? Best of every run? - JJ
 The best solution has a rating of <%=human_readable(10.313031174658876)%> and a Film DNA with the following tropes.\\
 
@@ -925,8 +925,8 @@ The best solution has a rating of <%=human_readable(10.313031174658876)%> and a 
 & \qquad\qquad\qquad [GENRE]Animation, [GENRE]Documentary, [GENRE]Drama, [GENRE]History, \\
 & \qquad\qquad\qquad [GENRE]Mystery, [GENRE]Romance, [GENRE]War, [GENRE]Western\}
 \end{align*}
-\\
-
+%
+%
 <<echo=False>>=
 checker = TropesSimilarityChecker()
 checker.load_extended_dataset_json(FILM_EXTENDED_DATASET_DICTIONARY_BZ2_FILE)
@@ -1029,7 +1029,7 @@ and to a lesser extent the genre Mystery and the trope Homage.
 
 
 Our synthesised Film DNA not only has a very high potential rating but also is very different to the rest of the films
-in our \textit{extended dataset}, that is positive because it proves that the Genetic Algorithm is exploring
+in our \textit{extended dataset}, that is positive because it proves that the GA is exploring
 combinations that are far from those already realized in real life % and inferring the rating of them.
 % The GA does not infer the rating, it optimizes the rating. We don't know how
 % it would result in real life. Maybe you should say that too. - JJ
@@ -1057,11 +1057,11 @@ or the analysis of distribution of the data, that affects the further steps.
 % the main problem here is that you devised a heuristic to merge the two databases
 % You should at least mention it, because it's also a consequence of data analysis - JJ
 We did an exploratory search of the hyper-parameters of a multi-layer perceptron and chose the one that reduces
-the average loss with our extended dataset and trained it. We designed the operators of a Genetic Algorithm
+the average loss with our extended dataset and trained it. We designed the operators of a GA
 that is able to evolve a set of tropes (Film DNA) maximizing the expected rating and did an exploratory search of the
 best parameters. % Don't mention these details. You should start the conclusions
 % with a summary of what you have done, and that's not interesting - JJ
-Finally, we did 30 runs of the Genetic Algorithm and analysed the best candidate, explaining it from
+Finally, we did 30 runs of the GA and analysed the best candidate, explaining it from
 the narrative perspective and in comparison with the rest of the films of the extended dataset with
 two similarity metrics. Our results show that we are able to evolve a synthetic Film DNA
 in a way that the potential rating is maximized, and that the solution is genuine.
