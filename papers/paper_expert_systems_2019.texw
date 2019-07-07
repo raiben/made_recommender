@@ -672,15 +672,10 @@ We will use the \textit{extended dataset},
 to build a trope-to-rating approximator
 that can then be used as a surrogate model by the GA.
 
-Among the different possible representations, we have chosen to use binary values
-because they adapt to our current \textit{extended dataset} in the way that
-it is not aware of multiple uses of the same trope in a film, that is to say,
-a trope is present in the film or isn't at all, there is no halfway.
-As explained in the previous section, %say the precise section - JJ
- the genres are included as well, and we could apply the same logic
-as with the tropes regarding their representation: a film belongs to a genre or
-doesn't, the relation is binary. % I don't think you're using binary correctly
-% Please check if Boolean would be more adequate - JJ
+As explained in the Section~\ref{sec:methodology_mapper}, the tropes and genres have
+a relationship of belonging with the film, and hence, the proposed way to represent the input of the evaluator
+is a list of boolean whose indexes map to the list of possible tropes.
+% Please, review the rewritten paragraph - RH
 
 The output is a continuous numeric value that represents the rating of the film, theorically from 0 to 10.
 As the average number of tropes by film is 53, and the possible number of tropes is <%=n_tropes%>,
@@ -728,11 +723,12 @@ a MLP with the structure <%='/'.join(layers)%>, using ReLu activation,
 constant learning rate and SGD solver provides the best validation score.
 After training the MLP using the selected hyper-parameters, the \textit{extended dataset} as input
 and the rating as output, until it does not improve more than the tolerance for 10 consecutive runs,
-the evaluation converges to a loss of <%=human_readable(iterations_evaluator['loss'].iloc[-1])%>
-and a validation score of <%=human_readable(iterations_evaluator['validation'].iloc[-1])%>.
-% Which is very good, excellent, or what? Is that high or low? 0.410 is over
-% rating, meaning that on average it will fail by 0.410? - JJ
-
+the evaluation converged to a training mean squared error (MSE) of <%=human_readable(iterations_evaluator['loss'].iloc[-1])%>
+and the a validation MSE of <%=human_readable(iterations_evaluator['validation'].iloc[-1])%>,
+that implies that the model is a good predictor as both values are quite similar, and that it is not overfitting.
+The root mean squared error (RMSE), that is a metric in rating units, has the value of
+<%=human_readable(math.sqrt(iterations_evaluator['validation'].iloc[-1]))%>
+for new predictions, that implies that in some cases the evaluations might be above 10.
 
 <<echo=False>>=
 info_file = u'../datasets/evaluator_tests.json.bz2'
@@ -833,7 +829,7 @@ because it is a mechanism that allows us to explore the domain of Film DNAs,
 in other words, of combinations of tropes, getting high-quality solutions and dealing with global optimization problems.
 % cite
 
-Our chromosome will be the Film DNA, that is, a set of tropes. % And genres!!! - JJ
+Our chromosome will be the Film DNA, that is, a set of tropes and genres.
 In practice it will be encoded as an array of different indices on a dictionary of the total set of tropes available
 without value repetitions, given that, \textit{a priori}, the order of the tropes is irrelevant
 (according to their nature, they may refer to specific moments, but also to narrative structures and general settings)
@@ -876,8 +872,8 @@ because it can lead to a wide range of ratings, good and bad,
 and the GA will have a better chance to evolve solution from bad cases;
 however, as we saw in the Section~\ref{sec:methodology_surrogate_model}, a Film of size 30 implies
 more chances to under or over-evaluate, and the rating will be less accurate.
-% "We also use a fixed length chromosome because at this stage we were only
-% interested in a proof of concept and... " - JJ
+We also use a fixed length chromosome because at this stage we were only
+interested in a proof of concept and, otherwise, the results  could be harder to explain and interpret.
 
 The most suitable parameters to solve a specific problem require an extensive calibration, which is outside
 of the scope of this paper. However, to choose the set of parameters that we will use in all the experiments
@@ -897,7 +893,7 @@ The first one is a metric called \textit{Jaccard coefficient}
 and is defined as the cardinality of the intersection of Film DNAs divided by the cardinality of the union of the Film DNAs.
 The Jaccard coefficient is interesting to measure not only what two sets have in common,
 but also, how different their sizes are, penalizing big differences in length of the sets.
-However, as we will be comparing our Synthetised Film DNA os a fixed size of 30,
+However, as we will be comparing our Synthetised Film DNA of a fixed size of 30,
 popular films with hundred of tropes will be penalized just because they are too broadly described in comparison;
 In order to address this problematic, we will also use a coefficient based only in the common elements
 and is defined as the intersection between the sets divided by the length of our synthetic Film DNA.
@@ -905,10 +901,12 @@ and is defined as the intersection between the sets divided by the length of our
 
 \section{Results}
 
-The goal of this specific experiment if to find the best Film DNA possible with a fixed small length.
-% Actually, it's to check if the surrogate model can be used successfully for
-% optimizing tropes. You need to explain why you use that fixed length, as well
-% as other decisions such as adding genre - JJ
+The goal of this specific experiment is to to check if the surrogate model can be used successfully for
+optimizing a Film DNA by its potential rating.
+According to the experimental setup in Section~\ref{sec:experimental_setup},
+the selected length of the Film DNA is 30, as it has been analysed to be a good candidate.
+The Film DNA will include tropes and genres, as discussed previously in Section~\ref{sec:methodology_mapper},
+because the estimation will benefit from considering the genres as features, specially when the number of tropes is small.
 
 The repetition of the GA 30 times has resulted in an average fitness of <%=human_readable(9.783487634688873)%>
 (+-<%=human_readable(0.4307202616394516)%>). % average over what? Best of every run? - JJ
@@ -941,36 +939,40 @@ top_overlap, top_jaccard, top_common = checker.get_top_films_by_simmilarity(trop
 @
 
 The synthetic Film DNA belongs to a multi-genre film (historical documentary romantic animation drama,
-set during a war, that includes western and mistery settings, not comedy).
+set during a war, that includes western and mystery settings, not comedy).
 However, according to one of the tropes, even if it is historical/documentary,
 it is completely an adaptation from the author with clear differences with the overall known story
-for pragmatic reasons (PragmaticAdaptation).
-There are tropes that point to specific features of a hero:
-The 'hero' is a rich character with free time (RichIdiotWithNoDayJob),
-that has a position of responsibility for children (ActionHeroBabysitter),
-that could be related to the existence of irresponsible parents (HandsOffParenting).
+for pragmatic reasons (\textit{PragmaticAdaptation}).
+The following explanations are derived from the current definitions in TV Tropes and,
+in any case, they should be interpreted as just one of the vast number of possible implementations,
+specially considering that tropes and genres evolve through time, adapting to the new films and cultural trends.
+In the synthetic Film DNA, there are tropes that point to specific features of a hero:
+He has a position of responsibility for children (\textit{ActionHeroBabysitter}),
+that could be related to the existence of irresponsible parents (\textit{HandsOffParenting}).
+There is a rich character with a lot of free time, as Bruce Wayne  (\textit{RichIdiotWithNoDayJob}),
+that could be the hero as well.
 There are tropes that define the conflicts and how they will develop:
-Someone resisting the controlling influence acting on them ('FightingFromTheInside'),
-a villain is finally fought by the hero when he is \textit{not afraid} anymore (ImNotAfraidOfYou),
-there is a duel (DuelToTheDeath),
-a special weapon is used (WeaponOfXSlaying),
-the villain falls off (DisneyVillainDeath),
-and the hero also dies, as required by the trope SomeoneToRememberHimBy.
-There are tropes that points to a romantic relation between the hero and a girl,
-that in some scenes is be clearly taller or shorter than him (OneHeadTaller),
-and that discovers, in the end, that is pregnant (SomeoneToRememberHimBy).
+characters resisting an external influence acting on them (\textit{FightingFromTheInside}),
+a villain is finally fought by the hero when this character is \textit{not afraid} anymore (\textit{ImNotAfraidOfYou}),
+there is a duel (\textit{DuelToTheDeath}),
+a special weapon is used (\textit{WeaponOfXSlaying}),
+the villain falls off (\textit{DisneyVillainDeath}),
+and the hero also dies, as required by the trope \textit{SomeoneToRememberHimBy}.
+There are tropes that points to a relation between the hero and a main female character,
+that in some scenes is be clearly taller or shorter than him (\textit{OneHeadTaller}),
+and that discovers, in the end, that is pregnant (\textit{SomeoneToRememberHimBy}).
 There are also tropes that define the setting, in this case, there is fog (OminousFog) as part of the mystery genre
-and a clear 'Homage' to a classic or well known artwork in the same genres is present.
+and a clear \textit{'Homage'} to a classic or well known artwork in the same genres is present.
 According to the narrative perspective,
-the story includes a flashback that points to the death of the main character/s (DeathByFlashback),
-uses 'Jump Cuts' as an editing technique (JumpCut) and make a character appear before his/her introduction (EarlyBirdCameo).
-Some tropes also define very specific sequences: in some cases the film includes spits (SpitefulSpit)
-and the characters swear, although it cannot be heard by the audience (MouthingTheProfanity).
-There is also a scene where terrible things have happened to the main characters but no-one acts as it is really important (NoSympathy),
-and there are scenes with no action, just long conversations where people do not move from their place (TalkingHeads).
+the story includes a flashback that points to the death of the main character/s (\textit{DeathByFlashback}),
+uses 'Jump Cuts' as an editing technique (\textit{JumpCut}) and make a character appear before his/her introduction (\textit{EarlyBirdCameo}).
+Some tropes also define very specific sequences: in some cases the film includes spits (\textit{SpitefulSpit})
+and the characters swear, although it cannot be heard by the audience (\textit{MouthingTheProfanity}).
+There is also a scene where terrible things have happened to the main characters but no-one acts as it is really important (\textit{NoSympathy}),
+and there are scenes with no action, just long conversations where people do not move from their place (\textit{TalkingHeads}).
 The meta-tropes present, on the other hand, include
-an actor or actress that is relatively unknown but looks alike another well known one (PoorMansSubstitute)
-and the film's name is a reference to an existing song.\\
+an actor or actress that is relatively unknown but looks alike another well known one (\textit{PoorMansSubstitute})
+and the film's name is a reference to an existing song (\textit{TitledAfterTheSong}).\\
 
 As part of the analysis, we need to confirm the originality of the Film DNA, so
 we perform a similarity analysis against the whole \textit{extended dataset} and we find that the coefficients are small:
