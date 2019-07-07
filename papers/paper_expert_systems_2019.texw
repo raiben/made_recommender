@@ -1072,14 +1072,14 @@ is unknown and interesting as these changes could affect the expected rating and
 On the other hand, building a Film DNA might be the most direct application of the methodology,
 and a good fit for a proof of concept but there are other applications that could have explained the
 boundaries of the proposal and the limitations of the surrogate model, such as improving an existing film
-or mixing films;
+or mixing films.
 
 We also conclude that the tropes and the genres are good estimators of the quality
 and that the MLP works well as rating estimator, with a low error rate that decreases as the number of tropes grow.
 However, a MLP is a black box, hard to optimize and to explain, so we wonder
 how using other techniques could affect the rating and the possible applications.
 
-During the research we discovered limitations of the dataset that could compromise
+Moreover, during the research we discovered limitations of the dataset that could compromise
 the quality of the evaluator:
 first of all, due the very nature of the user-generated data, the most popular and new films get a more detailed
 description in terms of tropes, hence the films with less tropes are more prone to be evaluated with errors.
@@ -1102,10 +1102,9 @@ working with the coherence among tropes and genres,
 filling the gaps with elements in the story and narrating them in a compelling way
 is still required, not part of the scope of the current research and,
 as far as we know, mostly a human responsibility
-that the final rating depends on.\\
+that the final rating depends on.
 
-
-We have addressed different areas that could benefit from future work:
+All previous considerations open a new research line:
 
 The GA could be improved by implementing constraints such as limiting the genres, dealing with tropes dependencies,
 enforcing the appearance of tropes/genres, penalizing tropes/genres or promoting certain Film DNA similarity.
@@ -1128,7 +1127,6 @@ the ones that share common contexts in the corpus are located close in the space
 The datatset could be improved by applying techniques to reduce the dimensionality,
 such as \textit{principal components analysis} and \textit{feature selection},
 improving the performance of the evaluator.
-
 Finally, any further research focused in automating the translation of tropes to
 coherent actions in a virtual world would be a decisive contribution to make the
 results suitable for a content generator of stories.
