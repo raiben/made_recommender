@@ -674,9 +674,11 @@ Among the different possible representations, we have chosen to use binary value
 because they adapt to our current \textit{extended dataset} in the way that
 it is not aware of multiple uses of the same trope in a film, that is to say,
 a trope is present in the film or isn't at all, there is no halfway.
-As explained in the previous section, the genres are included as well, and we could apply the same logic
-as with the tropes regarding their representation: a film belongs to a genre or doesn't belong, the relation
-is binary.
+As explained in the previous section, %say the precise section - JJ
+ the genres are included as well, and we could apply the same logic
+as with the tropes regarding their representation: a film belongs to a genre or
+doesn't, the relation is binary. % I don't think you're using binary correctly
+% Please check if Boolean would be more adequate - JJ
 
 The output is a continuous numeric value that represents the rating of the film, theorically from 0 to 10.
 As the average number of tropes by film is 53, and the possible number of tropes is <%=n_tropes%>,
@@ -829,7 +831,7 @@ because it is a mechanism that allows us to explore the domain of Film DNAs,
 in other words, of combinations of tropes, getting high-quality solutions and dealing with global optimization problems.
 % cite
 
-Our chromosome will be the Film DNA, that is, a set of tropes.
+Our chromosome will be the Film DNA, that is, a set of tropes. % And genres!!! - JJ
 In practice it will be encoded as an array of different indices on a dictionary of the total set of tropes available
 without value repetitions, given that, \textit{a priori}, the order of the tropes is irrelevant
 (according to their nature, they may refer to specific moments, but also to narrative structures and general settings)
@@ -838,9 +840,10 @@ and also, our rating evaluator does not consider weights or multiple occurrences
 the trope appears or does not appear).
 % A trope could be repeated, right? What do you do in that case? - JJ
 % <- I said it in the parragraph above, "without value repetitions". Should I put it here as well? - RH
+% Already clarified below - JJ
 The mutation operator changes a trope of the Film DNA by another that is randomly chosen
-from the set of tropes out of the Film DNA. By doing this, the Film DNA keeps complying with its restrictions,
-mentioned above, and allows an exploration of new tropes.
+from the set of tropes not included of the Film DNA, which avoids repetition of
+tropes/genres, and allows an exploration of new tropes.
 The crossover operator will make a superset of tropes from the parents' Film DNAs
 and randomly selects two subsets for the offspring.
 This way, the offspring will have Film DNAs whose tropes are exclusively from their parents, allowing
@@ -873,13 +876,15 @@ because it can lead to a wide range of ratings, good and bad,
 and the GA will have a better chance to evolve solution from bad cases;
 however, as we saw in the Section~\ref{sec:methodology_surrogate_model}, a Film of size 30 implies
 more chances to under or over-evaluate, and the rating will be less accurate.
+% "We also use a fixed length chromosome because at this stage we were only
+% interested in a proof of concept and... " - JJ
 
 The most suitable parameters to solve a specific problem require an extensive calibration, which is outside
 of the scope of this paper. However, to choose the set of parameters that we will use in all the experiments
 in this paper, we have made a preliminary selection executing 30 times every possible combination of Population (P) = \{50, 100, 200\},
 Mutation probability (Mp) = \{\(2\div size_{dna}\), \(1\div size_{dna}\), \(0.5\div size_{dna}\)\}
 and Crossover Probability (Cp) = \{0.25, 0.5, 0.75\}
-and we have chosen the combination P = 200, Mp = \(1\div size_dna\) , Cp = 0.5, because it obtains better results on average.
+and we have chosen the combination P = 200, Mp = \(1\div size_{dna}\) , Cp = 0.5, because it obtains better results on average.
 In the experiments we have set the stop criterion to a minimum of 3000 evaluations and
 until the best generation does not improve during 10000 evaluations.
 We will run the GA 30 times with different random seeds and
@@ -901,9 +906,12 @@ and is defined as the intersection between the sets divided by the length of our
 \section{Results}
 
 The goal of this specific experiment if to find the best Film DNA possible with a fixed small length.
+% Actually, it's to check if the surrogate model can be used successfully for
+% optimizing tropes. You need to explain why you use that fixed length, as well
+% as other decisions such as adding genre - JJ
 
 The repetition of the GA 30 times has resulted in an average fitness of <%=human_readable(9.783487634688873)%>
-(+-<%=human_readable(0.4307202616394516)%>).
+(+-<%=human_readable(0.4307202616394516)%>). % average over what? Best of every run? - JJ
 The best solution has a rating of <%=human_readable(10.313031174658876)%> and a Film DNA with the following tropes.\\
 
 
@@ -917,8 +925,8 @@ The best solution has a rating of <%=human_readable(10.313031174658876)%> and a 
 & \qquad\qquad\qquad [GENRE]Animation, [GENRE]Documentary, [GENRE]Drama, [GENRE]History, \\
 & \qquad\qquad\qquad [GENRE]Mystery, [GENRE]Romance, [GENRE]War, [GENRE]Western\}
 \end{align*}
-\\
-
+%
+%
 <<echo=False>>=
 checker = TropesSimilarityChecker()
 checker.load_extended_dataset_json(FILM_EXTENDED_DATASET_DICTIONARY_BZ2_FILE)
@@ -1022,8 +1030,9 @@ and to a lesser extent the genre Mystery and the trope Homage.
 
 Our synthesised Film DNA not only has a very high potential rating but also is very different to the rest of the films
 in our \textit{extended dataset}, that is positive because it proves that the GA is exploring
-combinations that do not actually exist and inferring the rating of them.
-
+combinations that are far from those already realized in real life % and inferring the rating of them.
+% The GA does not infer the rating, it optimizes the rating. We don't know how
+% it would result in real life. Maybe you should say that too. - JJ
 %If we perform the same analysis with the 30 runs of the experiment, the maximum similarity is ... %TODO
 
 %By looking at the results, the executions lead to Film DNA with an average of X genres and a maximum of T,
