@@ -67,9 +67,9 @@ T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
 
 
 
-\address[1]{\orgdiv{Org Division}, \orgname{Badger Maps}, \orgaddress{\state{Granada}, \country{Spain}}}
+\address[1]{\orgdiv{Development Department}, \orgname{Badger Maps}, \orgaddress{\state{Granada}, \country{Spain}}}
 
-\address[2]{\orgdiv{Org Division}, \orgname{Department of Computer Science and Engineering, University of C\'adiz}, \orgaddress{\state{C\'adiz}, \country{Spain}}}
+\address[2]{\orgdiv{Department of Computer Science and Engineering}, \orgname{University of C\'adiz}, \orgaddress{\state{C\'adiz}, \country{Spain}}}
 
 \address[3]{\orgdiv{Department of Computer Architecture and Technology}, \orgname{University of Granada}, \orgaddress{\country{Spain}}}
 
@@ -946,22 +946,24 @@ for pragmatic reasons (\textit{PragmaticAdaptation}).
 The following explanations are derived from the current definitions in TV Tropes and,
 in any case, they should be interpreted as just one of the vast number of possible implementations,
 specially considering that tropes and genres evolve through time, adapting to the new films and cultural trends.
-In the synthetic Film DNA, there are tropes that point to specific features of a hero:
-He has a position of responsibility for children (\textit{ActionHeroBabysitter}),
+
+In the synthetic Film DNA, there are tropes that point to specific features of a male and a female characters:
+the actor use to be an action hero in his movies but in this case,
+his character has a position of responsibility for children (\textit{ActionHeroBabysitter}),
 that could be related to the existence of irresponsible parents (\textit{HandsOffParenting}).
-There is a rich character with a lot of free time, as Bruce Wayne  (\textit{RichIdiotWithNoDayJob}),
-that could be the hero as well.
+She is clearly taller or shorter than him in some scenes (\textit{OneHeadTaller}),
+and she discovers, in the end, that is pregnant (\textit{SomeoneToRememberHimBy}).
+One of them is rich and has a lot of free time  (\textit{RichIdiotWithNoDayJob}).
+
 There are tropes that define the conflicts and how they will develop:
 characters resisting an external influence acting on them (\textit{FightingFromTheInside}),
-a villain is finally fought by the hero when this character is \textit{not afraid} anymore (\textit{ImNotAfraidOfYou}),
+a villain is finally fought by a protagonist when this character is \textit{not afraid} anymore (\textit{ImNotAfraidOfYou}),
 there is a duel (\textit{DuelToTheDeath}),
 a special weapon is used (\textit{WeaponOfXSlaying}),
 the villain falls off (\textit{DisneyVillainDeath}),
-and the hero also dies, as required by the trope \textit{SomeoneToRememberHimBy}.
-There are tropes that points to a relation between the hero and a main female character,
-that in some scenes is be clearly taller or shorter than him (\textit{OneHeadTaller}),
-and that discovers, in the end, that is pregnant (\textit{SomeoneToRememberHimBy}).
-There are also tropes that define the setting, in this case, there is fog (OminousFog) as part of the mystery genre
+and the male protagonist also dies, as required by the trope \textit{SomeoneToRememberHimBy}.
+
+There are also tropes that define the setting, in this case, there is fog (\textit{OminousFog}) as part of the mystery genre
 and a clear \textit{'Homage'} to a classic or well known artwork in the same genres is present.
 According to the narrative perspective,
 the story includes a flashback that points to the death of the main character/s (\textit{DeathByFlashback}),
