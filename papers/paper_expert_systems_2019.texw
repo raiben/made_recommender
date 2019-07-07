@@ -67,9 +67,9 @@ T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
 
 
 
-\address[1]{\orgdiv{Org Division}, \orgname{Org name}, \orgaddress{\state{State name}, \country{Country name}}}
+\address[1]{\orgdiv{Org Division}, \orgname{Badger Maps}, \orgaddress{\state{Granada}, \country{Spain}}}
 
-\address[2]{\orgdiv{Org Division}, \orgname{Org name}, \orgaddress{\state{State name}, \country{Country name}}}
+\address[2]{\orgdiv{Org Division}, \orgname{Department of Computer Science and Engineering, University of C\'adiz}, \orgaddress{\state{C\'adiz}, \country{Spain}}}
 
 \address[3]{\orgdiv{Department of Computer Architecture and Technology}, \orgname{University of Granada}, \orgaddress{\country{Spain}}}
 
@@ -99,9 +99,9 @@ and, ultimately, for supporting the automatic generation of stories, for example
 
 \jnlcitation{\cname{%
 \author{R.H. Garc\'ia-Ortega},
-\author{J.J. Merelo},
-\author{P. Garc\'ia-S\'anchez}} (\cyear{2019}),
-\ctitle{Creating compelling stories using computational intelligence and tropes}, \cjournal{}, \cvol{}.}
+\author{P. Garc\'ia-S\'anchez},
+\author{J.J. Merelo}} (\cyear{2019}),
+\ctitle{StarTroper, a film trope rating optimizer using Deep Learning and Evolutionary Algorithms}, \cjournal{}, \cvol{}.}
 
 \maketitle
 
@@ -132,7 +132,7 @@ the \textit{Chekhov's Gun} formulated by the Russian writer with the eponymous
 name, according to \cite{bitsilli1983chekhov};
 however, there are thousands of not-so-widely used tropes as well, discovered and
 catalogued everyday by professionals and enthusiastic of the storytelling;
-their study is organic, dynamic and extensive, according to~\cite{garcia2018overview}.
+their study is organic, dynamic and extensive, according to~\cite{garcia2018overview}. In fact, their emergence, self-organization and pattern formation are difficult to model, implying they can be dealt as a complex system  \citep{@article{juarrero2000dynamics}.
 In general, we might say that the set of tropes defines the overall narrative
 architecture over which the narrative layer is eventually set. Tropes do not
 define plot univocally, but constrain it in a number of ways.
@@ -466,7 +466,7 @@ However, the last version of DBTropes is from 2016, and the community of users o
 of the database since then; in other words, we are not using it because it is outdated.
 If we work with the latest data from TV Tropes our machine learning algorithms
 would benefit from having much entries and hence, provide better results. That is why our first step is to
-extract the data directly from TV Tropes while making it available to the public % TODO cite
+extract the data directly from TV Tropes while making it available to the public
 and the researchers,
 in the context of the Open Science.
 
@@ -685,7 +685,7 @@ with a small representation of the tropes in the catalogued films.
 The deep learning technique most suitable in this context needs to expose feature-extraction capabilities
 in order to deal with unknown and unbalanced relations between tropes to achieve a specific rating.
 Although there are different candidates that could perform properly under these circumstances,
-in our current research we choose a neural network. % TODO cite
+in our current research we choose a neural network \citep{schmidhuber2015deep}.
 
 The goal of our research in this initial stage is to evaluate a methodology,
 so tuning the surrogate model is carried out as far as it suits the needs in terms of quality of the estimations,
