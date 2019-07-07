@@ -700,7 +700,7 @@ results may differ drastically depending on the nature of the problem and
 it is recommended to do a hyper-parameters evaluation. % TODO cite
 We selected the multi-layer perceptron (MLP), the most widespread neural network architecture,
 because it has been proven to be able to approximate any function that we require,
-the so called \textit{Universal Approximation Theorem}. % TODO cite
+the so called \textit{Universal Approximation Theorem} \cite{hornik1989multilayer}. 
 In order to choose hyper-parameters that get along with the nature of our problem
 we did a preliminary search with all the combinations in a domain of possible values
 for the activation (ReLu or tanh), % define them. - JJ
