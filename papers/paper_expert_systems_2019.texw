@@ -824,8 +824,7 @@ comes into play.
 At this step we already have a set of candidate tropes for the Film DNA and the
 surrogate model trained and evaluated in the previous step,
 so our goal is to use a system that allows us to generate a Film DNA that optimizes the rating.
-
-We chose to use a genetic algorithm % TODO cite
+We determine to use a genetic algorithm % TODO cite
 because it is a mechanism that allows us to explore the domain of Film DNAs,
 in other words, of combinations of tropes, getting high-quality solutions and dealing with global optimization problems.
 % cite
