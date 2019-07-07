@@ -674,9 +674,11 @@ Among the different possible representations, we have chosen to use binary value
 because they adapt to our current \textit{extended dataset} in the way that
 it is not aware of multiple uses of the same trope in a film, that is to say,
 a trope is present in the film or isn't at all, there is no halfway.
-As explained in the previous section, the genres are included as well, and we could apply the same logic
-as with the tropes regarding their representation: a film belongs to a genre or doesn't belong, the relation
-is binary.
+As explained in the previous section, %say the precise section - JJ
+ the genres are included as well, and we could apply the same logic
+as with the tropes regarding their representation: a film belongs to a genre or
+doesn't, the relation is binary. % I don't think you're using binary correctly
+% Please check if Boolean would be more adequate - JJ
 
 The output is a continuous numeric value that represents the rating of the film, theorically from 0 to 10.
 As the average number of tropes by film is 53, and the possible number of tropes is <%=n_tropes%>,
@@ -829,7 +831,7 @@ because it is a mechanism that allows us to explore the domain of Film DNAs,
 in other words, of combinations of tropes, getting high-quality solutions and dealing with global optimization problems.
 % cite
 
-Our chromosome will be the Film DNA, that is, a set of tropes.
+Our chromosome will be the Film DNA, that is, a set of tropes. % And genres!!! - JJ
 In practice it will be encoded as an array of different indices on a dictionary of the total set of tropes available
 without value repetitions, given that, \textit{a priori}, the order of the tropes is irrelevant
 (according to their nature, they may refer to specific moments, but also to narrative structures and general settings)
@@ -838,9 +840,10 @@ and also, our rating evaluator does not consider weights or multiple occurrences
 the trope appears or does not appear).
 % A trope could be repeated, right? What do you do in that case? - JJ
 % <- I said it in the parragraph above, "without value repetitions". Should I put it here as well? - RH
+% Already clarified below - JJ
 The mutation operator changes a trope of the Film DNA by another that is randomly chosen
-from the set of tropes out of the Film DNA. By doing this, the Film DNA keeps complying with its restrictions,
-mentioned above, and allows an exploration of new tropes.
+from the set of tropes not included of the Film DNA, which avoids repetition of
+tropes/genres, and allows an exploration of new tropes.
 The crossover operator will make a superset of tropes from the parents' Film DNAs
 and randomly selects two subsets for the offspring.
 This way, the offspring will have Film DNAs whose tropes are exclusively from their parents, allowing
@@ -873,6 +876,8 @@ because it can lead to a wide range of ratings, good and bad,
 and the GA will have a better chance to evolve solution from bad cases;
 however, as we saw in the Section~\ref{sec:methodology_surrogate_model}, a Film of size 30 implies
 more chances to under or over-evaluate, and the rating will be less accurate.
+% "We also use a fixed length chromosome because at this stage we were only
+% interested in a proof of concept and... " - JJ
 
 The most suitable parameters to solve a specific problem require an extensive calibration, which is outside
 of the scope of this paper. However, to choose the set of parameters that we will use in all the experiments
