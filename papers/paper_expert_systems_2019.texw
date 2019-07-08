@@ -994,7 +994,7 @@ the action character use to be an \textit{action hero} in previous movies,
 and, in contrast, in the current one the character deals with unfamiliar problems and domestic situations.
 Also, one of the actors is relatively unknown but looks alike another well known one (\textit{PoorMansSubstitute})
 and the film's name is a reference to an existing song (\textit{TitledAfterTheSong}).
-As we mentioned above, the film DNA has 8 genres, that can be seen as a high number for a film,
+As we mentioned above, the film DNA has 8 genres (out of 27), that can be seen as a high number for a film,
 but there are examples of TV series
 with a high number of genres as well, like Dr. Who or Stranger Things, with 5 genres each.
 \\
@@ -1107,7 +1107,7 @@ model to evaluate fitness of sets of tropes is able to find genuine Film DNAs
 with a very high potential rating, and is able to deal with the intrinsic difficulties
 of working with this \textit{complex system} of films, tropes, genres and ratings.
 
-The best result, which includes several genres amongh the synthetic film DNA, shows
+The best result, which includes several genres among the synthetic film DNA, shows
 that, even if the individual contribution of every genre to rating is not too
 important, combining several genres, even more so in an environment such as this
 proof of concept where the number of tropes/genres in the chromosome is limited,
