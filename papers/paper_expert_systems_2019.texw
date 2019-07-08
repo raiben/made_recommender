@@ -641,7 +641,7 @@ Finally, there is a significant positive correlation between the number of trope
 according to the scatter plot, the year of the film limitates the maximum number of tropes that describe the films
 in our dataset.
 
-These three results will help us unravel the limitations of a surrogate model fed from the \textit{extended dataset}
+These three findings will help us unravel the limitations of a surrogate model fed from the \textit{extended dataset}
 and used to predict the rating from a set of tropes. The analysis points out that choosing a small Film DNA
 will lead to films not very well described,
 with potential to have a rating in a wider range of values, but also
@@ -837,7 +837,8 @@ without value repetitions, given that, \textit{a priori}, the order of the trope
 (according to their nature, they may refer to specific moments, but also to narrative structures and general settings)
 and also, our rating evaluator does not consider weights or multiple occurrences of the trope in the movie
 (both, training data and model do not consider multiple occurrences of a trope in a single Film, in other words,
-the trope appears or does not appear).
+the trope appears or does not appear). In practice, it will be a list of 30 tropes
+and genres with no repetitions.
 
 The mutation operator changes a trope of the Film DNA by another that is randomly chosen
 from the set of tropes not included of the Film DNA, which avoids repetition of
@@ -848,12 +849,14 @@ This way, the offspring will have Film DNAs whose tropes are exclusively from th
 the exploitation of the data.
 
 As we explained above, we have to rely on a surrogate model for the evaluation of Film DNAs, and our approach uses
-a neural network trained with existing movies. The fitness of our GA will be the result of evaluating a DNA trope with
-the neural network, that is, their predicted rating.
+a neural network trained with existing movies, the one that has been presented
+in the previous section. The fitness of our GA will be the result of evaluating
+the set of tropes and genres the neural network, that is, their predicted rating.
 
 According to our tests, the GA has proven to converge towards optimal solutions efficiently,
-given the simplicity of the operators based on set algebra, and fitness calculation.
-It is important to remark that the GA is interesting for the research  as far as it leads us to our goal,
+given the simplicity of the operators based on set algebra and fitness calculation.
+It is important to remark that the GA performs an optimization step that is
+essential for the research as far as it leads us to our goal,
 that is to prove that the methodology works, and hence,
 an exploratory analysis of the parameters of the GA is reasonable in this context,
 as we will see in the next section, \ref{sec:experimental_setup}.
@@ -888,7 +891,7 @@ until the best generation does not improve during 10000 evaluations.
 We will run the GA 30 times with different random seeds and
 we will select the run that gives the highest fitness in order to analyse it.
 
-As previously stated, a trope is not a full-fledged film, so we need to have an idea of what a movie
+As previously stated, a set of tropes is not a full-fledged film, so we need to have an idea of what a movie
 with that set of tropes would look like. This is why, as tools to interpret the results,
 we will use metrics of similarity between finite sample sets.
 The first one is a metric called \textit{Jaccard coefficient}
@@ -1057,18 +1060,20 @@ combinations that are far from those already realized in real life % and inferri
 
 \section{Conclusions} \label{sec:conclusions}
 
-The goal of the research is to evaluate a methodology to automatically synthesise sets of tropes
-in a way that they maximize the potential rating of a film that conforms to them.
-In order to do so, we have been able to extract all the tropes from TV Tropes and the genres and ratings from IMDb,
-joining them in a single \textit{extended dataset}
+The goal of this research is to evaluate a methodology that automatically synthesises sets of tropes
+in a way that they maximize the potential rating of a film that uses them.
+In order to do so, we have first extracted all the tropes from the TV Tropes sites and the genres and ratings from IMDb,
+merging them in a single \textit{extended dataset}
 and dealing with technical challenges as the devise of heuristics to disambiguate film names
 and the consequent analysis of distribution of the data, that affects the further steps.
-We used the dataset to train a MLP that predicts the rating from a Film DNA,
-and used it as the surrogate model of a GA.
-Finally, we used the GA to generate a fixed-length Film DNA that maximizes the rating and we
-explained the best candidate after several executions.
+We used the dataset to train a MLP that predicts the rating from a Film DNA from its set of tropes and genres,
+and used it as the surrogate model in an evolutionary algorithm that tries to
+find a set of tropes and genres that maximizes rating; this evolutionary algorithm
+uses a fixed-length set of tropes and is able to find a set with a rating that is,
+in fact, higher than the maximum rating found in the training set.
 
-The main conclusion that we learned is that the methodology works: a GA that uses a MLP as surrogate model
+The main conclusion that we learned is that the methodology works: a GA that uses
+a MLP as surrogate model to evaluate fitness of sets of tropes
 is able to find genuine Film DNAs with a very high potential rating.
 However, we had to make decisions for the proof of concept, like including the genres in the Film DNA or
 doing the experiments with 30 elements in the Film DNA,
