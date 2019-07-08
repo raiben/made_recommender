@@ -75,7 +75,7 @@ T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
 
 \corres{*Rubén Héctor García Ortega, Badger Maps. \email{raiben@gmail.com}}
 
-\presentaddress{Present address}
+\presentaddress{Badger Maps. Granada, Spain.}
 
 \abstract[Abstract]{
 Designing a story is widely considered a crafty yet critical task that requires deep specific human knowledge
@@ -113,7 +113,7 @@ Crafting film scripts is quite challenging because of the plot complexities and 
 that promulgate that the elements involved in the development of a media product need to work together
 and a single failing one may provoke a disaster in cascade.
 In fact, the concept of narrative itself can be seen as a complex adaptive system
-where interactions between their elements or events make the story emerge \cite{Sack14Emergence}.
+where interactions between their elements or events make the story emerge \citep{Sack14Emergence}.
 In order to tackle this complexity in the current research we are going to to describe the elements of the film
 % we need to → there's only one way to do it
 % we are going to → this is how we are going to do it.
@@ -1153,9 +1153,7 @@ as far as we know, mostly a human responsibility
 that the final rating depends on.
 
 All previous considerations may open a promising and encouraging research line,
-hence we propose that further research should be undertaken in the following areas:\begin{itemize}
-
-\item The GA could be improved by implementing constraints such as limiting the genres, dealing with tropes dependencies,
+hence we propose that further research should be undertaken in different areas. First, the GA could be improved by implementing constraints such as limiting the genres, dealing with tropes dependencies,
 enforcing the appearance of tropes/genres, penalizing tropes/genres or promoting certain Film DNA similarity.
 This way, further experiments could help us define the
 problems that the methodology can address, for example,
@@ -1167,21 +1165,21 @@ or even massively generating film DNAs that share common tropes, leading to
 backstories that cross in time, and ultimately,
 can help us populate the virtual world of a videogame.
 
-\item The surrogate model could be improved as well in any number of different ways;
+The surrogate model could be improved as well in any number of different ways;
 in order to simplify the arithmetic of tropes/genres in the set and explain hidden relations between them,
 further researches could implement a technique
 similar to word2vec,  % cita
 assigning a vector in a multi-dimensional space to every trope/genre, in a way that
 the ones that share common contexts in the corpus are located close in the space.
-
-\item The quality of the dataset could be improved by applying techniques to reduce the dimensionality,
+Also, the quality of the dataset could be improved by applying techniques to reduce the dimensionality,
 such as \textit{principal components analysis} and \textit{feature selection},
 improving the performance of the evaluator.
+
 Finally, any further research focused in automating the translation of tropes to
 coherent actions in a virtual world would be a decisive contribution to make the
 results suitable for a content generator of stories.
 
-\end{itemize}
+
 
 
 \section*{Acknowledgements}
