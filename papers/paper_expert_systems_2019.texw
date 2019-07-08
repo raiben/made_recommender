@@ -964,8 +964,8 @@ specially considering that tropes and genres evolve through time and are continu
 adapting to the new films and cultural trends.
 
 In the synthetic Film DNA, there are tropes that define the main characters:
-one of them, as an actor, used to be an \textit{action hero} in his movies but in this case,
-his character has a position of responsibility for children (\textit{ActionHeroBabysitter}),
+one of them is a rude action character that, in this case, is compelled to
+have a position of responsibility for children (\textit{ActionHeroBabysitter}),
 that could be related to the existence of irresponsible parents (\textit{HandsOffParenting}).
 There is a female character, as required by the trope \textit{SomeoneToRememberHimBy},
 and there is a couple, according to \textit{OneHeadTaller}, where one character is clearly taller or shorter than the other.
@@ -989,9 +989,15 @@ Some tropes also define very specific sequences: in some cases the film includes
 and the characters swear, although it cannot be heard by the audience (\textit{MouthingTheProfanity}).
 There is also a scene where terrible things have happened to the main characters but no-one acts as it is really important (\textit{NoSympathy}),
 and there are scenes with no action, just long conversations where people do not move from their place (\textit{TalkingHeads}).
-The meta-tropes present, on the other hand, include
-an actor or actress that is relatively unknown but looks alike another well known one (\textit{PoorMansSubstitute})
-and the film's name is a reference to an existing song (\textit{TitledAfterTheSong}).\\
+According to the meta-tropes present,
+the action character use to be an \textit{action hero} in previous movies,
+and, in contrast, in the current one the character deals with unfamiliar problems and domestic situations.
+Also, one of the actors is relatively unknown but looks alike another well known one (\textit{PoorMansSubstitute})
+and the film's name is a reference to an existing song (\textit{TitledAfterTheSong}).
+As we mentioned above, the film DNA has 8 genres, that can be seen as a high number for a film,
+but there are examples of TV series
+with a high number of genres as well, like Dr. Who or Stranger Things, with 5 genres each.
+\\
 
 As part of the analysis, we need to confirm the originality of the Film DNA, so
 we perform a similarity analysis against the whole \textit{extended dataset} and we find that the coefficients are small:
@@ -1084,7 +1090,9 @@ in fact, higher than the maximum rating found in the training set.
 
 The main conclusion that we learned is that the methodology works: a GA that uses
 a MLP as surrogate model to evaluate fitness of sets of tropes
-is able to find genuine Film DNAs with a very high potential rating.
+is able to find genuine Film DNAs with a very high potential rating,
+dealing with the intrinsic difficulties
+of working with this \textit{complex system} of films, tropes, genres and ratings.
 However, we had to make decisions for the proof of concept, like including the genres in the Film DNA or
 doing the experiments with 30 elements in the Film DNA,
 that lead to results with a very high rating (9.7 on average) but many genres, 8 in the case of the best one.
