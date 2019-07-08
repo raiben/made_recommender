@@ -924,7 +924,8 @@ because the estimation will benefit from considering the genres as features, spe
 
 The repetition of the GA 30 times has resulted in an average fitness of <%=human_readable(9.783487634688873)%>
 (+-<%=human_readable(0.4307202616394516)%>). % average over what? Best of every run? - JJ
-The best solution has a rating of <%=human_readable(10.313031174658876)%> and a Film DNA with the following tropes.\\
+The best solution across all runs has a rating of <%=human_readable(10.313031174658876)%> and a Film DNA with the following tropes.\\
+% Please check these comments and the change above - JJ
 
 
 \begin{align*}
