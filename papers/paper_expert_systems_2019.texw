@@ -1093,27 +1093,35 @@ find a set of tropes and genres that maximizes rating; this evolutionary algorit
 uses a fixed-length set of tropes and is able to find a set with a rating that is,
 in fact, higher than the maximum rating found in the training set.
 
-The main conclusion that we learned is that the methodology works: a GA that uses
-a MLP as surrogate model to evaluate fitness of sets of tropes
-is able to find genuine Film DNAs with a very high potential rating,
-dealing with the intrinsic difficulties
+This first work on the subject establishes the methodology through a proof of
+concept, and will also be used to establish a series of baseline measurements that
+can eventually be used to compare with further developments of this methodology.
+This proof of concept already proves that the GA that uses a MLP as surrogate
+model to evaluate fitness of sets of tropes is able to find genuine Film DNAs
+with a very high potential rating, and is able to deal with the intrinsic difficulties
 of working with this \textit{complex system} of films, tropes, genres and ratings.
-However, we had to make decisions for the proof of concept, like including the genres in the Film DNA or
-doing the experiments with 30 elements in the Film DNA,
-that lead to results with a very high rating (9.7 on average) but many genres, 8 in the case of the best one.
-The effect of using a different number of tropes, even unlimited, or limiting the genres, even do not including them at all,
+
+The best result, which includes several genres amongh the synthetic film DNA, shows
+that, even if the individual contribution of every genre to rating is not too
+important, combining several genres, even more so in an environment such as this
+proof of concept where the number of tropes/genres in the chromosome is limited,
+makes sense and boosts the rating, on average (9.7) and also in the best case
+analyzed, which includes 8 genres.
+The effect of using a different number of tropes, even unlimited, or limiting the genres or not including them at all,
 is unknown and interesting as these changes could affect the expected rating and the applicability of the tropes.
+This is left, however, as future work.
 On the other hand, building a Film DNA might be the most direct application of the methodology,
 and a good fit for a proof of concept but there are other applications that could have explained the
 boundaries of the proposal and the limitations of the surrogate model, such as improving an existing film
 or mixing films.
 
 We also conclude that the tropes and the genres are good estimators of the quality
-and that the MLP works well as rating estimator, with a low error rate that decreases as the number of tropes grow.
+and that the neural network architecture chose, a MLP, works well as rating estimator, with a low error rate that decreases as the number of tropes grow.
 However, a MLP is a black box, hard to optimize and to explain, so we wonder
-how using other techniques could affect the rating and the possible applications.
+how using other techniques could affect the rating and the possible applications;
+this exploration is also left as future work.
 
-Moreover, during the research we discovered limitations of the dataset that could compromise
+Moreover, during this proof of concept we discovered limitations of the dataset that could compromise
 the quality of the evaluator:
 first of all, due the very nature of the user-generated data, the most popular and new films get a more detailed
 description in terms of tropes, hence the films with less tropes are more prone to be evaluated with errors.
@@ -1153,10 +1161,11 @@ or even massively generating film DNAs that share common tropes, leading to
 backstories that cross in time, and ultimately,
 can help us populate the virtual world of a videogame.
 
-The surrogate model could be improved as well;
+The surrogate model could be improved as well in any number of different ways;
 in order to simplify the arithmetic of tropes/genres in the set and explain hidden relations between them,
 further researches could implement a technique
-similar to word2vec, assigning a vector in a multi-dimensional space to every trope/genre, in a way that
+similar to word2vec,  % cita
+assigning a vector in a multi-dimensional space to every trope/genre, in a way that
 the ones that share common contexts in the corpus are located close in the space.
 
 The dataset could be improved by applying techniques to reduce the dimensionality,
