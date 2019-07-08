@@ -619,7 +619,7 @@ It is important to remark that the films up to $\sim53$ tropes (the average) or 
 $\{\sim 1.3-\sim9.5\}$, for the rating,
 whereas films with more than 600 tropes have a rating in the range $\{6-\sim9.5\}$.
 If we want to test the methodology, choosing a fixed number of tropes lower or
-equal to $53,$ for example, the median (30), which what we are doing,
+equal to $53,$ wuch as the median the median (30), which what we are doing,
 would allow us to find an optimal solution in a wider range while keeping the
 search space small. At the same time, a number of tropes in this range
 has an average rating in the range $\{6-6.5\}$, according to the regression function,
@@ -627,9 +627,11 @@ which is good enough. No search algorithm will guarantee that a synthetic set of
 tropes will reach that average, but at least we know that we will be able to
 generate movies with good or excellent rating if we work with that specific number
 of tropes.
+
+% Long tail, not long queue - JJ
 There seems to be also a significant positive correlation between the number of
 tropes and the votes (popularity) as well, which
-might explain the long queue distributions in the previous step, Figure~\ref{fig:films_analysis};
+might explain the long tail distributions in the previous step, Figure~\ref{fig:films_analysis};
 in other words,
 the more popular the film is, the better it is described by the community and the more tropes are found.
 This outcome implies that, if the experimental setup fixes the number of tropes for the synthetic Film DNA,
@@ -697,7 +699,7 @@ results may differ drastically depending on the nature of the problem and
 it is recommended to do a hyper-parameters evaluation. % TODO cite
 We selected the multi-layer perceptron (MLP), the most widespread neural network architecture,
 because it has been proven to be able to approximate any function that we require,
-the so called \textit{Universal Approximation Theorem} \cite{hornik1989multilayer}. 
+the so called \textit{Universal Approximation Theorem} \cite{hornik1989multilayer}.
 In order to choose hyper-parameters that get along with the nature of our problem
 we did a preliminary search with all the combinations in a domain of possible values
 for the activation (ReLu or tanh), % define them. - JJ
