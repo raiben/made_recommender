@@ -236,6 +236,12 @@ def build_paper_latex(context):
     command = 'cd papers && pweave -f texminted report.texw'
     run(command, hide=False, warn=True)
 
+@task
+def build_paper_latex_arxiv(context):
+    print("Building latex file and figures through pweave ...")
+    command = 'cd papers && pweave -f texminted tropescraper_arxiv.texw'
+    run(command, hide=False, warn=True)
+
 
 @task
 def build_paper_pdf(context):
@@ -247,6 +253,16 @@ def build_paper_pdf(context):
               '&& pdflatex -shell-escape report.tex'
     run(command, hide=False, warn=True)
 
+@task
+def build_paper_pdf_arxiv(context):
+    this_paper = 'tropescraper_arxiv'
+    print("Building pdf through pdflatex ...")
+    command = 'cd papers ' \
+              '&& pdflatex -shell-escape {this_paper}.tex ' \
+              '&& bibtex report.aux ' \
+              '&& pdflatex -shell-escape {this_paper}.tex ' \
+              '&& pdflatex -shell-escape {this_paper}.tex'
+    run(command, hide=False, warn=True)
 
 @task
 def open_paper(context):
