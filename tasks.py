@@ -255,13 +255,12 @@ def build_paper_pdf(context):
 
 @task
 def build_paper_pdf_arxiv(context):
-    this_paper = 'tropescraper_arxiv'
     print("Building pdf through pdflatex ...")
     command = 'cd papers ' \
-              '&& pdflatex -shell-escape {this_paper}.tex ' \
-              '&& bibtex report.aux ' \
-              '&& pdflatex -shell-escape {this_paper}.tex ' \
-              '&& pdflatex -shell-escape {this_paper}.tex'
+              "&& pdflatex -shell-escape tropescraper_arxiv.tex " \
+              '&& bibtex tropescraper_arxiv ' \
+              "&& pdflatex -shell-escape tropescraper_arxiv.tex " \
+              "&& pdflatex -shell-escape tropescraper_arxiv.tex"
     run(command, hide=False, warn=True)
 
 @task

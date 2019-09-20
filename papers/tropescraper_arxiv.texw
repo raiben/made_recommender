@@ -32,6 +32,8 @@ n_tropes = len(tropes_dictionary.keys())
 \documentclass[a4paper,12pt]{article}
 \usepackage[utf8]{inputenc}
 \usepackage{minted}
+\usepackage{graphicx} % Includegraphics
+\usepackage{hyperref} % url
 %\usepackage{moreverb}
 
 % -- begin: Added by Rubén
@@ -53,6 +55,8 @@ T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
 
 \author{Rubén Héctor García-Ortega\thanks{Badger Maps, Granada} \and Pablo García-Sánchez\thanks{Department of Computer Science and Engineering, University of C\'adiz} \and JJ Merelo\thanks{University of Granada}}
 
+\maketitle
+
 \begin{abstract}
 Designing a story is widely considered a crafty yet critical task that requires deep specific human knowledge
 in order to reach a minimum quality and originality. This includes designing at a high
@@ -72,14 +76,55 @@ are directly suitable for assisting in the plots generation as an authoring tool
 and, ultimately, for supporting the automatic generation of stories, for example, in massively populated videogames.
 \end{abstract}
 
-\keywords{Content Generation; Tropes; Computational Narrative; Deep Learning; Genetic Algorithms}
-
-
-\maketitle
+{\bf Keywords}: Content Generation; Tropes; Computational Narrative; Deep Learning; Genetic Algorithms.
 
 
 \section{Step 1: Extraction of tropes} \label{sec:methodology_scraper}
 
+<<echo=False>>=
+workflow = f'''
+digraph {{
+    splines=polyline
+    rankdir=LR
+    ranksep=0.25;
+    margin=0;
+    nodesep=0.3;
+    graph [ resolution=128, fontsize=30];
+
+    node [margin=0 fontcolor=black fontsize=10 width=1];
+    tvtropes[label="TV Tropes\nwebsite\n\ntvtropes.org\n " type="database"];
+    scrape_tropes[label="Step 1:\nScrape tropes\n\nPython+\nrequests+\nlxml+\nbz2 (blocksize 900k)+\ndisk cache\n~11.900 pages" type="process"];
+    dataset[label="Dataset\n\nfilms->tropes\n({n_films}->{n_tropes})\n " type="data"];
+    imdb[label="IMDb\ndatasets:\nimdb.com/\ninterfaces/" type="database"];
+    map_rating[label="Step 2:\nDisambiguate\nfilms\n\nPython+\nHeuristics+\nbz2" type="process"];
+    extended_dataset[label="Extended\nDataset\n\nFilm DNA+genres->\nrating" type="data"];
+    build_evaluator[label="Step 3:\nBuild\nSurrogate\nModel\n\npandas+\nsklearn (MLPRegressor)\n " type="process"];
+    evaluator[label="Surrogate model\n\nFilm DNA+genres->\nExpected\nRating\n\nMulti-layer\nPerceptron" type="tool"];
+    user[label="User's\nconstraints\nfor the\nSynthetic\nFilm DNA" type="data"];
+    dna_builder[label="Step 4:\nGenetic Algorithm\n\ninspyred+\ncachetools" type="process"];
+    trope_sequence[label="Optimal\nSynthetic\nFilm DNA" type="data"];
+
+    tvtropes -> scrape_tropes[minlen=0];
+    scrape_tropes -> dataset[minlen=1];
+    dataset -> map_rating;
+    imdb -> map_rating[minlen=0];
+    map_rating -> extended_dataset;
+    extended_dataset -> build_evaluator;
+    build_evaluator -> evaluator;
+    evaluator -> dna_builder;
+    user -> dna_builder[minlen=0];
+    dna_builder -> trope_sequence;
+}}'''
+
+draw_graphviz(workflow, "main_workflow_extended.pdf")
+@
+
+\begin{figure}[h!tbp]
+\centering
+\includegraphics[width=\textwidth]{figures/main_workflow_extended.pdf}
+\caption[Methodology]{Methodology to generate constrained optimal Film DNAs using Genetic Algorithms with Neural
+Networks as surrogate models, fed from TV Tropes and IMDb.\label{fig:main_workflow_extended}}
+\end{figure}
 
 <<echo=False>>=
 tropes_summary_dictionary = {}
@@ -95,7 +140,7 @@ for key in tropes_dictionary:
 films_summary_dataframe = pd.DataFrame(films_summary_dictionary).transpose()
 @
 
-\begin{figure}
+\begin{figure}[h!tbp]
     \centering
     \begin{subfigure}[b]{0.15\textwidth}
         \centering
@@ -166,7 +211,7 @@ to their usage in creations for digital entertainment. The data, however, is onl
 which is why, in order to make it usable by the scientific community, \cite{maltekiesel_2} extracted all
 their data to a database so-called \textit{DBTropes.org}.
 As the base of the research on automatic trope generation, we begun with a dataset based in the
-latest version of DBTropes, called PicTropes~\citep{garcia2018overview} that included 5,925 films with 18,270 tropes.
+latest version of DBTropes, called PicTropes~\cite{garcia2018overview} that included 5,925 films with 18,270 tropes.
 However, the last version of DBTropes is from 2016, and the community of users of TV Tropes has tripled the size
 of the database since then; in other words, we are not using it because it is outdated.
 If we work with the latest data from TV Tropes our machine learning algorithms
@@ -197,7 +242,7 @@ the distribution of evaluation errors, and during the experimental setup, in ord
 according to the observed bias.
 
 It is part of the current research to analyze the expected effect of this distribution
-in the results of applying our methodology.
+in the results of maketitleapplying our methodology.
 The first conclusion is that we have many more samples with a small number of tropes than with many;
 however, at this step we do not have enough information to elucidate if this situation is explained
 by the fact that it is user-generated data and the popularity
@@ -217,6 +262,8 @@ This work has been partially funded by projects DeepBio (TIN2017-85727-C4-2-P) a
 and ``Ayuda del Programa de Fomento e Impulso de la actividad Investigadora de la Universidad de C\'adiz''.
 
 \section{Bibliography}
+
+\bibliographystyle{abbrv}
 \bibliography{report}
 
 \end{document}
