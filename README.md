@@ -237,3 +237,10 @@ You have to do these in turn:
 
     invoke build-paper-latex-expert-systems-2019
     invoke build-paper-pdf-expert-systems-2019
+    
+If you have an old version of graphviz, this will issue some warnings
+which will be embedded in the final PDF. Just put
+
+    PYTHONWARNINGS="ignore" 
+    
+in front of the first command.

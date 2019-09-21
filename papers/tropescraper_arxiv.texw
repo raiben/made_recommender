@@ -1,0 +1,269 @@
+<<echo=False>>=
+import os
+import pandas as pd
+import scipy.stats  as stats
+import matplotlib.pyplot as plt
+import sys
+sys.path.append(os.getcwd())
+
+from utils import *
+
+FILM_TROPES_JSON_BZ2_FILE = '../datasets/scraper/cache/20190501/films_tropes_20190501.json.bz2'
+FILM_EXTENDED_DATASET_TABLE_BZ2_FILE = '../datasets/extended_dataset.csv.bz2'
+FILM_EXTENDED_DATASET_DICTIONARY_BZ2_FILE = '../datasets/extended_dataset.json.bz2'
+USE_HDF = True
+SCRAPER_LOG_FILE = '../logs/scrape_tvtropes_20190501_20190512_191015.log'
+MAPPER_LOG_FILE = '../logs/map_films_20190526_164459.log'
+EVALUATOR_BUILDER_LOG_FILE = '../logs/build_evaluator_20190624_223230.log'
+TOP_VALUES = 14
+EVERYTHING_BUT_TROPES = ['Id','NameTvTropes', 'NameIMDB', 'Rating', 'Votes', 'Year']
+EVALUATOR_HYPER_PARAMETERS_LOG_FILE = '../logs/build_evaluator_hyperparameters_20190622_203043.log'
+
+
+films_dictionary = read_compressed_json(FILM_TROPES_JSON_BZ2_FILE)
+tropes_dictionary = reverse_dictionary(films_dictionary)
+
+
+n_films = len(films_dictionary.keys())
+n_tropes = len(tropes_dictionary.keys())
+@
+
+\errorcontextlines=3
+\documentclass[a4paper,12pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{minted}
+\usepackage{graphicx} % Includegraphics
+\usepackage{hyperref} % url
+%\usepackage{moreverb}
+
+% -- begin: Added by Rubén
+\usepackage{subcaption}
+\captionsetup{compatibility=false}
+\usepackage{tabularx}
+\usepackage{ragged2e}
+\newcolumntype{L}{>{\raggedright\arraybackslash}X}
+% -- end: Added by Rubén
+
+
+\newcommand\BibTeX{{\rmfamily B\kern-.05em \textsc{i\kern-.025em b}\kern-.08em
+T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
+
+
+\begin{document}
+
+\title{Tropes in films: an initial analysis}
+
+\author{Rubén Héctor García-Ortega\thanks{Badger Maps, Granada} \and Pablo García-Sánchez\thanks{Department of Computer Science and Engineering, University of C\'adiz} \and JJ Merelo\thanks{University of Granada}}
+
+\maketitle
+
+\begin{abstract}
+Designing a story is widely considered a crafty yet critical task that requires deep specific human knowledge
+in order to reach a minimum quality and originality. This includes designing at a high
+level different elements of the film; these high-level elements are called tropes when they become patterns.
+The present paper proposes and evaluates a methodology to automatically synthesise sets of tropes
+in a way that they maximize the potential rating of a film that conforms to them.
+We use deep learning to create a surrogate model mapping film ratings from tropes,
+trained with the data extracted and processed from huge film databases in Internet,
+and then we use a Genetic Algorithm that uses that surrogate model as evaluator
+to optimize the combination of tropes in a film.
+In order to evaluate the methodology, we analyse the nature of the tropes and their distributions in existing films,
+the performance of the models and the quality of the sets of tropes synthesised.
+The results of this proof of concept show that the methodology works and is able to
+build sets of tropes that maximize the rating and that these sets are genuine.
+The work has revealed that the methodology and tools developed
+are directly suitable for assisting in the plots generation as an authoring tool
+and, ultimately, for supporting the automatic generation of stories, for example, in massively populated videogames.
+\end{abstract}
+
+{\bf Keywords}: Content Generation; Tropes; Computational Narrative; Deep Learning; Genetic Algorithms.
+
+
+\section{Step 1: Extraction of tropes} \label{sec:methodology_scraper}
+
+<<echo=False>>=
+workflow = f'''
+digraph {{
+    splines=polyline
+    rankdir=LR
+    ranksep=0.25;
+    margin=0;
+    nodesep=0.3;
+    graph [ resolution=128, fontsize=30];
+
+    node [margin=0 fontcolor=black fontsize=10 width=1];
+    tvtropes[label="TV Tropes\nwebsite\n\ntvtropes.org\n " type="database"];
+    scrape_tropes[label="Step 1:\nScrape tropes\n\nPython+\nrequests+\nlxml+\nbz2 (blocksize 900k)+\ndisk cache\n~11.900 pages" type="process"];
+    dataset[label="Dataset\n\nfilms->tropes\n({n_films}->{n_tropes})\n " type="data"];
+    imdb[label="IMDb\ndatasets:\nimdb.com/\ninterfaces/" type="database"];
+    map_rating[label="Step 2:\nDisambiguate\nfilms\n\nPython+\nHeuristics+\nbz2" type="process"];
+    extended_dataset[label="Extended\nDataset\n\nFilm DNA+genres->\nrating" type="data"];
+    build_evaluator[label="Step 3:\nBuild\nSurrogate\nModel\n\npandas+\nsklearn (MLPRegressor)\n " type="process"];
+    evaluator[label="Surrogate model\n\nFilm DNA+genres->\nExpected\nRating\n\nMulti-layer\nPerceptron" type="tool"];
+    user[label="User's\nconstraints\nfor the\nSynthetic\nFilm DNA" type="data"];
+    dna_builder[label="Step 4:\nGenetic Algorithm\n\ninspyred+\ncachetools" type="process"];
+    trope_sequence[label="Optimal\nSynthetic\nFilm DNA" type="data"];
+
+    tvtropes -> scrape_tropes[minlen=0];
+    scrape_tropes -> dataset[minlen=1];
+    dataset -> map_rating;
+    imdb -> map_rating[minlen=0];
+    map_rating -> extended_dataset;
+    extended_dataset -> build_evaluator;
+    build_evaluator -> evaluator;
+    evaluator -> dna_builder;
+    user -> dna_builder[minlen=0];
+    dna_builder -> trope_sequence;
+}}'''
+
+draw_graphviz(workflow, "main_workflow_extended.pdf")
+@
+
+\begin{figure}[h!tbp]
+\centering
+\includegraphics[width=\textwidth]{figures/main_workflow_extended.pdf}
+\caption[Methodology]{Methodology to generate constrained optimal Film DNAs using Genetic Algorithms with Neural
+Networks as surrogate models, fed from TV Tropes and IMDb.\label{fig:main_workflow_extended}}
+\end{figure}
+
+<<echo=False>>=
+tropes_summary_dictionary = {}
+for key in films_dictionary:
+    tropes_summary_dictionary[key] = {'tropes':len(films_dictionary[key])}
+
+tropes_summary_dataframe = pd.DataFrame(tropes_summary_dictionary).transpose()
+
+films_summary_dictionary = {}
+for key in tropes_dictionary:
+    films_summary_dictionary[key] = {'films':len(tropes_dictionary[key])}
+
+films_summary_dataframe = pd.DataFrame(films_summary_dictionary).transpose()
+@
+
+\begin{figure}[h!tbp]
+    \centering
+    \begin{subfigure}[b]{0.15\textwidth}
+        \centering
+        <%=print(get_table_for_dataframe(tropes_summary_dataframe.describe([.1,.2,.3,.4,.5,.6,.7,.8,.9]), fixed_width=True))%>
+        \caption{}
+        \label{fig:descriptive_analysis_tropes}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.4\textwidth}
+        \centering
+<<width="\\linewidth",echo=False, results='hidden'>>=
+plot = tropes_summary_dataframe.plot.hist(log=True, color='green', figsize=(5, 5.2), zorder=2, rwidth=0.5)
+plot.set_xlabel("Films by number of tropes")
+@
+        \caption{}
+        \label{fig:histogram_tropes}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.35\textwidth}
+        \centering
+        <%=print(get_table_for_dataframe(tropes_summary_dataframe.sort_values('tropes',ascending=False).head(TOP_VALUES), fixed_width=True))%>
+        \caption{}
+        \label{fig:top_tropes_films}
+    \end{subfigure}
+
+    \begin{subfigure}[b]{0.15\textwidth}
+        \centering
+        <%=print(get_table_for_dataframe(films_summary_dataframe.describe([.1,.2,.3,.4,.5,.6,.7,.8,.9]), fixed_width=True))%>
+        \caption{}
+        \label{fig:descriptive_analysis_films}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.4\textwidth}
+        \centering
+<<width="\\linewidth",echo=False, results='hidden'>>=
+plot = films_summary_dataframe.plot.hist(log=True, color='#1E77B4', figsize=(5, 5.2), zorder=2, rwidth=0.5)
+plot.set_xlabel("Tropes by number of films")
+@
+        \caption{}
+        \label{fig:histogram_films}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.35\textwidth}
+        \centering
+        <%=print(get_table_for_dataframe(films_summary_dataframe.sort_values('films',ascending=False).head(TOP_VALUES), fixed_width=True))%>
+        \caption{}
+        \label{fig:top_films_tropes}
+    \end{subfigure}
+    \caption{
+    \textbf{(a)} Descriptive analysis of the Tropes by appearance in films.
+    \textbf{(b)} Histogram of number of tropes by film (with logarithmic $y$ axis).
+    \textbf{(c)} Top films by number of tropes.
+    \textbf{(d)} Descriptive analysis of the tropes by number of films in which they appear.
+    \textbf{(e)} Histogram of number of films by tropes (with logarithmic $y$ axis).
+    \textbf{(f)} Top tropes by number of films.}
+    \label{fig:films_analysis}
+\end{figure}
+
+We are going to use tropes as described in a live wiki called \cite{tvtropes_2}, that is
+collecting thousand of descriptions and examples of tropes from 2014 until now.
+As the data is fed by a community
+of users, we could find the bias that popular films are better described and analysed in terms of the tropes
+than older or independent films, and that popular tropes are more recognised than very specific ones. % REFERENCE NEEDED - JJ
+Which means that, during the automatic generation of Film DNAs, tropes could be under/overrepresented,
+and that positive and negative estimation errors are possible.
+The semantic network of knowledge behind TV Tropes is huge and complex; it massively links hierarchies of tropes
+to their usage in creations for digital entertainment. The data, however, is only available through its web interface,
+which is why, in order to make it usable by the scientific community, \cite{maltekiesel_2} extracted all
+their data to a database so-called \textit{DBTropes.org}.
+As the base of the research on automatic trope generation, we begun with a dataset based in the
+latest version of DBTropes, called PicTropes~\cite{garcia2018overview} that included 5,925 films with 18,270 tropes.
+However, the last version of DBTropes is from 2016, and the community of users of TV Tropes has tripled the size
+of the database since then; in other words, we are not using it because it is outdated.
+If we work with the latest data from TV Tropes our machine learning algorithms
+would benefit from having much entries and hence, provide better results. That is why our first step is to
+extract the data directly from TV Tropes while making it available to the public
+and the researchers,
+in the context of the Open Science.
+
+Our scraper, which is also released as free software in the Python ecosystem under
+the {\tt tropescraper} name, and is also available from GitHub
+(\url{https://github.com/raiben/tropescraper}), %cite scraper
+extracts all the categories from the main
+categories page and, for every one of them, it extracts all the film identifiers assigned to it.
+Finally, for every film page, it extracts all the trope identifiers, building
+a dictionary of films and tropes.
+Trope identifiers are written in \textit{CamelCase} format and may include the year to avoid ambiguity.
+Some technical details are listed in Figure~\ref{fig:main_workflow_extended}.
+
+The resulting dataset includes <%=n_films%> \textit{Film DNAs} and <%=n_tropes%> tropes.
+In both cases, the number of tropes by film and film by tropes follow long tail distributions, where
+a large number of occurrences are far from the "head" or central part of the distribution,
+as shown in Figure~\ref{fig:films_analysis}.
+60\% of the films have 40 or less tropes
+but there are films with more than 800 tropes.
+On the other hand, most tropes appear in 6 films, but there are tropes with more than 3000 occurrences in films.
+These figures will have to be taken into account when we analyse the expected quality of the evaluator and
+the distribution of evaluation errors, and during the experimental setup, in order to make decisions
+according to the observed bias.
+
+It is part of the current research to analyze the expected effect of this distribution
+in the results of maketitleapplying our methodology.
+The first conclusion is that we have many more samples with a small number of tropes than with many;
+however, at this step we do not have enough information to elucidate if this situation is explained
+by the fact that it is user-generated data and the popularity
+defines how well described are the films in terms of tropes, but we can assume that, in general, that is the case.
+Furthermore, we cannot make out yet a relationship between the number of tropes
+in a film and its rating, but according to the Figure \ref{fig:films_analysis}c,
+the films with the highest number of tropes are mostly last-generation superhero movies
+are popular and broadly acclaimed by the critic,
+and that suggests a positive correlation between rating and number of tropes.
+However, as the next section complements the tropes with additional information,
+such as the rating, the genres or the number of votes,
+we will be in a position where we can find correlations
+that help us explain the possible results of the experiments in a better way.
+
+\section*{Acknowledgements}
+This work has been partially funded by projects DeepBio (TIN2017-85727-C4-2-P) and TEC2015-68752
+and ``Ayuda del Programa de Fomento e Impulso de la actividad Investigadora de la Universidad de C\'adiz''.
+
+\section{Bibliography}
+
+\bibliographystyle{abbrv}
+\bibliography{report}
+
+\end{document}
