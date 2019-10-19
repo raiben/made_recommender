@@ -254,16 +254,6 @@ def build_paper_pdf(context):
     run(command, hide=False, warn=True)
 
 @task
-def build_paper_pdf_arxiv(context):
-    print("Building pdf through pdflatex ...")
-    command = 'cd papers ' \
-              "&& pdflatex -shell-escape tropescraper_arxiv.tex " \
-              '&& bibtex tropescraper_arxiv ' \
-              "&& pdflatex -shell-escape tropescraper_arxiv.tex " \
-              "&& pdflatex -shell-escape tropescraper_arxiv.tex"
-    run(command, hide=False, warn=True)
-
-@task
 def open_paper(context):
     command = 'cd paper && open paper.pdf'
     run(command, hide=True, warn=True)
@@ -312,6 +302,36 @@ def build_paper_expert_systems_2019(context, documentation_mode=False):
     build_paper_latex_expert_systems_2019(context, documentation_mode)
     build_paper_pdf_expert_systems_2019(context)
 
+
+@task
+def build_paper_latex_arxiv(context, documentation_mode=False):
+    print("Building latex file and figures through pweave ...")
+    command = 'cd papers && pweave -f texminted tropescraper_arxiv.texw'
+
+    if documentation_mode:
+        command = command + ' -d'
+
+    run(command, hide=False, warn=True)
+
+@task
+def build_paper_pdf_arxiv(context):
+    print("Building pdf through pdflatex ...")
+    command = 'cd papers ' \
+              "&& pdflatex -shell-escape tropescraper_arxiv.tex " \
+              '&& bibtex tropescraper_arxiv ' \
+              "&& pdflatex -shell-escape tropescraper_arxiv.tex " \
+              "&& pdflatex -shell-escape tropescraper_arxiv.tex"
+    run(command, hide=False, warn=True)
+
+@task
+def build_paper_arxiv(context, documentation_mode=False):
+    """
+    Cleans and build the paper using pweave, pdflatex and bibtex.
+    Output file: report.pdf
+    """
+    clean_paper(context, documentation_mode)
+    build_paper_latex_arxiv(context, documentation_mode)
+    build_paper_pdf_arxiv(context)
 
 if __name__ == "__main__":
     import sys
