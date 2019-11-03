@@ -14,6 +14,8 @@
 \usemintedstyle{native}
 \definecolor{bg}{HTML}{282828}
 \setminted[python]{xleftmargin=0em, bgcolor=bg}
+\setminted[console]{xleftmargin=0em, bgcolor=bg}
+\setminted[json]{xleftmargin=0em, bgcolor=bg}
 %\usepackage{graphicx} % Includegraphics
 %usepackage{fancyvrb, color, graphicx, hyperref, amsmath, url}
 %\usepackage{palatino}
@@ -99,40 +101,58 @@ standards defined by the RFC 8259 (from now on, JSON),
 widespread, natively supported by the latest versions of Python or ECMAScript,
 and easily manageable in all modern languages.
 
-Tropescraper is built with the aim of reusability, extensibility and maintainability,
-for this reason, some techniques and methodologies have been selected for its development:
+By definition, a scraper is a fragile piece of software because it relies in the structure of web pages
+that can change for many different reasons. For this reason,
+tropescraper is built with the aim of reusability, extensibility and maintainability,
+and some techniques and methodologies have been selected for its development:
 \textit{SOLID principles}, \textit{Clean Code}, \textit{Clean Architecture} and TDD.
 The Diagram in figure~\ref{fig:architecture} shows the components arranged according to
-Clean Architecture:
-\begin{itemize}
-\item The interaction is started from the terminal, that launches the command scrape\-tvtropes.
-This command maps interfaces to implementations,
-so the \textit{use case} will be able to apply the \textit{Dependency Inversion} principle
-through a \textit{Service Locator} called ObjectFactory.
-By doing this, we can apply the \textit{Separation of Concerns} principle and keep different classes
-with Single Responsibility to perform the different actions that need to be done (scrape, cache, parse and store)
-while easing the maintainability and flexibility.
-\item The use case called TVTropesScraper has access to the ObjectFactory and the interfaces of the adaptors,
-so it can instantiate the implementations indirectly. It will use an instance of WebPageRetrieverInterface
-to retrieve the information from a web page, an instance CacheInterface to store in the cache,
-an instance of PageParserInterface to extract the information and an instance of TropesStoreInterface to build
-the resulting dataset. The main sequence includes:
-\item
-\begin{enumerate}
-\item Retrieving the categories catalog and cache it.
-\item Parsing the catalog and scrape the categories.
-\item Retrieving every category page and cache it.
-\item Parsing every category page and scrape the film names.
-\item Retrieving every film page and cache it.
-\item Parsing every film page and scrape the trope names.
-\item Store the dictionary of films and tropes.
-\end{enumerate}
+Clean Architecture. Down below, some decisions are explained in detail:
 
-\item WebPageRetriever connects to tvtropes.org and retrieves the page doing
-pauses in between calls so that the service is not harmed.
-\item FileCache stores every single page in the hard drive, as bzip2 with compression 9.
-\item TVTropesParser use selectors to retrieve information from specific nodes in the DOM tree.
-\item TropesStore saves the resulting dictionary of films and tropes as a compressed JSON.
+\begin{itemize}
+    \item the diagram shows three concentric circles that correspond to the Clean Architecture,
+    as proposed by Robert C. Martin. The inner circle includes interfaces, Data Transport Objects (entities)
+    and common utilities that are directly accessible by all the components, such as the ObjectFactory.
+    The second circle includes the only use case that has been implemented, called TVTropesScraper,
+    that implements the logic to extract the data and store it. The outer circle includes the connectors, adaptors,
+    facades and repositories, in other words, the so called \textit{details} that depend on \textit{third parties} and
+    can be easily replaceable. Finally, out of the circles, we can find main programs, tests, external services,
+    devices and UI.
+
+    \item The interaction is started from the terminal, that launches the command \textit{scrape\-tvtropes}.
+    This command maps interfaces to implementations,
+    so the \textit{use case} will be able to apply the \textit{Dependency Inversion} principle
+    through a \textit{Service Locator} called ObjectFactory.
+    By doing this, we can apply the \textit{Separation of Concerns} principle
+    and design \textit{Single Responsibility} classes
+    to perform the different actions that need to be done (scrape, cache, parse and store)
+    while easing the maintainability and flexibility.
+    The command also launches the use case that is the runnable class that orchestrates the business logic.
+
+    \item The use case called TVTropesScraper has access to the ObjectFactory and the interfaces of the adaptors,
+    so it can instantiate the implementations indirectly. It will use an instance of WebPageRetrieverInterface
+    to retrieve the information from a web page, an instance CacheInterface to store in the cache,
+    an instance of PageParserInterface to extract the information and an instance of TropesStoreInterface to build
+    the resulting dataset. The main sequence of this use case includes:
+
+    \begin{enumerate}
+        \item Retrieving the categories catalog and cache it.
+        \item Parsing the catalog and scrape the categories.
+        \item Retrieving every category page and cache it.
+        \item Parsing every category page and scrape the film names.
+        \item Retrieving every film page and cache it.
+        \item Parsing every film page and scrape the trope names.
+        \item Store the dictionary of films and tropes.
+    \end{enumerate}
+
+    \item WebPageRetriever connects to tvtropes.org and retrieves the page doing
+    pauses in between calls so that the service is not harmed.
+    \item FileCache stores every single page in the hard drive, as bzip2 with compression 9.
+    \item TVTropesParser use dom selectors to retrieve information from specific nodes in the HTML tree.
+    \item TropesStore saves the resulting dictionary of films and tropes as a compressed JSON.
+    \item The architecture can easily be extended with new adaptors that implement new features as required,
+    for example, volatile in-memory cache, threaded requests, different compression, adaptations to changes in the
+    web page structure, extraction of other items from TV Tropes, etc.
 \end{itemize}
 
 \begin{figure}
@@ -209,17 +229,52 @@ draw_graphviz(workflow, "modules_classes.pdf")
 % TODO Talk about tests and the python library ecosystem
 The tests are written in natural language and follow the FIRST principles.
 
-\section{Installation os tropescraper} \label{sec:installation}
+\section{Installation of tropescraper} \label{sec:installation}
 
-how to install pypi % TODO
+Attention: This tool uses python >= 3.6.
+
+If you want to use this tool, you don't need to download the sources
+or clone the repository. Just install the latest version through PyPi:
+
+\begin{minted}[mathescape, fontsize=\small, xleftmargin=0.5em]{console}
+pip install tropescraper
+\end{minted}
+
+This will create an executable called \textbf{scrape-tvtropes}.
 
 \section{Use of tropescraper} \label{sec:how_to_use}
 
-how to use % TODO
+Try to execute
+\begin{minted}[mathescape, fontsize=\small, xleftmargin=0.5em]{console}
+scrape-tvtropes
+\end{minted}
+
+The script can take some hours to finish, but don't worry,
+it can be stopped at any moment because it relies in file cache, so
+it will not try to re-download the same page twice even in
+different executions.
+
+The script will create a folder in the same directory called \textbf{scraper\_cache}
+with thousand of small compressed files that are internally used as cache.
 
 \section{Description of the generated dataset} \label{sec:extraction}
 
-description % TODO
+When the script finishes, it will generate a file called \textbf{tvtropes.json}
+with a JSON that contains all the films and the tropes found.
+The keys of the JSON file will be the identifiers of the films in TV Tropes, and the values
+will be lists of trope identifiers in TV Tropes. In both cases, identifiers will be  short camelCased versions of the
+name, that can include the year for disambiguation purposes.
+
+\begin{minted}[mathescape, fontsize=\small, xleftmargin=0.5em]{json}
+
+{
+  "<film_identifier>":[
+    "<trope_identifier>",
+    "<trope_identifier>"
+  ],
+  ...
+},
+\end{minted}
 
 \section{Analysis if the generated dataset} \label{sec:tools}
 
