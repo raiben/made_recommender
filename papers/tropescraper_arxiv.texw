@@ -18,6 +18,18 @@
 %usepackage{fancyvrb, color, graphicx, hyperref, amsmath, url}
 %\usepackage{palatino}
 
+<<echo=False>>=
+import pygraphviz as pgv
+import os
+
+def draw_graphviz(dot, filename):
+    G = pgv.AGraph()
+    G = G.from_string(dot)
+    G.layout(prog='dot')
+    if not os.path.isdir('figures'):
+        os.makedirs('figures')
+    G.draw(os.path.join('figures', filename))
+@
 
 \begin{document}
 
@@ -28,54 +40,188 @@
 \maketitle
 
 \begin{abstract}
-    We present the process to automatically extract all the tropes, grouped by film, from the TVTropes database through
-    the library tropescraper, how to interpret the results and how to manipulate and represent them using pandas,
-    and matplotlib.
+    The following technical report presents the free-software licensed library \textit{tropescraper},
+    a tool that automatically connects
+    to the wiki TVTropes and extracts the graph of films and tropes
+    to a standard-formatted output, up and running for scientific experiments.
+    It covers implementation details, input/outputs
+    and instructions on how to install the library via PyPI, how to use it and how to collaborate with the project.
+    The report also includes \textit{python code snippets} to manipulate the generated file
+    and pull out information from it making use of the libraries \textit{pandas} and \textit{matplotlib}.
+    As a practical example, the report uses them to compare how the data evolved
+    from July 2016, date of the latest official snapshot of \textit{DBTropes},
+    to November 2019, date of the latest extraction through tropescraper.
 \end{abstract}
 
 {\bf Keywords}: Tropes; TvTropes; tropescraper.
 
 \section{Motivations} \label{sec:problem}
 
-Researches on story generation can benefit from having all the tropes discovered for all the films.
+Researches on story generation can benefit from having a recent \textit{corpus}
+of tropes discovered in a generous amount film, actually, as large as possible,
+in a way that they can be efficiently processed and used in different experiments.
 
 \begin{enumerate}
-\item There is a wiki called TV Tropes that describes thousands of films and tropes,
-and has a prolific community to feed the data.
-\item A project called DBTropes had the goal to extract n-tuples from TV Tropes so they can be automatically processed,
-including, among many other interesting information, the tropes and the films.
-\item DB Tropes was discontinued in 2016 and the latest snapshot of the n-tuples was built in 2016-07-01.
-\item Recent publications still need to use the data from 2016 but would benefit from having updated information.
+\item There is a wiki called \textit{TV Tropes} that describes thousands % how many
+films and tropes, and has a prolific community that feeds the data.
+\item A project called \textit{DBTropes} had the goal to extract n-tuples from TV Tropes so they can be automatically processed,
+including, among much other interesting information, the tropes and the films.
+\item DB Tropes was discontinued in 2016 and the latest snapshot of the dataset of n-tuples was built July 1st, 2016.
+\item Recent publications still need to make use of the tropes by film and the latest dataset available is from 2016;
+however, they would benefit from having updated information.
 \end{enumerate}
 
-In order to fulfill the need to have an updated corpus of films and tropes,
-in 2019 we developed a library called tropescraper that:
+To fulfil the need of having an updated corpus of films and tropes,
+in 2019 we developed a library called \textit{tropescraper} that:
 \begin{enumerate}
-\item is able to connect to the wiki TV Tropes
-\item crawls through all the films and extract their tropes
-\item returns a small dataset in a standard format.
+\item can connect to the wiki TV Tropes,
+\item crawls through all the web pages of the films and extract their tropes,
+\item and returns a small dataset in a standard format.
 \end{enumerate}
 
-\section{The structure of the report}
+\section{About the report}
 
-The current report details how the library tropescraper is built, how to use it, how to interpret the results and
-how it can be analyzed.
-The report uses the technology called pweave that is able to execute python snippets inside latex documents,
-so the code examples are actually run and the output is real.
+The current report details how the library tropescraper is built, how to use it, how to install it,
+how to contribute to it, how to interpret the results and how they can be analyzed.
+The report uses the technology called \textit{pweave} that is able to execute python code snippets
+and generate graphs that are included into \LaTeX documents,
+so the code examples are actually being run at compilation time.
+
 The source of the report can be downloaded at
 \url{https://github.com/raiben/made_recommender/blob/master/papers/tropescraper_arxiv.texw}
 and can be re-run for further researches by the scientific community.
 
-\section{Design of the tool} \label{design}
-TODO
+\section{Design of tropescraper} \label{design}
 
-\section{Tropes extraction} \label{sec:extraction}
-TODO
+Tropescraper has been developed in python 3 because it allows fast-prototyping and offers facilities for
+web scraping. The resulting dataset accomplishes the \textit{JavaScript Object Notation}
+standards defined by the RFC 8259 (from now on, JSON),
+widespread, natively supported by the latest versions of Python or ECMAScript,
+and easily manageable in all modern languages.
 
-\section{Dataset interpretation} \label{sec:datase}
-TODO
+Tropescraper is built with the aim of reusability, extensibility and maintainability,
+for this reason, some techniques and methodologies have been selected for its development:
+\textit{SOLID principles}, \textit{Clean Code}, \textit{Clean Architecture} and TDD.
+The Diagram in figure~\ref{fig:architecture} shows the components arranged according to
+Clean Architecture:
+\begin{itemize}
+\item The interaction is started from the terminal, that launches the command scrape\-tvtropes.
+This command maps interfaces to implementations,
+so the \textit{use case} will be able to apply the \textit{Dependency Inversion} principle
+through a \textit{Service Locator} called ObjectFactory.
+By doing this, we can apply the \textit{Separation of Concerns} principle and keep different classes
+with Single Responsibility to perform the different actions that need to be done (scrape, cache, parse and store)
+while easing the maintainability and flexibility.
+\item The use case called TVTropesScraper has access to the ObjectFactory and the interfaces of the adaptors,
+so it can instantiate the implementations indirectly. It will use an instance of WebPageRetrieverInterface
+to retrieve the information from a web page, an instance CacheInterface to store in the cache,
+an instance of PageParserInterface to extract the information and an instance of TropesStoreInterface to build
+the resulting dataset. The main sequence includes:
+\item
+\begin{enumerate}
+\item Retrieving the categories catalog and cache it.
+\item Parsing the catalog and scrape the categories.
+\item Retrieving every category page and cache it.
+\item Parsing every category page and scrape the film names.
+\item Retrieving every film page and cache it.
+\item Parsing every film page and scrape the trope names.
+\item Store the dictionary of films and tropes.
+\end{enumerate}
 
-\section{Analyzing tools} \label{sec:tools}
+\item WebPageRetriever connects to tvtropes.org and retrieves the page doing
+pauses in between calls so that the service is not harmed.
+\item FileCache stores every single page in the hard drive, as bzip2 with compression 9.
+\item TVTropesParser use selectors to retrieve information from specific nodes in the DOM tree.
+\item TropesStore saves the resulting dictionary of films and tropes as a compressed JSON.
+\end{itemize}
+
+\begin{figure}
+\centering
+\includegraphics[width=\textwidth]{diagrams/tropescraper_architecture.pdf}
+\caption[Architecture]{Architecture of tvtropes\label{fig:architecture}}
+\end{figure}
+
+The different classes are detailed in the UML diagram in Figure~\ref{fig:classes}.
+
+<<echo=False>>=
+workflow = '''
+digraph "classes" {
+
+charset="utf-8"
+rankdir=BT
+ranksep=1;
+
+TVTropesScraper [label="{TVTropesScraper|cache_interface\lcache_path : NoneType\lfilms : NoneType, set\llatest_log_datetime : NoneType\llogger : NoneType\lobject_factory\lpage_parser_interface\lpage_retriever_interface\lparser\ltropes : NoneType, set\ltropes_by_film\lwait_time_between_calls_in_seconds : NoneType\l|export_to_json()\lget_info()\lget_tropes()\llog_summary()\l}", shape="record"];
+
+subgraph cluster_common{
+style="rounded";
+label="tropescraper.common";
+ObjectFactory [label="{ObjectFactory|DEFAULT_IMPLEMENTATION_MAP : dict\lMOCK_IMPLEMENTATION_MAP : dict\lT : T\l|clean_mocks()\lget_instance()\linstall_mock()\l}", shape="record"];
+}
+
+subgraph cluster_interfaces{
+style="rounded";
+label="tropescraper.interfaces";
+CacheInterface [label="{CacheInterface|\l|get()\lget_info()\lset()\l}", shape="record"];
+PageParserInterface [label="{PageParserInterface|\l|extract_categories()\lextract_films()\lextract_tropes()\lget_category_url()\lget_film_url()\lget_starting_url()\l}", shape="record"];
+WebPageRetrieverInterface [label="{WebPageRetrieverInterface|\l|retrieve()\l}", shape="record"];
+}
+
+subgraph cluster_adaptors{
+style="rounded";
+label="tropescraper.adaptors";
+FileCache [label="{FileCache|COMPRESSED_EXTENSION : str\lDEFAULT_CACHE_PATH : str\lDEFAULT_ENCODING : str\lEXTENSION : str\lcache_path : str\llogger : NoneType\l|get()\lget_info()\lset()\l}", shape="record"];
+TVTropesParser [label="{TVTropesParser|BASE_FILM_URL : str\lBASE_MAIN_URL : str\lFILM_RESOURCE : str\lLINK_ADDRESS_SELECTOR : str\lLINK_SELECTOR : str\lLINK_SELECTOR_INSIDE_ARTICLE : str\lMAIN_RESOURCE : str\lMAIN_SEARCH : str\l|extract_categories()\lextract_films()\lextract_tropes()\lget_category_url()\lget_film_url()\lget_starting_url()\l}", shape="record"];
+WebPageRetriever [label="{WebPageRetriever|DEFAULT_WAIT_TIME : float\llogger : NoneType\lwait_time_between_calls_in_seconds : float\l|retrieve()\l}", shape="record"];
+}
+
+subgraph cluster_tests{
+style="rounded";
+label="tropescraper.tests";
+FileCacheTestCase [label="{FileCacheTestCase|EXPECTED_CONTENT : str\lUNEXPECTED_CONTENT : str\lURL_KEY : str\lcache\ltemporal_directory_name : NoneType\l|setUp()\ltearDown()\ltest_get_when_key_found_then_returns_file_content()\ltest_get_when_key_not_found_then_returns_None()\ltest_set_when_key_does_not_exist_then_sets_content_in_new_file()\ltest_set_when_key_exists_then_file_content_updated()\l}", shape="record"];
+TVTropesParserTestCase [label="{TVTropesParserTestCase|SAMPLE_CATEGORY : str\lSAMPLE_FILM : str\lSAMPLE_TROPE : str\lparser\lretriever\l|setUp()\ltest_extract_categories_when_categories_page_retrieved_then_returns_the_tropes()\ltest_extract_categories_when_starting_page_retrieved_then_returns_categories()\ltest_extract_films_when_category_page_retrieved_then_returns_films()\l}", shape="record"];
+WebPageRetrieverTestCase [label="{WebPageRetrieverTestCase|\l|test_retrieve_when_called_then_returns_the_page()\l}", shape="record"];
+}
+
+FileCache -> CacheInterface [arrowhead="empty", arrowtail="none"];
+TVTropesParser -> PageParserInterface [arrowhead="empty", arrowtail="none"];
+WebPageRetriever -> WebPageRetrieverInterface [arrowhead="empty", arrowtail="none"];
+CacheInterface -> TVTropesScraper [arrowhead="diamond", arrowtail="none", fontcolor="green", label="", style="solid"];
+FileCacheTestCase -> FileCache [arrowhead="none", arrowtail="diamond", fontcolor="green", label="", style="solid"];
+ObjectFactory -> TVTropesScraper [arrowhead="diamond", arrowtail="none", fontcolor="green", label="", style="solid"];
+PageParserInterface -> TVTropesScraper [arrowhead="diamond", arrowtail="none", fontcolor="green", label="", style="solid"];
+TVTropesParserTestCase -> TVTropesParser [arrowhead="none", arrowtail="diamond", fontcolor="green", label="", style="solid"];
+TVTropesParserTestCase -> WebPageRetriever [arrowhead="none", arrowtail="diamond", fontcolor="green", label="", style="solid"];
+WebPageRetrieverInterface -> TVTropesScraper [arrowhead="diamond", arrowtail="none", fontcolor="green", label="", style="solid"];
+WebPageRetrieverTestCase -> WebPageRetriever [arrowhead="none", arrowtail="diamond", fontcolor="green", label="", style="solid"];
+}
+'''
+
+draw_graphviz(workflow, "modules_classes.pdf")
+@
+
+\begin{figure}
+\centering
+\includegraphics[width=\textwidth]{figures/modules_classes.pdf}
+\caption[Class Diagram]{UML Class Diagram\label{fig:classes}}
+\end{figure}
+
+% TODO Talk about tests and the python library ecosystem
+The tests are written in natural language and follow the FIRST principles.
+
+\section{Installation os tropescraper} \label{sec:installation}
+
+how to install pypi % TODO
+
+\section{Use of tropescraper} \label{sec:how_to_use}
+
+how to use % TODO
+
+\section{Description of the generated dataset} \label{sec:extraction}
+
+description % TODO
+
+\section{Analysis if the generated dataset} \label{sec:tools}
 
 Pre-conditions:
 \begin{enumerate}
