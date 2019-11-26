@@ -38,6 +38,9 @@ n_tropes = len(tropes_dictionary.keys())
 \usepackage{subcaption}
 \captionsetup{compatibility=false}
 \usepackage{tabularx}
+\usepackage{xcolor}
+\newcommand{\modification}[1]{{\color{blue}#1}}
+
 \usepackage{ragged2e}
 \newcolumntype{L}{>{\raggedright\arraybackslash}X}
 % -- end: Added by Rubén
@@ -56,8 +59,7 @@ T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
 
 \begin{document}
 
-%\title{Chasing compelling stories using deep learning and tropes}
-\title{StarTroper, a film trope rating optimizer using Deep Learning and Evolutionary Algorithms}
+\title{StarTroper, a film trope rating optimizer using \modification{Machine} Learning and Evolutionary Algorithms}
 
 \author[1]{Rubén Héctor García-Ortega}
 
@@ -83,7 +85,7 @@ in order to reach a minimum quality and originality. This includes designing at 
 level different elements of the film; these high-level elements are called tropes when they become patterns.
 The present paper proposes and evaluates a methodology to automatically synthesise sets of tropes
 in a way that they maximize the potential rating of a film that conforms to them.
-We use deep learning to create a surrogate model mapping film ratings from tropes,
+We use \modification{machine} learning to create a surrogate model mapping film ratings from tropes,
 trained with the data extracted and processed from huge film databases in Internet,
 and then we use a Genetic Algorithm that uses that surrogate model as evaluator
 to optimize the combination of tropes in a film.
@@ -95,13 +97,13 @@ The work has revealed that the methodology and tools developed
 are directly suitable for assisting in the plots generation as an authoring tool
 and, ultimately, for supporting the automatic generation of stories, for example, in massively populated videogames.}
 
-\keywords{Content Generation; Tropes; Computational Narrative; Deep Learning; Genetic Algorithms}
+\keywords{Content Generation; Tropes; Computational Narrative; Machine Learning; Genetic Algorithms}
 
 \jnlcitation{\cname{%
 \author{R.H. Garc\'ia-Ortega},
 \author{P. Garc\'ia-S\'anchez},
 \author{J.J. Merelo}} (\cyear{2019}),
-\ctitle{StarTroper, a film trope rating optimizer using Deep Learning and Evolutionary Algorithms}, \cjournal{}, \cvol{}.}
+\ctitle{StarTroper, a film trope rating optimizer using \modification{Machine} Learning and Evolutionary Algorithms}, \cjournal{}, \cvol{}.}
 
 \maketitle
 
@@ -120,21 +122,21 @@ In order to tackle this complexity in the current research we are going to to de
 and how well they combine and interact; our candidates for both mechanisms are the
 tropes that have been discovered in the films, and the massive human-evaluated ratings, respectively.
 
-A trope is as a recurring narrative device or pattern, according to the definition by \cite{baldick2015oxford};
+A trope is as a recurring narrative device or pattern, according to the definition by \citet{baldick2015oxford};
 it could be a technique, a motif, an archetype or a \textit{clich\'e},
 used by the script writers, producers and directors
 to achieve specific effects that might vary from interest-increasing
 to surprising through recall familiarity or entertaining,
 in their creative works, such as books, films, comics or videogames.
 Some tropes are broadly adopted and academically studied such as
-the \textit{Three-act Structure} formulated by \cite{field1982screenplay},
-the \textit{hero's journey} studied by \cite{vogler2007writer},
-the \textit{McGuffin} popularized by Hitchcock, according to \cite{truffaut1985hitchcock}, and
+the \textit{Three-act Structure} formulated by \citet{field1982screenplay},
+the \textit{hero's journey} studied by \citet{vogler2007writer},
+the \textit{McGuffin} popularized by Hitchcock, according to \citet{truffaut1985hitchcock}, and
 the \textit{Chekhov's Gun} formulated by the Russian writer with the eponymous
-name, according to \cite{bitsilli1983chekhov};
+name, according to \citet{bitsilli1983chekhov};
 however, there are thousands of not-so-widely used tropes as well, discovered and
 catalogued everyday by professionals and enthusiastic of the storytelling;
-their study is organic, dynamic and extensive, according to~\cite{garcia2018overview}.
+their study is organic, dynamic and extensive, according to~\citet{garcia2018overview}.
 In fact, their emergence, self-organization and pattern formation are difficult to model,
 implying they can be approached as a complex system  \citep{juarrero2000dynamics}.
 In general, we might say that the set of tropes defines the overall narrative
@@ -156,6 +158,8 @@ and model them from a mathematical perspective.
 The challenge of our research is to build original synthetic Film DNAs
 based on a huge corpus of film-tropes, and through computational intelligence,
 in a way that they have an intrinsic potential quality when reflected together in a film.
+\modification{Our technique to build synthetic Film DNAs can achieve \textit{combinational creativity} \citep{boden2004creative},
+because the generation of new Film DNAs is performed through the combination of old and familiar ideas.}
 
 At the same time, we need to be able to associate a measure of quality to the \textit{Film DNA}
 and it needs to summarize many factors, at last, perceived and evaluated by humans.
@@ -186,7 +190,7 @@ from external Data Sources
 and maps it to a database of film ratings and genres, dealing with disambiguation heuristics
 in order to build what we have called the \textit{extended dataset}.
 However, submitting a set of tropes to the box office is impossible, which is
-why we use Deep Learning \citep{lecun2015deep}
+why we use \modification{Machine} Learning \citep{lecun2015deep}
 to create surrogate models that are able
 to infer the rating from any combination of tropes.
 We perform different analysis in order to determine the quality
@@ -215,15 +219,15 @@ that generates instances of Russian folk tales~\citep{gervs:OASIcs:2013:4156}
 or stories and discourses with characters/places/objects relating to Iwate prefecture in Japan
 through micro/macro story techniques~\citep{6505320}.
 Other example of a popular narrative pattern widely used today is the \textit{hero's journey},
-proposed by~\cite{campbell2008hero}, first edited in 1949,
-and later on, reviewed from the perspective of the film industry by~\cite{vogler2007writer}.
+proposed by~\citet{campbell2008hero}, first edited in 1949,
+and later on, reviewed from the perspective of the film industry by~\citet{vogler2007writer}.
 It divides the story in 3 acts (\textit{departure}, \textit{initiation} and \textit{return}),
 with 17 non-mandatory stages that are the universal scaffolding of ancient myths as well as modern day adventures.
 The \textit{hero's journey} has been used for interactive storytelling in video games~\citep{delmas2007bringing},
 and massive backstories generation~\citep{GarciaOrtega16MADE2}.
 
 The Propp's formalism and the \textit{hero's journey}, as well as many other widely used narrative patterns, are included in the definition of trope.
-According to~\cite{mellina2011trope},
+According to~\citet{mellina2011trope},
 "a trope is a unit of literary currency, recurring in works over time and gaining meaning
 through audience recognition of its connotations and associations".
 Their work, is one of the inspiration sources of our current research, as they use the tropes from
@@ -239,7 +243,7 @@ However, in spite of having a similar base, their focus is the community detecti
 and ours is to use the dataset to predict the rating of Film DNAs.
 
 Other authors are using the tropes from TV Tropes in their research as well.
-In the work of \cite{Thompson18NarrativeEvents}, a system of agents relies on tropes to obtain a consistent narrative,
+In the work of \citet{Thompson18NarrativeEvents}, a system of agents relies on tropes to obtain a consistent narrative,
 to describe the social norms that model the world in which they live.
 The authors, as in this work, use tropes available on TV Tropes as a base
 and translate them into logic statements that express duty or obligation,
@@ -247,7 +251,7 @@ using TropICAL language, which are the input for a logic programming solver;
 however, they do not use all the tropes,
 but a small set chosen by hand, which means that the range of resulting stories
 is going to be limited.
-\cite{guarneri2017ghost} built an authoring tool that proposes the use of tropes according to a narration structure,
+\citep{guarneri2017ghost} built an authoring tool that proposes the use of tropes according to a narration structure,
 and takes the objects from the card Game 'Once upon a time'.
 They selected 94 elements out of 176 present in the Periodic Table of Tropes,
 a subset of the most famous tropes from TV Tropes.
@@ -255,26 +259,26 @@ a subset of the most famous tropes from TV Tropes.
 Nevertheless, it is very complicated to evaluate the content generated by an automatic generator,
 not only because of its non-deterministic behaviour that makes it difficult to predict its outputs,
 but also because of the subjective, diverse and stochastic nature of the audience,
-as stated by \cite{TogeliusCap4Evaluating}.
+as stated by \citet{TogeliusCap4Evaluating}.
 To evaluate a generator one can use directly the opinion of the designer,
-or indirectly from the audience, for example, using surveys, as in the work by \cite{guarneri2017ghost}.
+or indirectly from the audience, for example, using surveys, as in the work by \citet{guarneri2017ghost}.
 In our research, we are also interested in a smart use of the tropes within a story but,
-unlike \cite{guarneri2017ghost},
+unlike \citet{guarneri2017ghost},
 we are relying in Artificial Intelligence techniques
 by simulating and estimating the quality of the content via some metrics,
-while benefiting from the wisdom of collective opinions \citep(surowiecki2005wisdom) in IMDb for the rating.
-In their work, \cite{hsu2014predicting} used different prediction models for the film rating
+while benefiting from the wisdom of collective opinions \citep{surowiecki2005wisdom} in IMDb for the rating.
+In their work, \citet{hsu2014predicting} used different prediction models for the film rating
 from features of the films in IMDb and, according to their evaluations, the Neural Network gave the best results,
 in comparison with  linear combinations and multiple linear regressions.
 In our current research, we will apply the same idea of using a Neural Network as predictor,
 but fed from the film's tropes instead of from the film's features such as the director, actors or writers.
 In fact, through the use of user-generated data, it is possible to obtain a large corpus
-of examples to be used in computational narrative, as in the work of \cite{Guzdial15Crowdsourcing}.
+of examples to be used in computational narrative, as in the work of \citet{Guzdial15Crowdsourcing}.
 Moreover, it is possible to extract information about review
-sites, according to \cite{BoPang08OpinionMining}, such as MetaCritic or IMDb,
+sites, according to \citet{BoPang08OpinionMining}, such as MetaCritic or IMDb,
 to be the input of a model like the one we propose in this article.
 
-Some authors as \cite{bui2010evolving} have addressed the problem of the optimization of stories
+Some authors as \citet{bui2010evolving} have addressed the problem of the optimization of stories
 by applying evolutionary computation. In their work, they developed a regular grammar model with causal relationships
 and they evolve it, demonstrating that evolutionary computation can potentially contribute
 significantly to story generations.
@@ -460,7 +464,7 @@ plot.set_xlabel("Tropes by number of films")
     \label{fig:films_analysis}
 \end{figure}
 
-We are going to use tropes as described in a live wiki called \cite{tvtropes_2}, that is
+We are going to use tropes as described in a live wiki called \citet{tvtropes_2}, that is
 collecting thousand of descriptions and examples of tropes from 2014 until now.
 As the data is fed by a community
 of users, we could find the bias that popular films are better described and analysed in terms of the tropes
@@ -469,7 +473,7 @@ Which means that, during the automatic generation of Film DNAs, tropes could be 
 and that positive and negative estimation errors are possible.
 The semantic network of knowledge behind TV Tropes is huge and complex; it massively links hierarchies of tropes
 to their usage in creations for digital entertainment. The data, however, is only available through its web interface,
-which is why, in order to make it usable by the scientific community, \cite{maltekiesel_2} extracted all
+which is why, in order to make it usable by the scientific community, \citet{maltekiesel_2} extracted all
 their data to a database so-called \textit{DBTropes.org}.
 As the base of the research on automatic trope generation, we begun with a dataset based in the
 latest version of DBTropes, called PicTropes~\citep{garcia2018overview} that included 5,925 films with 18,270 tropes.
@@ -637,7 +641,6 @@ tropes will reach that average, but at least we know that we will be able to
 generate movies with good or excellent rating if we work with that specific number
 of tropes.
 
-% Long tail, not long queue - JJ
 There seems to be also a significant positive correlation between the number of
 tropes and the votes (popularity) as well, which
 might explain the long tail distributions in the previous step, Figure~\ref{fig:films_analysis};
@@ -692,7 +695,7 @@ The output is a continuous numeric value that represents the rating of the film,
 As the average number of tropes by film is 53, and the possible number of tropes is <%=n_tropes%>,
 99\% of the cells in the matrix will have a value of 0, in other words, it will be very sparse,
 with a small representation of the tropes in the catalogued films.
-The deep learning technique most suitable in this context needs to expose feature-extraction capabilities
+The \modification{machine} learning technique most suitable in this context needs to expose feature-extraction capabilities
 in order to deal with unknown and unbalanced relations between tropes to achieve a specific rating.
 Although there are different candidates that could perform properly under these circumstances,
 in our current research we choose a neural network \citep{schmidhuber2015deep}.
@@ -708,12 +711,12 @@ results may differ drastically depending on the nature of the problem and
 it is recommended to do a hyper-parameters evaluation. % TODO cite
 We selected the multi-layer perceptron (MLP), the most widespread neural network architecture,
 because it has been proven to be able to approximate any function that we require,
-the so called \textit{Universal Approximation Theorem} \cite{hornik1989multilayer}.
+the so called \textit{Universal Approximation Theorem} \citep{hornik1989multilayer}.
 In order to choose hyper-parameters that get along with the nature of our problem
 we did a preliminary search with all the combinations in a domain of possible values
 for the activation (ReLu or tanh), % define them. - JJ
 the number of hidden layers (1 or 2),
-the number of neurons in each layer (162 or 883/29) according to the geometric pyramid rule proposed by \cite{masters1993practical},
+the number of neurons in each layer (162 or 883/29) according to the geometric pyramid rule proposed by \citet{masters1993practical},
 the learning rate (constant or adaptive)
 and the solver (Adam or SGD). % No idea what is that. Define it - JJ
 We applied 3-fold cross validation and obtained the average and the standard deviation.
@@ -729,6 +732,9 @@ gridsearch_dataframe = extract_grid_parameters_from_log_and_results(log_file_nam
     \label{fig:gridsearch_results}
 \end{table}
 %
+
+\modification{The \textit{validation score} is the mean of the scores of the model trained with 90\% of the data (training data),
+against 10\% of the data not used for training (validating data) for every k-fold.}
 The results in Table~\ref{fig:gridsearch_results} show that
 a MLP with the structure <%='/'.join(layers)%>, using ReLu activation,
 constant learning rate and SGD solver provides the best validation score.
@@ -889,29 +895,83 @@ more chances to under or over-evaluate, and the rating will be less accurate.
 We also use a fixed length chromosome because at this stage we were only
 interested in a proof of concept and, otherwise, the results  could be harder to explain and interpret.
 
-The most suitable parameters to solve a specific problem require an extensive calibration, which is outside
-of the scope of this paper. However, to choose the set of parameters that we will use in all the experiments
-in this paper, we have made a preliminary selection executing 30 times every possible combination of Population (P) = \{50, 100, 200\},
-Mutation probability (Mp) = \{\(2\div size_{dna}\), \(1\div size_{dna}\), \(0.5\div size_{dna}\)\}
-and Crossover Probability (Cp) = \{0.25, 0.5, 0.75\}
-and we have chosen the combination P = 200, Mp = \(1\div size_{dna}\) , Cp = 0.5, because it obtains better results on average.
-In the experiments we have set the stop criterion to a minimum of 3000 evaluations and
-until the best generation does not improve during 10000 evaluations.
-We will run the GA 30 times with different random seeds and
+\modification{Our decision to use an evolutionary algorithm implies that
+we adopt the decision of having a population, manipulated by selection,
+recombination, and mutation operators \citep{eiben2011parameter}, that's why we need to focus on
+the parameters Population size ($\mu$), Mutation rate ($p_m$) and Crossover rate ($p_c$).
+However,}  the most suitable parameters to solve a specific problem require an extensive calibration, which is outside
+of the scope of this paper. \modification{For this reason}, to choose the set of parameters that we will use in all the experiments
+in this paper, we have made a preliminary selection \modification{from combinations of values of Population size ($\mu$),
+Mutation rate ($p_m$) and Crossover rate ($p_c$) chosen through rules of the thumb,
+so we can test the methodology with a decently parameterised Genetic Algorithm.
+The Population size candidates are 50, the \textit{de facto} value suggested by \citet{de1990analysis},
+100, the default value in the library inspyred \citep{LibraryR37}
+and 200, the next element in the exponential series.
+The Mutation rate candidates, circle the popular idea of having 1 mutation per locus,
+also proposed formally by \citet{harvey2001artificial}, in our case $1\div size_{dna} = 0.0\widehat{3}$.
+We include as candidates the previous value divided by 2 ($0.5\div size_{dna} = 0.01\widehat{6}$)
+and multiplied by 2 ($2\div size_{dna} = 0.0\widehat{6}$).
+The Crossover rate candidates include 0.75, 0.5 and 0.25, so we explore different convergence alternatives,
+from high to slow, that will perform better or worst depending on the nature and complexity of the search space.
+In summary, we explore how the Genetic Algorithm performs changing the values of 3 parameters
+and we choose 3 candidates for each one based on widely adopted rules of the thumb,
+that leads to 27 possible combinations to tests, each one run 30 times, that is translated to 810 runs.
+As stated previously, we aware that our research may have limitations due the lack of more fine parameter tuning,
+specially because the parameter values can largely influence the performance of the algorithm
+\citep{eiben2011parameter}, but our first selection aims
+to be a first working approach with a decent number of combinations and execution time,
+avoiding the exponential effect of having more variables and values.
+
+We executed }  30 times every possible combination of Population size \modification{($\mu$)} = \{50, 100, 200\},
+Mutation probability \modification{($p_m$)} = \{\(2\div size_{dna}\), \(1\div size_{dna}\), \(0.5\div size_{dna}\)\}
+and Crossover Probability \modification{($p_c$)} = \{0.25, 0.5, 0.75\} in order to achieve minimal statistical significance.
+The results in graph XX show that the combination \modification{$\mu$} = 200, \modification{$p_m$} = \modification{$0.5\div size_{dna}$} and \modification{$p_m$} = \modification{0.25},
+obtains better results on average.
+
+\modification{Each run performs a minimum of 3000 evaluations and the stop criterion is set to not improve
+the best generation during 10000 evaluations, both values set after empirical trials and errors.
+The experimental setup described is summarized in Table \ref{fig:ga_setup} to improve the readability of the paper.}
+
+<<echo=False>>=
+ga_setup_dictionary = {
+    "Parameter": ["Population size ($\mu$)","Mutation probability ($p_m$)", "Crossover probability ($p_c$)", "Minimum number of evaluations", "Stop criterion", "Number of runs"],
+    "Value": ["$200$", "$0.5\div size_{dna} = 0.01\widehat{6}$", 0.25, 3000, "No improvements in the population in the last 10000 evaluations",30]
+}
+
+ga_setup_dataframe = pd.DataFrame.from_dict(ga_setup_dictionary)
+@
+
+\begin{table}
+    \modification{
+    \centering
+<%=print(get_table_for_dataframe(ga_setup_dataframe))%>
+    \caption{Experimental Setup of the Genetic Algorithm}
+    \label{fig:ga_setup}
+    }
+\end{table}
+
+For the experiments, we will run the GA 30 times with different random seeds and
 we will select the run that gives the highest fitness in order to analyse it.
 
 As previously stated, a set of tropes is not a full-fledged film, so we need to have an idea of what a movie
 with that set of tropes would look like. This is why, as tools to interpret the results,
 we will use metrics of similarity between finite sample sets.
-The first one is a metric called \textit{Jaccard coefficient}
-and is defined as the cardinality of the intersection of Film DNAs divided by the cardinality of the union of the Film DNAs.
+The first one is a metric called \textit{Jaccard coefficient} \modification{($C_{j}$), a metric that can successfully
+used for keywords similarity \citep{niwattanakul2013using}},
+and is defined as the cardinality of the intersection of Film DNAs \modification{($T_A$ and $T_B$)} divided by the cardinality of the union of the Film DNAs.
+
+\modification{
+\[ C_{j}(T_A,T_B) = \frac{| T_A  \cap T_B |}{|T_A  \cup T_B|} \]
+}
 The Jaccard coefficient is interesting to measure not only what two sets have in common,
 but also, how different their sizes are, penalizing big differences in length of the sets.
 However, as we will be comparing our synthesised Film DNA of a fixed size of 30,
 popular films with hundred of tropes will be penalized just because they are too broadly described in comparison;
-In order to address this problematic, we will also use a coefficient based only in the common elements
-and is defined as the intersection between the sets divided by the length of our synthetic Film DNA.
-% TODO Citar las métricas
+In order to address this problematic, we will also use a coefficient based only in the common elements \modification{($C_{c}$)}
+and is defined as the intersection between the sets.
+\modification{
+\[C_{c}(T_A,T_B) = |T_A  \cap T_B| \]
+}
 
 \section{Results}
 
@@ -924,6 +984,7 @@ because the estimation will benefit from considering the genres as features, spe
 
 The repetition of the GA 30 times has resulted in an average fitness of <%=human_readable(9.783487634688873)%>
 (+-<%=human_readable(0.4307202616394516)%>). % average over what? Best of every run? - JJ
+
 The best solution across all runs has a rating of <%=human_readable(10.313031174658876)%> and a Film DNA with the following tropes.\\
 % Please check these comments and the change above - JJ
 
@@ -1165,6 +1226,16 @@ or even massively generating film DNAs that share common tropes, leading to
 backstories that cross in time, and ultimately,
 can help us populate the virtual world of a videogame.
 
+\modification{As stated in the introduction, the presented technique can reach
+\textit{combinational creativity}, making use of old and familiar tropes to build new Film DNAs.
+However, more complex creativity types such as the \textit{exploratory creativity} or the \textit{transformational creativity}
+could only be tackled through the decomposition of tropes in concepts and the categorization of tropes,
+requiring more elaborated techniques to extract information from natural language sentences found in TV Tropes.
+Being able to to extract these concepts from the tropes and
+using them to build new tropes, in other words, enhancing our world-knowledge,
+would result in natural constraints, according to \citet{boden2009creativity}, to generate more interesting tropes,
+achieving higher levels of creativity.}
+
 The surrogate model could be improved as well in any number of different ways;
 in order to simplify the arithmetic of tropes/genres in the set and explain hidden relations between them,
 further researches could implement a technique
@@ -1174,6 +1245,10 @@ the ones that share common contexts in the corpus are located close in the space
 Also, the quality of the dataset could be improved by applying techniques to reduce the dimensionality,
 such as \textit{principal components analysis} and \textit{feature selection},
 improving the performance of the evaluator.
+\modification{TV Tropes also offers information of sub and super tropes, allowing buolding
+a directed graph of categories that includes cycles;
+using this information during the creation of the model could enrich it, providing new tools to reduce noisy tropes
+and filling in the gaps of the missing ones during the data wangling phase.}
 
 Finally, any further research focused in automating the translation of tropes to
 coherent actions in a virtual world would be a decisive contribution to make the

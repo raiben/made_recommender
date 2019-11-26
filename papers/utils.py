@@ -69,6 +69,12 @@ def get_table_for_dataframe(df, fixed_width=None, **kwargs):
         latex_code = latex_code.replace('[GENRE]','')
     return latex_code
 
+def get_tabularx_for_dataframe(df, **kwargs):
+    latex_code = tabulate(df, headers=df, tablefmt='latex_raw', **kwargs)
+    latex_code = latex_code.replace('%', '\\%')
+    latex_code = latex_code.replace('\\begin{tabular}', '\\begin{tabularx}')
+    latex_code = latex_code.replace('\\end{tabular}', '\\end{tabularx}')
+    return latex_code
 
 def tex_wrap_and_escape(text, length=40):
     if isinstance(text, str):

@@ -18,82 +18,133 @@ The authors.
 
 Reviewer(s)' Comments to Author:
 
------------
+--------------------------------------
 Reviewer: 1
------------
+--------------------------------------
 
 Comments to the Author (Please refer to the instructions above)
 1.      The main topic concerns a methodology to be “used to synthesise an optimal Trope DNA for a standard movie in terms of potential rating”.
 2.      The “Introduction” and “State of the art” items contextualizes the focus of the research and supports adequately the proposed approach. The “Methodology” item is also very well organized in 4 interrelated steps. The “Experimental setup” item is too short in order to carry out the main advantages of the approach.
---------------------------------------
-RESPONSE TO REVIEWER:
---------------------------------------
-(Si añadimos más resultados al experimento como dice el R2, lo pondremos aquí también)
---------------------------------------
+
+>>>>>>>>>>>>>>>>>>>>>
+Response to reviewer:
+---------------------
+We agree that the Experimental Setup could be explained in a better way.
+We have extended it by providing the reasons behind this parameter selection,
+explaining the parameters, the candidate values, the limitations and the goal of the preliminary analysis.
+We also consider that the paper would benefit from having a table that summarizes the values selected.
+Finally, the two coefficients are explained in a better way, including references and formula.
+<<<<<<<<<<<<<<<<<<<<<
+
+
 3.      The results are satisfactory and the study is supported in an adequate bibliography.
---------------------------------------
-RESPONSE TO REVIEWER:
---------------------------------------
+
+>>>>>>>>>>>>>>>>>>>>>
+Response to reviewer:
+---------------------
 We would like to thank the reviewer for his suggestions, and hope that the new modifications have improved the quality of the paper.
+<<<<<<<<<<<<<<<<<<<<<
+
+
+
+
 --------------------------------------
-
-
-
-
-
------------
 Reviewer: 2
------------
+--------------------------------------
 
 Comments to the Author (Please refer to the instructions above)
 This paper presents a method for the computational analysis of the links between film ratings and a database of tropes and genres describing films. This is used both analytically, to understand the links between tropes and how the films have been rated, and synthetically, searching for a combination of tropes that the predictive system suggests would receive a high rating.
 
 The idea is an interesting one. There is a developing body of work that attempts to analyse large databases of media works (whether through features or metadata) for connections with features such as audience rating - the "hit song science" work being the most well known. This paper makes a contribution towards the - currently rather small - set of work that applies this to films. The authors have demonstrated a good knowledge of the existing body of work in the area,
---------------------------------------
-RESPONSE TO REVIEWER
---------------------------------------
-Thanks for the kind words and positive assessment. Next we indicate the changes made in the paper to address the reviewer's remarks
---------------------------------------
+
+>>>>>>>>>>>>>>>>>>>>>
+Response to reviewer:
+---------------------
+We thank the reviewer for the kind words and positive assessment.
+Next we indicate the changes made in the paper to address the reviewer's remarks
+<<<<<<<<<<<<<<<<<<<<<
 
 
 It is an interesting question whether this has any prima facie justification. It could be argued that the tropes are too abstract, and the success of combinations of them too dependent on the specific realisation in a particular film, for work such as this to be at all meaningful. The authors address this specific criticism, both in broad discursive terms but also in some of the experimental work that shows some predictive ability on ratings for the use of tropes to predict rating.
 
 The prima facie argument for the synthetic part of the paper is on less steady ground. It could be argued that creating interesting new works will inevitably require new ways of combining tropes, which are not evident from the existing dataset (perhaps there are connections here with Boden's idea of "exploratory"/"combinational" creativity vs. "transformative" creativity). It would be good to see a brief discussion of this.
 
+>>>>>>>>>>>>>>>>>>>>>
+Response to reviewer:
+---------------------
+We agree that the discussion would be enriched by bringing ideas from Boden's typology.
+In the introduction, we mention that, due to its nature, our approach uses combinational creativity. Also,
+in the conclusions, enclosed in the future-works paragraphs, we point out that, using more sophisticated techniques
+to extract elements from the tropes and categories, we could be able to build new tropes, that would
+lead to higher levels of creativity.
+<<<<<<<<<<<<<<<<<<<<<
+
 The authors present their new work well. They are honest about the complexity of the dataset - in particular, the fact that films are tagged with very variable numbers of tropes, and that the tagging is biased by levels of interest in the films. I wonder if there is also some comment to be made about the possible use of hierarchies of tropes and connections between tropes ("related" tropes).
+
+>>>>>>>>>>>>>>>>>>>>>
+Response to reviewer:
+---------------------
+The reviewer points out a very interesting issue. Actually, the research started using the categories, but we
+discovered that the hierarchy was not following a tree-based structure but a directed graph with cycles, and it went out of scope.
+We have brought it to the discussions as well, because considering the categories to remove noisy tropes or fill in the gaps
+of the missing ines during the data wangling phase could improve the quality of future models.
+<<<<<<<<<<<<<<<<<<<<<
+
 
 The production of the dataset is clearly explained, and it is a good feature of the paper that the code and data are available for other researchers. It is very good to see a thorough discussion of data preparation and cleaning - this is a really important part of this, and it doesn't always get well considered in papers.
 
 (there is scope for more analysis of the trope vector space - e.g. using LDA or PCA - but, I would not insist on this being done in this paper)
 
-The two experiments are decently described. The first uses a neural network to map between sets of tropes (using an n-hot encoding) and the ratings. This would benefit from a clearer explanation of what "validation score" means. I would consider changing the description of this here (and in the title) as "deep learning" because most of the networks used have only one, and at most two, hidden layers.
---------------------------------------
-RESPONSE TO REVIEWER
---------------------------------------
+>>>>>>>>>>>>>>>>>>>>>
+Response to reviewer:
+---------------------
+The reviewer is right about this kind of analysis. We will work on them in the future.
+<<<<<<<<<<<<<<<<<<<<<
 
---------------------------------------
+
+The two experiments are decently described. The first uses a neural network to map between sets of tropes (using an n-hot encoding) and the ratings. This would benefit from a clearer explanation of what "validation score" means. I would consider changing the description of this here (and in the title) as "deep learning" because most of the networks used have only one, and at most two, hidden layers.
+
+>>>>>>>>>>>>>>>>>>>>>
+Response to reviewer:
+---------------------
+The reviewer had a point. We explained the meaning of the "validation score" as "the mean of the scores of the model
+trained with 90% of the data (training data), against 10% of the data not used for training (validating data) for every
+k-fold". The reflexion about the term deep learning is also interesting, and right. As we are only using 1 and 2 hidden
+layers in the experiments, it is more accurate to use the term "Machine Learning".
+We replaced this term in the title and along the article.
+<<<<<<<<<<<<<<<<<<<<<
 
 The second experiment uses a GA to search for combinations of features (tropes) that the surrogate rater considers would lead to a high rating. This works fine, but the analysis is rather thin. There is a single example given of the best-rated example, and a hypothetical example of a film that followed that combination of tropes is sketched out - this is a rather weak "just so story", and aspects that don't match well (e.g. the 8 genre predictions) are not very well discussed. It would have been good to see a few examples both of good and bad examples - perhaps 10 of the best rated, and then 5 of the weakest ones. Whilst still rather subjective, this would allow the reader to test this against their ideas of what makes a coherent trope set. Something that I thought was very strong is that the analysis contains an analysis of how different the generated examples are from the examples in the training set - this is really important and is often (shockingly!) neglected in papers on these topics.
---------------------------------------
-RESPONSE TO REVIEWER
---------------------------------------
 
---------------------------------------
+>>>>>>>>>>>>>>>>>>>>>
+Response to reviewer:
+---------------------
+TODO:
+<<<<<<<<<<<<<<<<<<<<<
 
 The paper is written in decent (though not native-speaker standard) scientific English, and has a very clear structure.
 
-Overall, this is a decent paper in an emerging area of study. I have some doubts about whether this can really tell us anything useful and meaningful, but it is a good first attempt at exploring this space and should lead on to more rigorous methodologies in the future.
---------------------------------------
-RESPONSE TO REVIEWER
---------------------------------------
+>>>>>>>>>>>>>>>>>>>>>
+Response to reviewer:
+---------------------
+We thank the reviewer for pointing this out. We have taken advantage of this second chance to improve the article
+and we have fixed some errata, apart from the changes suggested by the reviewers. We have set them all in blue color.
+<<<<<<<<<<<<<<<<<<<<<
 
---------------------------------------
+Overall, this is a decent paper in an emerging area of study. I have some doubts about whether this can really tell us anything useful and meaningful, but it is a good first attempt at exploring this space and should lead on to more rigorous methodologies in the future.
+
+>>>>>>>>>>>>>>>>>>>>>
+Response to reviewer:
+---------------------
+We agree that this area is promising but more work needs to be done in order to get aplicable results.
+<<<<<<<<<<<<<<<<<<<<<
 
 minor corrections:
 p1. "according to ois Truffaut" to "according to Truffaut"
 p3. correct "(?)surowiecki"
---------------------------------------
-RESPONSE TO REVIEWER
---------------------------------------
 
---------------------------------------
+>>>>>>>>>>>>>>>>>>>>>
+Response to reviewer:
+---------------------
+We appreciate that the reviewer found these errata. They both were Latex-related.
+<<<<<<<<<<<<<<<<<<<<<
