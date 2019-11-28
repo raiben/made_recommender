@@ -155,7 +155,7 @@ and model them from a mathematical perspective.
 The challenge of our research is to build original synthetic Film DNAs
 based on a huge corpus of film-tropes, and through computational intelligence,
 in a way that they have an intrinsic potential quality when reflected together in a film.
-\modification{Our technique to build synthetic Film DNAs can achieve \textit{combinational creativity} \citep{boden2004creative},
+\modification{Our technique to build synthetic Film DNAs can achieve \textit{combinational creativity} \citep{boden2004creative}
 because the generation of new Film DNAs is performed through the combination of old and familiar ideas.}
 
 At the same time, we need to be able to associate a measure of quality to the \textit{Film DNA}
@@ -909,7 +909,7 @@ In summary, we explore how the Genetic Algorithm performs changing the values of
 and we choose 3 candidates for each one based on widely adopted rules of the thumb,
 that leads to 27 possible combinations to tests, each one run 30 times, that is translated to 810 runs.
 As stated previously, we aware that our research may have limitations due the lack of more fine parameter tuning,
-specially because the parameter values can largely influence the performance of the algorithm
+especially because the parameter values can largely influence the performance of the algorithm
 \citep{eiben2011parameter}, but our first selection aims
 to be a first working approach with a decent number of combinations and execution time,
 avoiding the exponential effect of having more variables and values.
@@ -920,8 +920,8 @@ and Crossover Probability \modification{($p_c$)} = \{0.25, 0.5, 0.75\} in order 
 The results in graph XX show that the combination \modification{$\mu$} = 200, \modification{$p_m$} = \modification{$0.5\div size_{dna}$} and \modification{$p_m$} = \modification{0.25},
 obtains better results on average.
 
-\modification{Each run performs a minimum of 3000 evaluations and the stop criterion is set to not improve
-the best generation during 10000 evaluations, both values set after empirical trials and errors.
+\modification{Each run performs a minimum of 3,000 evaluations and stops when
+the best generation has not improved during 10,000 evaluations, both values set after empirical trials and errors.
 The experimental setup described is summarized in Table \ref{fig:ga_setup} to improve the readability of the paper.}
 
 <<echo=False>>=
@@ -978,7 +978,7 @@ because the estimation will benefit from considering the genres as features, spe
 \modification{We run the GA 30 times with different random seeds, obtaining 30 solutions (the best synthetic Film DNA of each run).
 Figure \ref{fig:ratings_30_runs}.b shows a boxplot of the potential rating of the solutions
 with an average of <%=human_readable(9.783487634688873)%> (+-<%=human_readable(0.4307202616394516)%>),
-that confirms the GA is able to evolve solutions to very high potential ratings.
+that confirms that the GA can evolve solutions to very high potential ratings.
 
 In order to confirm the originality of the solutions, we calculate the Jaccard and Common similarity coefficients
 among all the different pairs of synthetic Film DNAs for the 30 solutions (435),
@@ -987,8 +987,8 @@ and among all the different pairs of synthetic and existing film DNAs in our cor
 what we call \textit{inter-corpus} coefficients in Figure \ref{fig:common_1}. As we can observe, the synthetic films generated through our
 methodology and our current configurations are more similar between themselves (<%=human_readable(0.144531)%>)
 than among the existing films (<%=human_readable(0.012018)%>),
-that confirms that the results are original in terms of previous work. Without more constraints, the GA is able to reach
-local optimal regardless the different paths followed through the search space, reaching in some cases the exact same solution,
+that confirms that the results are original in terms of previous work. Without more constraints, the GA can reach
+local optimal regardless of the different paths followed through the search space, reaching in some cases the same solution,
 as reflected by a maximum similarity of 1.
 
 <<echo=False>>=
@@ -1052,9 +1052,9 @@ plt.yscale('log')
 
     \caption{\modification{\textbf{(a)} Rating distribution of the synthetic Film DNAs (30 runs).
     \textbf{(b)} Distribution of the \textit{Jaccard coefficients} ($C_{j}$) for all pair combinations in
-                 the synthetic Film DNA set (intra-synthetic) and compared to the corpus of existing Film DNAs (inter-corpus), with logarithmic $y$ axis.
+                 the synthetic Film DNA set (intra-synthetic) and compared to the corpus of existing Film DNAs (inter-corpus), with a logarithmic $y$-axis.
     \textbf{(c)} Distribution of the \textit{Common Elements coefficients} ($C_{c}$) for all pair combinations in
-                 the synthetic Film DNA set (intra-synthetic) and compared to the corpus of existing Film DNAs (inter-corpus), with logarithmic $y$ axis.
+                 the synthetic Film DNA set (intra-synthetic) and compared to the corpus of existing Film DNAs (inter-corpus), with a logarithmic $y$-axis.
     \textbf{(d)} Descriptive analysis of the ratings.
     \textbf{(e)} Descriptive analysis  of the \textit{Jaccard coefficients} ($C_{j}$) for all pair combinations in
                  the synthetic Film DNA set (intra-synthetic) and compared to the corpus of existing Film DNAs (inter-corpus).
@@ -1305,7 +1305,7 @@ can help us populate the virtual world of a videogame.
 However, more complex creativity types such as the \textit{exploratory creativity} or the \textit{transformational creativity}
 could only be tackled through the decomposition of tropes in concepts and the categorization of tropes,
 requiring more elaborated techniques to extract information from natural language sentences found in TV Tropes.
-Being able to to extract these concepts from the tropes and
+Being able to extract these concepts from the tropes and
 using them to build new tropes, in other words, enhancing our world-knowledge,
 would result in natural constraints, according to \citet{boden2009creativity}, to generate more interesting tropes,
 achieving higher levels of creativity.}
@@ -1319,7 +1319,7 @@ the ones that share common contexts in the corpus are located close in the space
 Also, the quality of the dataset could be improved by applying techniques to reduce the dimensionality,
 such as \textit{principal components analysis} and \textit{feature selection},
 improving the performance of the evaluator.
-\modification{TV Tropes also offers information of sub and super tropes, allowing buolding
+\modification{TV Tropes also offers information of sub and super tropes, allowing building
 a directed graph of categories that includes cycles;
 using this information during the creation of the model could enrich it, providing new tools to reduce noisy tropes
 and filling in the gaps of the missing ones during the data wangling phase.}
