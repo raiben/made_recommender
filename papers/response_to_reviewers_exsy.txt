@@ -42,7 +42,7 @@ Finally, the two coefficients are explained in a better way, including reference
 >>>>>>>>>>>>>>>>>>>>>
 Response to reviewer:
 ---------------------
-We would like to thank the reviewer for his suggestions, and hope that the new modifications have improved the quality of the paper.
+We would like to thank the reviewer for his suggestions and hope that the new modifications have improved the quality of the paper.
 <<<<<<<<<<<<<<<<<<<<<
 
 
@@ -61,7 +61,7 @@ The idea is an interesting one. There is a developing body of work that attempts
 Response to reviewer:
 ---------------------
 We thank the reviewer for the kind words and positive assessment.
-Next we indicate the changes made in the paper to address the reviewer's remarks
+Next, we indicate the changes made in the paper to address the reviewer's remarks
 <<<<<<<<<<<<<<<<<<<<<
 
 
@@ -84,10 +84,10 @@ The authors present their new work well. They are honest about the complexity of
 >>>>>>>>>>>>>>>>>>>>>
 Response to reviewer:
 ---------------------
-The reviewer points out a very interesting issue. Actually, the research started using the categories, but we
+The reviewer points out a very interesting issue. The research started using the categories, but we
 discovered that the hierarchy was not following a tree-based structure but a directed graph with cycles, and it went out of scope.
-We have brought it to the discussions as well, because considering the categories to remove noisy tropes or fill in the gaps
-of the missing ines during the data wangling phase could improve the quality of future models.
+We have brought it to the discussions as well because considering the categories to remove noisy tropes or fill in the gaps
+of the missing ones during the data wangling phase could improve the quality of future models.
 <<<<<<<<<<<<<<<<<<<<<
 
 
@@ -111,7 +111,7 @@ The reviewer had a point. We explained the meaning of the "validation score" as 
 trained with 90% of the data (training data), against 10% of the data not used for training (validating data) for every
 k-fold". The reflexion about the term deep learning is also interesting, and right. As we are only using 1 and 2 hidden
 layers in the experiments, it is more accurate to use the term "Machine Learning".
-We replaced this term in the title and along the article.
+We replaced this term in the title and along with the article.
 <<<<<<<<<<<<<<<<<<<<<
 
 The second experiment uses a GA to search for combinations of features (tropes) that the surrogate rater considers would lead to a high rating. This works fine, but the analysis is rather thin. There is a single example given of the best-rated example, and a hypothetical example of a film that followed that combination of tropes is sketched out - this is a rather weak "just so story", and aspects that don't match well (e.g. the 8 genre predictions) are not very well discussed. It would have been good to see a few examples both of good and bad examples - perhaps 10 of the best rated, and then 5 of the weakest ones. Whilst still rather subjective, this would allow the reader to test this against their ideas of what makes a coherent trope set. Something that I thought was very strong is that the analysis contains an analysis of how different the generated examples are from the examples in the training set - this is really important and is often (shockingly!) neglected in papers on these topics.
@@ -120,8 +120,8 @@ The second experiment uses a GA to search for combinations of features (tropes) 
 Response to reviewer:
 ---------------------
 We agree that the analysis could be improved:
-Instead of analysing just the best result, we have made the analysis of the best results (the 30 best generations that correspond to the 30 runs).
-We added a boxplot to show the potential quality of the solutions and we confirmed that in all the cases,
+Instead of analysing just the best result, we have analyzed the best results (the 30 best generations that correspond
+to the 30 runs). We added a boxplot to show the potential quality of the solutions and we confirmed that in all the cases,
 the GA reaches very good solutions. We also analysed how different the solutions are between them
 and among the rest of the films in the corpus.
 
@@ -133,7 +133,7 @@ The paper is written in decent (though not native-speaker standard) scientific E
 Response to reviewer:
 ---------------------
 We thank the reviewer for pointing this out. We have taken advantage of this second chance to improve the article
-and we have fixed some errata, apart from the changes suggested by the reviewers. We have set them all in blue color.
+and we have fixed some errata, apart from the changes suggested by the reviewers. We have set them all in blue colour.
 <<<<<<<<<<<<<<<<<<<<<
 
 Overall, this is a decent paper in an emerging area of study. I have some doubts about whether this can really tell us anything useful and meaningful, but it is a good first attempt at exploring this space and should lead on to more rigorous methodologies in the future.
@@ -141,7 +141,7 @@ Overall, this is a decent paper in an emerging area of study. I have some doubts
 >>>>>>>>>>>>>>>>>>>>>
 Response to reviewer:
 ---------------------
-We agree that this area is promising but more work needs to be done in order to get aplicable results.
+We agree that this area is promising but more work needs to be done.
 <<<<<<<<<<<<<<<<<<<<<
 
 minor corrections:

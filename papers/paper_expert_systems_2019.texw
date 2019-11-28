@@ -1344,7 +1344,7 @@ and ``Ayuda del Programa de Fomento e Impulso de la actividad Investigadora de l
 top_film_dnas = get_top_film_dna_as_table(RECOMMENDER_SUMMARY_LOG, max=10)
 @
 \footnotesize
-<%=print(get_table_for_dataframe(top_film_dnas, fixed_width=True))%>
+<%=print(get_table_for_dataframe_with_horizontal_lines(top_film_dnas, fixed_width=True))%>
 
 \section{- Synthetic Film DNA examples with low estimated rating}
 \label{appendix:b}
@@ -1353,6 +1353,6 @@ top_film_dnas = get_top_film_dna_as_table(RECOMMENDER_SUMMARY_LOG, max=10)
 top_film_dnas = get_top_film_dna_as_table(RECOMMENDER_SUMMARY_LOG, max=5)
 @
 \footnotesize
-<%=print(get_table_for_dataframe(top_film_dnas, fixed_width=True))%>
+<%=print(get_table_for_dataframe_with_horizontal_lines(top_film_dnas, fixed_width=True))%>
 }
 \end{document}

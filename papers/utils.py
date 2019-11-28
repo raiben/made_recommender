@@ -74,6 +74,15 @@ def get_table_for_dataframe(df, fixed_width=None, **kwargs):
         latex_code = latex_code.replace('[GENRE]','')
     return latex_code
 
+def get_table_for_dataframe_with_horizontal_lines(df, fixed_width=None, **kwargs):
+    latex_code = get_table_for_dataframe(df, fixed_width, **kwargs)
+    horizontal_line = '\n\\hline\n'
+
+    parts = latex_code.split(horizontal_line)
+    parts[2] = parts[2].replace('\n', horizontal_line)
+    return horizontal_line.join(parts)
+
+
 def get_tabularx_for_dataframe(df, **kwargs):
     latex_code = tabulate(df, headers=df, tablefmt='latex_raw', **kwargs)
     latex_code = latex_code.replace('%', '\\%')
@@ -309,17 +318,21 @@ def get_solutions_analysis(film_extended_dataset_dictionary, recommender_details
 def get_top_film_dna_as_table(recommender_details_log, max = 100):
     film_dnas = []
     ratings = []
+    rows = []
 
     with open(recommender_details_log) as csv_file:
         csv_reader = csv.reader(csv_file, delimiter=',')
         line_count = 0
         for row in csv_reader:
-            line_count += 1
-            if row[3] == '0.016666666666666666' and row[4] == '0.25' and row[5] == '200':
-                film_dna = ", ".join([item.strip() for item in row[10:]])
-                if film_dna not in film_dnas:
-                    film_dnas.append(film_dna)
-                    ratings.append(float(row[8]))
+            rows.append(row)
+    rows = sorted(rows, key=lambda row: -float(row[8]))
+    for row in rows:
+        line_count += 1
+        film_dna = ", ".join([item.strip() for item in row[10:]])
+        if film_dna not in film_dnas:
+            film_dnas.append(film_dna)
+            ratings.append(float(row[8]))
+
     table = DataFrame.from_dict({'Film DNA':film_dnas[0:max], 'Estimated rating':ratings[0:max]})
     return table
 
