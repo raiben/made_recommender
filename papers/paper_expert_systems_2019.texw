@@ -1206,7 +1206,7 @@ Our synthesised Film DNA not only has a very high potential rating but also is v
 in our \textit{extended dataset}, that is positive because it proves that the GA is exploring
 combinations that are far from those already realized in real life.
 
-More examples of trope can be found in the Appendix~\ref{appendix:a}.
+\modification{More examples of trope can be found in the Appendixes \ref{appendix:a} and \ref{appendix:b}.}
 
 
 \section{Conclusions} \label{sec:conclusions}
@@ -1335,10 +1335,24 @@ and ``Ayuda del Programa de Fomento e Impulso de la actividad Investigadora de l
 \section{Bibliography}
 \bibliography{report}
 
+\modification{
 \appendix
-\section{- Film DNA examples}
+\section{- Synthetic Film DNA examples with high estimated rating}
 \label{appendix:a}
 
-% TODO
+<<echo=False>>=
+top_film_dnas = get_top_film_dna_as_table(RECOMMENDER_SUMMARY_LOG, max=10)
+@
+\footnotesize
+<%=print(get_table_for_dataframe(top_film_dnas, fixed_width=True))%>
 
+\section{- Synthetic Film DNA examples with low estimated rating}
+\label{appendix:b}
+
+<<echo=False>>=
+top_film_dnas = get_top_film_dna_as_table(RECOMMENDER_SUMMARY_LOG, max=5)
+@
+\footnotesize
+<%=print(get_table_for_dataframe(top_film_dnas, fixed_width=True))%>
+}
 \end{document}

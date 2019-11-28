@@ -70,6 +70,7 @@ def get_table_for_dataframe(df, fixed_width=None, **kwargs):
         latex_code = latex_code.replace('\\end{tabular}', '\\end{tabularx}')
         latex_code = latex_code.replace('{lr}','{Xr}')
         latex_code = latex_code.replace('{rllrrl}', '{rLLrrl}')
+        latex_code = latex_code.replace('{rlr}', '{rLr}')
         latex_code = latex_code.replace('[GENRE]','')
     return latex_code
 
@@ -304,10 +305,28 @@ def get_solutions_analysis(film_extended_dataset_dictionary, recommender_details
 
     return ratings, jaccard_coefficients, common_coefficients
 
+
+def get_top_film_dna_as_table(recommender_details_log, max = 100):
+    film_dnas = []
+    ratings = []
+
+    with open(recommender_details_log) as csv_file:
+        csv_reader = csv.reader(csv_file, delimiter=',')
+        line_count = 0
+        for row in csv_reader:
+            line_count += 1
+            if row[3] == '0.016666666666666666' and row[4] == '0.25' and row[5] == '200':
+                film_dna = ", ".join([item.strip() for item in row[10:]])
+                if film_dna not in film_dnas:
+                    film_dnas.append(film_dna)
+                    ratings.append(float(row[8]))
+    table = DataFrame.from_dict({'Film DNA':film_dnas[0:max], 'Estimated rating':ratings[0:max]})
+    return table
+
 if __name__ == '__main__':
     FILM_EXTENDED_DATASET_DICTIONARY_BZ2_FILE = '../datasets/extended_dataset.json.bz2'
     RECOMMENDER_DETAILS_LOG = '../logs/recommender_summary.log'
-    ratings, jaccard, common = get_solutions_analysis(FILM_EXTENDED_DATASET_DICTIONARY_BZ2_FILE,
-                                                      RECOMMENDER_DETAILS_LOG)
-
+    #ratings, jaccard, common = get_solutions_analysis(FILM_EXTENDED_DATASET_DICTIONARY_BZ2_FILE,
+    #                                                  RECOMMENDER_DETAILS_LOG)
+    table = get_top_film_dna_as_table(RECOMMENDER_DETAILS_LOG)
     pass
