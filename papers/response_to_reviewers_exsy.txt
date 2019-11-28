@@ -119,7 +119,12 @@ The second experiment uses a GA to search for combinations of features (tropes) 
 >>>>>>>>>>>>>>>>>>>>>
 Response to reviewer:
 ---------------------
-TODO:
+We agree that the analysis could be improved:
+Instead of analysing just the best result, we have made the analysis of the best results (the 30 best generations that correspond to the 30 runs).
+We added a boxplot to show the potential quality of the solutions and we confirmed that in all the cases,
+the GA reaches very good solutions. We also analysed how different the solutions are between them
+and among the rest of the films in the corpus.
+
 <<<<<<<<<<<<<<<<<<<<<
 
 The paper is written in decent (though not native-speaker standard) scientific English, and has a very clear structure.

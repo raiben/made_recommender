@@ -1,4 +1,5 @@
 import bz2
+import csv
 import json
 import os
 import textwrap
@@ -14,6 +15,9 @@ import statistics
 import math
 
 import sys
+
+from dataset_displayers.similarity_utils import get_jaccard_similarity, get_common_tropes_similarity
+
 sys.path.append("..")
 
 from dataset_displayers.tropes_similarity import TropesSimilarityChecker
@@ -208,6 +212,7 @@ def extract_grid_parameters_from_log_and_results(log_file_name):
     dataframe = dataframe.sort_values(by='mean', ascending=False).reset_index(drop=True)
     return dataframe
 
+
 def human_readable(value):
     if isinstance(value, float):
         print ("{0:.3f}".format(value))
@@ -215,16 +220,94 @@ def human_readable(value):
 
     print (str(value))
 
-if __name__=='__main__':
-    FILM_EXTENDED_DATASET_DICTIONARY_BZ2_FILE = '../datasets/extended_dataset.json.bz2'
+
+def human_readable_percent(value):
+    if isinstance(value, float):
+        print ("{0:.2f}".format(value))
+        return
+
+    print (str(value))
+
+def get_solutions_analysis(film_extended_dataset_dictionary, recommender_details_log):
     checker = TropesSimilarityChecker()
-    checker.load_extended_dataset_json(FILM_EXTENDED_DATASET_DICTIONARY_BZ2_FILE)
-    tropes_list = ['ActionHeroBabysitter', 'DeathByFlashback', 'DisneyVillainDeath', 'DuelToTheDeath',
-                   'EarlyBirdCameo', 'FightingFromTheInside', 'HandsOffParenting', 'Homage', 'ImNotAfraidOfYou',
-                   'JumpCut', 'MouthingTheProfanity', 'NoSympathy', 'OminousFog', 'OneHeadTaller',
-                   'PoorMansSubstitute', 'PragmaticAdaptation', 'RichIdiotWithNoDayJob', 'SomeoneToRememberHimBy',
-                   'SpitefulSpit', 'TalkingHeads', 'TitledAfterTheSong', 'WeaponOfXSlaying', '[GENRE]Animation',
-                   '[GENRE]Documentary', '[GENRE]Drama', '[GENRE]History', '[GENRE]Mystery', '[GENRE]Romance',
-                   '[GENRE]War', '[GENRE]Western']
-    top_overlap, top_jaccard, top_common = checker.get_top_films_by_simmilarity(tropes_list, 6)
+    checker.load_extended_dataset_json(film_extended_dataset_dictionary)
+
+    solutions = []
+    ratings = []
+
+    with open(recommender_details_log) as csv_file:
+        csv_reader = csv.reader(csv_file, delimiter=',')
+        line_count = 0
+        for row in csv_reader:
+            line_count += 1
+            if row[3] == '0.016666666666666666' and row[4] == '0.25' and row[5] == '200':
+                ratings.append(float(row[8]))
+                tropes = set([item.strip() for item in row[10:]])
+                solutions.append(tropes)
+    pairs = []
+
+    copy_of_solutions = solutions.copy()
+    while len(copy_of_solutions):
+        current_candidate = copy_of_solutions.pop(0)
+        for other_candidate in copy_of_solutions:
+            pairs.append((current_candidate, other_candidate))
+
+    # math.factorial(30) / (math.factorial(2) * math.factorial(30-2))
+    jaccard_coefficients_intra_synthetic = []
+    common_coefficients_intra_synthetic = []
+    for pair in pairs:
+        similarity = get_jaccard_similarity(pair[0], pair[1])
+        jaccard_coefficients_intra_synthetic.append(similarity)
+        similarity = get_common_tropes_similarity(pair[0], pair[1])
+        common_coefficients_intra_synthetic.append(similarity)
+
+    jaccard_coefficients_inter_corpus = []
+    common_coefficients_inter_corpus = []
+    for solution in solutions:
+        for existing_film in checker.films:
+            film_tropes = set(existing_film["tropes"])
+
+            similarity = get_jaccard_similarity(solution, film_tropes)
+            jaccard_coefficients_inter_corpus.append(similarity)
+            similarity = get_common_tropes_similarity(solution, film_tropes)
+            common_coefficients_inter_corpus.append(similarity)
+
+    nan_values = len(jaccard_coefficients_inter_corpus) - len(jaccard_coefficients_intra_synthetic)
+
+    ratings = DataFrame.from_dict({'rating': ratings})
+
+    jaccard_coefficients = DataFrame.from_dict(
+        {'intra-synthetic Cj': jaccard_coefficients_intra_synthetic + [None for index in range(0, nan_values)],
+         'inter-corpus Cj': jaccard_coefficients_inter_corpus})
+
+    common_coefficients = DataFrame.from_dict(
+        {'intra-synthetic Cc': common_coefficients_intra_synthetic + [None for index in range(0, nan_values)],
+         'inter-corpus Cj': common_coefficients_inter_corpus})
+
+    all_the_tropes_in_synthetic_films = set()
+    for solution in solutions:
+        all_the_tropes_in_synthetic_films.update(solution)
+    #236
+    films_that_contain_any_trope = set()
+    for trope in all_the_tropes_in_synthetic_films:
+        for existing_film in checker.films:
+            if trope in existing_film['tropes']:
+                films_that_contain_any_trope.add(existing_film['name'])
+    #10022
+    ratings_films_in_tropes = []
+    for existing_film in checker.films:
+        if existing_film['name'] in films_that_contain_any_trope:
+            ratings_films_in_tropes.append(existing_film['rating'])
+
+    # TODO Pending...
+
+
+    return ratings, jaccard_coefficients, common_coefficients
+
+if __name__ == '__main__':
+    FILM_EXTENDED_DATASET_DICTIONARY_BZ2_FILE = '../datasets/extended_dataset.json.bz2'
+    RECOMMENDER_DETAILS_LOG = '../logs/recommender_summary.log'
+    ratings, jaccard, common = get_solutions_analysis(FILM_EXTENDED_DATASET_DICTIONARY_BZ2_FILE,
+                                                      RECOMMENDER_DETAILS_LOG)
+
     pass
