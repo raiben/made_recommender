@@ -1346,13 +1346,14 @@ top_film_dnas = get_top_film_dna_as_table(RECOMMENDER_SUMMARY_LOG, max=10)
 \footnotesize
 <%=print(get_table_for_dataframe_with_horizontal_lines(top_film_dnas, fixed_width=True))%>
 
-\section{- Synthetic Film DNA examples with low estimated rating}
+\section{- Random Synthetic Film DNA examples}
 \label{appendix:b}
 
 <<echo=False>>=
-top_film_dnas = get_top_film_dna_as_table(RECOMMENDER_SUMMARY_LOG, max=5)
+EVALUATOR_FILE = '../datasets/evaluator_[26273, 162, 1].sav'
+random_film_dna = get_random_synthetic_film_dna(EVALUATOR_FILE, FILM_EXTENDED_DATASET_DICTIONARY_BZ2_FILE)
 @
 \footnotesize
-<%=print(get_table_for_dataframe_with_horizontal_lines(top_film_dnas, fixed_width=True))%>
+<%=print(get_table_for_dataframe_with_horizontal_lines(random_film_dna, fixed_width=True))%>
 }
 \end{document}

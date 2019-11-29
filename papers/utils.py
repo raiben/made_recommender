@@ -2,9 +2,11 @@ import bz2
 import csv
 import json
 import os
+import sys
 import textwrap
 from io import StringIO
 from pandas import DataFrame
+from random import Random
 import os
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -17,6 +19,7 @@ import math
 import sys
 
 from dataset_displayers.similarity_utils import get_jaccard_similarity, get_common_tropes_similarity
+from rating_evaluator.neural_network_tropes_evaluator import NeuralNetworkTropesEvaluator
 
 sys.path.append("..")
 
@@ -309,8 +312,7 @@ def get_solutions_analysis(film_extended_dataset_dictionary, recommender_details
         if existing_film['name'] in films_that_contain_any_trope:
             ratings_films_in_tropes.append(existing_film['rating'])
 
-    # TODO Pending...
-
+    ratings_all_films = [existing_film['rating'] for existing_film in checker.films]
 
     return ratings, jaccard_coefficients, common_coefficients
 
@@ -333,13 +335,42 @@ def get_top_film_dna_as_table(recommender_details_log, max = 100):
             film_dnas.append(film_dna)
             ratings.append(float(row[8]))
 
-    table = DataFrame.from_dict({'Film DNA':film_dnas[0:max], 'Estimated rating':ratings[0:max]})
+    table = DataFrame.from_dict({'Film DNA': film_dnas[0:max], 'Estimated rating': ratings[0:max]})
+    return table
+
+
+def get_random_synthetic_film_dna(evaluator_file, extended_dataset_file, n_films=5, film_length=30, seed=0):
+    evaluator = NeuralNetworkTropesEvaluator(evaluator_file)
+    with bz2.open(extended_dataset_file, "rb") as f:
+        content = f.read()
+    json_bytes = content.decode('utf-8')
+    films = json.loads(json_bytes)
+    all_tropes_in_list = set()
+    for film in films:
+        all_tropes_in_list.update(set(film['tropes']))
+    random = Random(seed)
+
+    film_dnas = []
+    ratings = []
+    trope_list = sorted(list(all_tropes_in_list))
+    for index in range(0,n_films):
+        random.shuffle(trope_list)
+        film_dna = trope_list[0:film_length]
+        evaluation = evaluator.evaluate(film_dna)
+
+        film_dnas.append(', '.join(film_dna))
+        ratings.append(evaluation.rating[0])
+
+    table = DataFrame.from_dict({'Film DNA': film_dnas, 'Estimated rating': ratings})
     return table
 
 if __name__ == '__main__':
     FILM_EXTENDED_DATASET_DICTIONARY_BZ2_FILE = '../datasets/extended_dataset.json.bz2'
-    RECOMMENDER_DETAILS_LOG = '../logs/recommender_summary.log'
-    #ratings, jaccard, common = get_solutions_analysis(FILM_EXTENDED_DATASET_DICTIONARY_BZ2_FILE,
+    # RECOMMENDER_DETAILS_LOG = '../logs/recommender_summary.log'
+    # ratings, jaccard, common = get_solutions_analysis(FILM_EXTENDED_DATASET_DICTIONARY_BZ2_FILE,
     #                                                  RECOMMENDER_DETAILS_LOG)
-    table = get_top_film_dna_as_table(RECOMMENDER_DETAILS_LOG)
-    pass
+    # table = get_top_film_dna_as_table(RECOMMENDER_DETAILS_LOG)
+    # pass
+
+    EVALUATOR_FILE = u'../datasets/evaluator_[26273, 162, 1].sav'
+    bad_film_dna = get_random_synthetic_film_dna(EVALUATOR_FILE, FILM_EXTENDED_DATASET_DICTIONARY_BZ2_FILE)
