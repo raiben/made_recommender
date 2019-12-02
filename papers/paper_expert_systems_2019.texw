@@ -1195,7 +1195,7 @@ in our \textit{extended dataset}, that is positive because it proves that the GA
 combinations that are far from those already realized in real life.
 
 \modification{More obtained examples of high rated synthetic Film DNAs and random ones with lower rates are available in
-the project's repository \footnote{\url{https://github.com/raiben/made_recommender/master/datasets/film_dna_examples_20191201.csv}}.}
+the project's repository \footnote{\url{https://github.com/raiben/made_recommender/blob/master/datasets/film_dna_examples_20191201.csv}}.}
 
 
 \section{Conclusions} \label{sec:conclusions}
