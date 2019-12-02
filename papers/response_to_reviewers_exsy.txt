@@ -29,11 +29,7 @@ Comments to the Author (Please refer to the instructions above)
 >>>>>>>>>>>>>>>>>>>>>
 Response to reviewer:
 ---------------------
-We agree that the Experimental Setup could be explained in a better way.
-We have extended it by providing the reasons behind this parameter selection,
-explaining the parameters, the candidate values, the limitations and the goal of the preliminary analysis.
-We also consider that the paper would benefit from having a table that summarizes the values selected.
-Finally, the two coefficients are explained in a better way, including references and formula.
+We agree that the Experimental Setup could be explained in a better way. Following reviewer's suggestion, we have extended it by providing the reasons behind this parameter selection, explaining the parameters, the candidate values, the limitations and the goal of the preliminary analysis. A figure describing the distribution of the obtained fitness for each configuration has been added (Figure 5). Moreover, a table summarizing the chosen values has been included for clarification (Table 2). Finally, the two coefficients are explained in more detail, including references and formulas. These new additions can be found in Pages 9 and 10.
 <<<<<<<<<<<<<<<<<<<<<
 
 
@@ -42,7 +38,8 @@ Finally, the two coefficients are explained in a better way, including reference
 >>>>>>>>>>>>>>>>>>>>>
 Response to reviewer:
 ---------------------
-We would like to thank the reviewer for his suggestions and hope that the new modifications have improved the quality of the paper.
+We would like to thank the reviewer for their suggestions and hope that the new modifications have improved the quality
+of the paper.
 <<<<<<<<<<<<<<<<<<<<<
 
 
@@ -72,11 +69,9 @@ The prima facie argument for the synthetic part of the paper is on less steady g
 >>>>>>>>>>>>>>>>>>>>>
 Response to reviewer:
 ---------------------
-We agree that the discussion would be enriched by bringing ideas from Boden's typology.
-In the introduction, we mention that, due to its nature, our approach uses combinational creativity. Also,
-in the conclusions, enclosed in the future-works paragraphs, we point out that, using more sophisticated techniques
-to extract elements from the tropes and categories, we could be able to build new tropes, that would
-lead to higher levels of creativity.
+We agree that the discussion would be enriched by bringing ideas from Boden's typology. The introduction has been updated to present these ideas. We have updated the conclusions with the next paragraph:
+
+"As stated in the introduction, the presented technique can achieve combinational creativity, making use of old and familiar tropes to build new Film DNAs. However, more complex creativity types such as the exploratory creativity or the transformational creativity could only be tackled through the decomposition of tropes in concepts and the categorization of tropes, requiring more elaborated techniques to extract information from natural language sentences found in TV Tropes. According to Boden (2009), being able to extract these concepts from the tropes and using them to build new tropes would help us to achieve higher levels of creativity while making use of natural semantic constraints to avoid misusing resources on generating invalid Film DNAs."
 <<<<<<<<<<<<<<<<<<<<<
 
 The authors present their new work well. They are honest about the complexity of the dataset - in particular, the fact that films are tagged with very variable numbers of tropes, and that the tagging is biased by levels of interest in the films. I wonder if there is also some comment to be made about the possible use of hierarchies of tropes and connections between tropes ("related" tropes).
@@ -84,10 +79,9 @@ The authors present their new work well. They are honest about the complexity of
 >>>>>>>>>>>>>>>>>>>>>
 Response to reviewer:
 ---------------------
-The reviewer points out a very interesting issue. The research started using the categories, but we
-discovered that the hierarchy was not following a tree-based structure but a directed graph with cycles, and it went out of scope.
-We have brought it to the discussions as well because considering the categories to remove noisy tropes or fill in the gaps
-of the missing ones during the data wangling phase could improve the quality of future models.
+The reviewer points out a very interesting issue. The research started using the categories, but we discovered that the hierarchy was not following a tree-based structure but a directed graph with cycles, and it went out of scope. We have brought it to the discussions as well:
+
+ " TV Tropes also offers information of sub and super tropes, allowing building a directed graph of categories that includes cycles; using this information during the creation of the model could enrich it, providing new tools to reduce noisy tropes and filling in the gaps of the missing ones during the data wrangling phase."
 <<<<<<<<<<<<<<<<<<<<<
 
 
@@ -98,7 +92,9 @@ The production of the dataset is clearly explained, and it is a good feature of 
 >>>>>>>>>>>>>>>>>>>>>
 Response to reviewer:
 ---------------------
-The reviewer is right about this kind of analysis. We will work on them in the future.
+Following the reviewer's suggestion we have updated the conclusion section with the next sentence:
+
+"... other techniques to reduce the dimensionality such as Principle Component Analysis (PCA) and Linear Discriminant Analysis (LDA), could help us analysing the trope space, ..."
 <<<<<<<<<<<<<<<<<<<<<
 
 
@@ -107,11 +103,11 @@ The two experiments are decently described. The first uses a neural network to m
 >>>>>>>>>>>>>>>>>>>>>
 Response to reviewer:
 ---------------------
-The reviewer had a point. We explained the meaning of the "validation score" as "the mean of the scores of the model
-trained with 90% of the data (training data), against 10% of the data not used for training (validating data) for every
-k-fold". The reflexion about the term deep learning is also interesting, and right. As we are only using 1 and 2 hidden
-layers in the experiments, it is more accurate to use the term "Machine Learning".
-We replaced this term in the title and along with the article.
+The reviewer had a point. We have added the next sentence in Page 7:
+
+"The validation score is the mean of the scores of the model trained with 90% of the data (training data), against 10% of the data not used for training (validating data) for every k-fold."
+
+The reflexion about the term deep learning is also interesting, and right. As we are only using 1 and 2 hidden layers in the experiments, it is more accurate to use the term "Machine Learning". We replaced this term in the title and along with the article.
 <<<<<<<<<<<<<<<<<<<<<
 
 The second experiment uses a GA to search for combinations of features (tropes) that the surrogate rater considers would lead to a high rating. This works fine, but the analysis is rather thin. There is a single example given of the best-rated example, and a hypothetical example of a film that followed that combination of tropes is sketched out - this is a rather weak "just so story", and aspects that don't match well (e.g. the 8 genre predictions) are not very well discussed. It would have been good to see a few examples both of good and bad examples - perhaps 10 of the best rated, and then 5 of the weakest ones. Whilst still rather subjective, this would allow the reader to test this against their ideas of what makes a coherent trope set. Something that I thought was very strong is that the analysis contains an analysis of how different the generated examples are from the examples in the training set - this is really important and is often (shockingly!) neglected in papers on these topics.
@@ -119,12 +115,7 @@ The second experiment uses a GA to search for combinations of features (tropes) 
 >>>>>>>>>>>>>>>>>>>>>
 Response to reviewer:
 ---------------------
-We agree that the analysis could be improved:
-Instead of analysing just the best result, we have analyzed the best results (the 30 best generations that correspond
-to the 30 runs). We added a boxplot to show the potential quality of the solutions and we confirmed that in all the cases,
-the GA reaches very good solutions. We also analysed how different the solutions are between them
-and among the rest of the films in the corpus.
-
+Following reviewer's suggestion we have improved the analysis by adding a more complete study of the best results: We have analyzed the best results (the 30 best individuals that correspond to the final generation of the 30 runs). We added a new boxplot (Figure 6-a) to show the potential quality of the solutions and we confirmed that in all the cases, the GA reaches very good solutions. We also analysed how different the solutions are between them and among the rest of the films in the corpus, by adding a descriptive analysis and boxplots of the similarity coefficients (Figure 6b-e). Moreover, a link to our repository showing more examples of (good and bad rated) films has been added.
 <<<<<<<<<<<<<<<<<<<<<
 
 The paper is written in decent (though not native-speaker standard) scientific English, and has a very clear structure.
@@ -132,8 +123,7 @@ The paper is written in decent (though not native-speaker standard) scientific E
 >>>>>>>>>>>>>>>>>>>>>
 Response to reviewer:
 ---------------------
-We thank the reviewer for pointing this out. We have taken advantage of this second chance to improve the article
-and we have fixed some errata, apart from the changes suggested by the reviewers. We have set them all in blue colour.
+We thank the reviewer for pointing this out. We have taken advantage of this second chance to improve the article and we have fixed some errata, apart from the changes suggested by the reviewers. We have typeset them all in blue colour.
 <<<<<<<<<<<<<<<<<<<<<
 
 Overall, this is a decent paper in an emerging area of study. I have some doubts about whether this can really tell us anything useful and meaningful, but it is a good first attempt at exploring this space and should lead on to more rigorous methodologies in the future.
@@ -141,7 +131,7 @@ Overall, this is a decent paper in an emerging area of study. I have some doubts
 >>>>>>>>>>>>>>>>>>>>>
 Response to reviewer:
 ---------------------
-We agree that this area is promising but more work needs to be done.
+We agree that this area is promising but more work needs to be done, therefore we have updated the conclusions accordingly with some of the reviewer's concerns. We would like to thank the reviewer for their suggestions, that have helped to improve the paper.
 <<<<<<<<<<<<<<<<<<<<<
 
 minor corrections:
@@ -151,5 +141,5 @@ p3. correct "(?)surowiecki"
 >>>>>>>>>>>>>>>>>>>>>
 Response to reviewer:
 ---------------------
-We appreciate that the reviewer found these errata. They both were Latex-related.
+We appreciate that the reviewer found these errata. They both were LaTeX-related.
 <<<<<<<<<<<<<<<<<<<<<

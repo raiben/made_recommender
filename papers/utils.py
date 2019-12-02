@@ -295,7 +295,7 @@ def get_solutions_analysis(film_extended_dataset_dictionary, recommender_details
 
     common_coefficients = DataFrame.from_dict(
         {'intra-synthetic Cc': common_coefficients_intra_synthetic + [None for index in range(0, nan_values)],
-         'inter-corpus Cj': common_coefficients_inter_corpus})
+         'inter-corpus Cc': common_coefficients_inter_corpus})
 
     all_the_tropes_in_synthetic_films = set()
     for solution in solutions:
@@ -364,13 +364,3 @@ def get_random_synthetic_film_dna(evaluator_file, extended_dataset_file, n_films
     table = DataFrame.from_dict({'Film DNA': film_dnas, 'Estimated rating': ratings})
     return table
 
-if __name__ == '__main__':
-    FILM_EXTENDED_DATASET_DICTIONARY_BZ2_FILE = '../datasets/extended_dataset.json.bz2'
-    # RECOMMENDER_DETAILS_LOG = '../logs/recommender_summary.log'
-    # ratings, jaccard, common = get_solutions_analysis(FILM_EXTENDED_DATASET_DICTIONARY_BZ2_FILE,
-    #                                                  RECOMMENDER_DETAILS_LOG)
-    # table = get_top_film_dna_as_table(RECOMMENDER_DETAILS_LOG)
-    # pass
-
-    EVALUATOR_FILE = u'../datasets/evaluator_[26273, 162, 1].sav'
-    bad_film_dna = get_random_synthetic_film_dna(EVALUATOR_FILE, FILM_EXTENDED_DATASET_DICTIONARY_BZ2_FILE)
