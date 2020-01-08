@@ -42,24 +42,26 @@ def draw_graphviz(dot, filename):
 \maketitle
 
 \begin{abstract}
-    The following technical report presents the free-software licensed library \textit{tropescraper},
-    a tool that automatically connects
-    to the wiki TVTropes and extracts the graph of films and tropes
-    to a standard-formatted output, up and running for scientific experiments.
-    It covers implementation details, input/outputs
-    and instructions on how to install the library via PyPI, how to use it and how to collaborate with the project.
-    The report also includes \textit{python code snippets} to manipulate the generated file
-    and pull out information from it making use of the libraries \textit{pandas} and \textit{matplotlib}.
-    As a practical example, the report uses them to compare how the data evolved
+    The following technical report presents the free library \textit{tropescraper},
+    a tool that extracts the graph of films and tropes from the TVTropes wiki and produces
+    an standard-formatted output, which can be used for scientific experiments.
+    % Say something about the license. Would this be free? Can the data be reused? - JJ
+    This report covers implementation details, input/outputs
+    and instructions on how to install the library via PyPI, how to use it and how to collaborate with the project,
+    includes \textit{python code snippets} to manipulate the generated file
+    and pull out information from it making use of the \textit{pandas} and \textit{matplotlib}
+    libraries. We then use these snippets to analyze how the data has evolved
     from July 2016, date of the latest official snapshot of \textit{DBTropes},
-    to November 2019, date of the latest extraction through tropescraper.
+    to November 2019, date of the latest extraction through tropescraper and draw
+    some general conclusions on tropes and their relation to films.
 \end{abstract}
 
-{\bf Keywords}: Tropes; TvTropes; tropescraper.
+{\bf Keywords}: Tropes; TVTropes; tropescraper; automatic narrative; procedural content generation.
 
 \section{Motivations} \label{sec:problem}
 
-Researches on story generation can benefit from having a recent \textit{corpus}
+% Say what's a trope. People needn't know what it is - JJ
+Research on story generation can benefit from having a recent \textit{corpus}
 of tropes discovered in a generous amount film, actually, as large as possible,
 in a way that they can be efficiently processed and used in different experiments.
 
@@ -67,13 +69,13 @@ in a way that they can be efficiently processed and used in different experiment
 \item There is a wiki called \textit{TV Tropes} that describes thousands % how many
 films and tropes, and has a prolific community that feeds the data.
 \item A project called \textit{DBTropes} had the goal to extract n-tuples from TV Tropes so they can be automatically processed,
-including, among much other interesting information, the tropes and the films.
-\item DB Tropes was discontinued in 2016 and the latest snapshot of the dataset of n-tuples was built July 1st, 2016.
+including, among much other interesting information, the tropes and the films. % Add reference
+\item DB Tropes was produced in 2016 as an one-shot; the last snapshot of the dataset of n-tuples was built July 1st, 2016.
 \item Recent publications still need to make use of the tropes by film and the latest dataset available is from 2016;
 however, they would benefit from having updated information.
 \end{enumerate}
 
-To fulfil the need of having an updated corpus of films and tropes,
+To fulfill the need of having an updated corpus of films and tropes,
 in 2019 we developed a library called \textit{tropescraper} that:
 \begin{enumerate}
 \item can connect to the wiki TV Tropes,
@@ -101,9 +103,10 @@ standards defined by the RFC 8259 (from now on, JSON),
 widespread, natively supported by the latest versions of Python or ECMAScript,
 and easily manageable in all modern languages.
 
-By definition, a scraper is a fragile piece of software because it relies in the structure of web pages
-that can change for many different reasons. For this reason,
-tropescraper is built with the aim of reusability, extensibility and maintainability,
+
+By definition, a scraper relies in the structure of web pages, and these
+can change for many different reasons, which implies they are going to need continuous attention and patches. For this reason,
+{\sf tropescraper} is built with the aim of reusability, extensibility and maintainability,
 and some techniques and methodologies have been selected for its development:
 \textit{SOLID principles}, \textit{Clean Code}, \textit{Clean Architecture} and TDD.
 The Diagram in figure~\ref{fig:architecture} shows the components arranged according to
@@ -148,7 +151,7 @@ Clean Architecture. Down below, some decisions are explained in detail:
     \item WebPageRetriever connects to tvtropes.org and retrieves the page doing
     pauses in between calls so that the service is not harmed.
     \item FileCache stores every single page in the hard drive, as bzip2 with compression 9.
-    \item TVTropesParser use dom selectors to retrieve information from specific nodes in the HTML tree.
+    \item TVTropesParser use DOM selectors to retrieve information from specific nodes in the HTML tree.
     \item TropesStore saves the resulting dictionary of films and tropes as a compressed JSON.
     \item The architecture can easily be extended with new adaptors that implement new features as required,
     for example, volatile in-memory cache, threaded requests, different compression, adaptations to changes in the
@@ -234,7 +237,7 @@ The tests are written in natural language and follow the FIRST principles.
 Attention: This tool uses python >= 3.6.
 
 If you want to use this tool, you don't need to download the sources
-or clone the repository. Just install the latest version through PyPi:
+or clone the repository. Just install the latest version through PyPI:
 
 \begin{minted}[mathescape, fontsize=\small, xleftmargin=0.5em]{console}
 pip install tropescraper
@@ -280,7 +283,7 @@ name, that can include the year for disambiguation purposes.
 
 Pre-conditions:
 \begin{enumerate}
-\item If you don't have access to the dbtropes file, please download it from:
+\item If you don't have access to the DBTropes file, please download it from:
 \url{http://skipforward.opendfki.de/wiki/DBTropes} and unzip it. Then copy the path.
 \item If you don't have access to the tropescraper-generated file, please run tropescraper and copy the path.
 \item Use the dbtropes\_dataset and tropescraper\_dataset as mappings from films to tropes:
