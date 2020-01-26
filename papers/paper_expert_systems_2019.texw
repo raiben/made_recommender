@@ -41,7 +41,7 @@ n_tropes = len(tropes_dictionary.keys())
 \usepackage{tabularx}
 \usepackage{xcolor}
 \usepackage{natbib}
-\newcommand{\modification}[1]{{\color{blue}#1}}
+\newcommand{\modification}[1]{{\color{black}#1}}
 
 \usepackage{ragged2e}
 \newcolumntype{L}{>{\raggedright\arraybackslash}X}
