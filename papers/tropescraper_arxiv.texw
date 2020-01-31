@@ -37,17 +37,16 @@ from report_utils import *
 \maketitle
 
 \begin{abstract}
-    The following technical report presents the free-software licensed library \textit{tropescraper},
-    a tool that automatically connects
-    to the wiki TVTropes and extracts the graph of films and tropes
-    to a standard-formatted output, up and running for scientific experiments.
-    It covers implementation details, input/outputs
-    and instructions on how to install the library via PyPI, how to use it and how to collaborate with the project.
-    The report also includes \textit{python code snippets} to manipulate the generated file
-    and pull out information from it making use of the libraries \textit{pandas} and \textit{matplotlib}.
-    As a practical example, the report uses them to compare how the data evolved
-    from July 2016, date of the latest official snapshot of \textit{DBTropes},
-    to November 2019, date of the latest extraction through tropescraper.
+    The following technical report describes and extracts useful information on
+    how tropes and films are related to each other, according to the data extracted from the wiki TV Tropes.
+    In order to do so, we generated a dataset through the tool TropeScraper (November 2019) and
+    compared it to the latest snapshot of DBTropes (July 2016), providing descriptive analysis,
+    studying the key differences and discussing the evolution of the wiki
+    in terms of number of tropes, number of films and relations.
+    The results show that the number of tropes and films doubled their size and their relations, ....
+    The dataset generated, the information extracted and the summaries provided are useful resources
+    for any research involving films and tropes and they can provide proper context and explanations
+    about the behaviour of models built on top of the dataset.
 \end{abstract}
 
 {\bf Keywords}: Tropes; TvTropes; tropescraper.
@@ -59,63 +58,93 @@ of tropes discovered in a generous amount film, actually, as large as possible,
 in a way that they can be efficiently processed and used in different experiments.
 
 \begin{enumerate}
-\item There is a wiki called \textit{TV Tropes} that describes thousands % how many
+\item There is a wiki called \textit{TV Tropes} that describes thousands
 films and tropes, and has a prolific community that feeds the data.
 \item A project called \textit{DBTropes} had the goal to extract n-tuples from TV Tropes so they can be automatically processed,
 including, among much other interesting information, the tropes and the films.
 \item DB Tropes was discontinued in 2016 and the latest snapshot of the dataset of n-tuples was built July 1st, 2016.
 \item Recent publications still need to make use of the tropes by film and the latest dataset available is from 2016;
 however, they would benefit from having updated information.
-\end{enumerate}
-
-To fulfil the need of having an updated corpus of films and tropes,
+\item To fulfil the need of having an updated corpus of films and tropes,
 in 2019 we developed a library called \textit{tropescraper} that:
-\begin{enumerate}
-\item can connect to the wiki TV Tropes,
-\item crawls through all the web pages of the films and extract their tropes,
-\item and returns a small dataset in a standard format.
+    \begin{enumerate}
+    \item can connect to the wiki TV Tropes,
+    \item crawls through all the web pages of the films and extract their tropes,
+    \item and returns a small dataset in a standard format.
+    \end{enumerate}
 \end{enumerate}
 
-The current report details how the library tropescraper is built, how to use it, how to install it,
-how to contribute to it, how to interpret the results and how they can be analyzed.
-The report uses the technology called \textit{pweave} that is able to execute python code snippets
-and generate graphs that are included into \LaTeX documents,
-so the code examples are actually being run at compilation time.
+However, a basic statistical analysis shows that the data is incomplete, with distributions
+that points out to huge biases due to the popularity of the films and tropes.
+The detection of these biases is essential to build automatic learning models that work.
 
-The source of the report can be downloaded at
-\url{https://github.com/raiben/made_recommender/blob/master/papers/tropescraper_arxiv.texw}
-and can be re-run for further researches by the scientific community.
+Furthermore, before the existence of TropeScraper,
+the scientific researches are based on the dataset DBTropes (2016).
+It makes us wonder how much the information about films and tropes from TVTropes has changed since then.
+How much has it grown? How have the most used tropes changes since then? And the best described films in terms of tropes?
+How has the graph of connections between tropes and films evolved through time?
+The answers to these questions can be the key to improve some researches and predict how
+the current dynamics of the TV Tropes community can affect future data.
 
-\section{Analysis if the generated dataset} \label{sec:tools}
+\section{Analysis of the generated dataset} \label{sec:tools}
 
+The relation between tropes and films can be studied from both perspectives.
 
-\subsection{Descriptive analysis of the tropes}
+\subsection{Descriptive analysis of the the films}
 
-Statistics
+According to Figure~\ref{fig:decriptive_analysis_tropes_by_film}. The dataset in November 2019
+contains 12147 observations (films),
+and the average number of tropes by film is 54.242, but the film with more tropes in the dataset has 971 tropes.
+If we compare these values against the data in 2016, the number of films is almost the double,
+and the average number of tropes per film as well. In other words, the dataset has more films and the films contain
+more tropes.
 
-<<echo=False,results="tex">>=
+\begin{figure}[htpb]
+\center
+<<echo=False,results="tex", width="10cm">>=
 describe_tropes()
 @
+\caption{Descriptive analysis comparison of trope occurrences by film in July 2016 vs November 2019}
+\label{fig:decriptive_analysis_tropes_by_film}
+\end{figure}
 
-Boxplots
+The figure~\ref{fig:boxplot_tropes_by_film} shows the boxplots comparison of the two datasets. As we can see,
+TV Tropes tends to have a better description of the films in terms of tropes and less films with no tropes,
+that is reflected in a interquartile range displaced to the top and shorter.
 
-<<echo=False,fig=True, width="\linewidth", f_pos="h", f_size=(16,9)>>=
+\begin{figure}[htpb]
+\center
+<<echo=False,fig=True, width="10cm", f_pos="h", f_size=(6,4)>>=
 boxplot_tropes()
 @
+\caption{Boxplots comparison of trope occurrences by film in July 2016 vs November 2019}
+\label{fig:boxplot_tropes_by_film}
+\end{figure}
 
-Trope frequencies
 
+In figure \ref{fig:frequency_tropes_by_film}, we can observe the number of films that have a specific number of tropes.
+As we can observe, the new dataset has been displaced to the right with recpect to the number of tropes in the film,
+that means that films are better described. Previously, most of the films had just 1 trope and currently
+
+\begin{figure}[htpb]
+\center
 <<echo=False,fig=True, width="\linewidth", f_pos="h", f_size=(16,9)>>=
 frequencies_tropes()
 @
+\caption{Boxplots comparison of trope occurrences by film in July 2016 vs November 2019}
+\label{fig:frequency_tropes_by_film}
+\end{figure}
+
 
 \subsection{Descriptive analysis of the films}
 
 Statistics
-
+\begin{center}
 <<echo=False,results="tex">>=
 describe_films()
 @
+\end{center}
+
 
 Boxplots
 

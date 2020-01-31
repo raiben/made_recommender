@@ -77,34 +77,28 @@ for key in tropescraper_films:
 
 tropescraper_dataset_reversed = reverse_mapping(tropescraper_dataset)
 
+
+
 dbtropes_dataset_count_by_film = {film: len(dbtropes_dataset[film])
                                   for film in dbtropes_dataset.keys()}
 tropescraper_dataset_count_by_film = {film: len(tropescraper_dataset[film])
                                       for film in tropescraper_dataset.keys()}
 
-dbtropes_values = list(dbtropes_dataset_count_by_film.values())
-tropescraper_values = list(tropescraper_dataset_count_by_film.values())
-
-dbtropes_dataset_count_by_trope = {trope: len(dbtropes_dataset_reversed[trope])
-                                   for trope in dbtropes_dataset_reversed.keys()}
-tropescraper_dataset_count_by_trope = {trope: len(tropescraper_dataset_reversed[trope])
-                                       for trope in tropescraper_dataset_reversed.keys()}
-
-dbtropes_values = list(dbtropes_dataset_count_by_trope.values())
-tropescraper_values = list(tropescraper_dataset_count_by_trope.values())
+tropes_dbtropes_values = list(dbtropes_dataset_count_by_film.values())
+tropes_tropescraper_values = list(tropescraper_dataset_count_by_film.values())
 
 
 def describe_tropes():
-    dbtropes_stats = stats.describe(dbtropes_values)
-    tropescraper_stats = stats.describe(tropescraper_values)
+    dbtropes_stats = stats.describe(tropes_dbtropes_values)
+    tropescraper_stats = stats.describe(tropes_tropescraper_values)
     dataframe = pd.DataFrame.from_dict({
-        'min': [dbtropes_stats.minmax[0], tropescraper_stats.minmax[0]],
-        'max': [dbtropes_stats.minmax[1], tropescraper_stats.minmax[1]],
-        'nobs': [dbtropes_stats.nobs, tropescraper_stats.nobs],
-        'mean': [dbtropes_stats.mean, tropescraper_stats.mean],
-        'kurtosis': [dbtropes_stats.kurtosis, tropescraper_stats.kurtosis],
-        'skewness': [dbtropes_stats.skewness, tropescraper_stats.skewness],
-        'variance': [dbtropes_stats.variance, tropescraper_stats.variance]
+        'min': [round(dbtropes_stats.minmax[0],3), round(tropescraper_stats.minmax[0],3)],
+        'max': [round(dbtropes_stats.minmax[1],3), round(tropescraper_stats.minmax[1],3)],
+        'nobs': [round(dbtropes_stats.nobs,3), round(tropescraper_stats.nobs,3)],
+        'mean': [round(dbtropes_stats.mean,3), round(tropescraper_stats.mean,3)],
+        'kurtosis': [round(dbtropes_stats.kurtosis,3), round(tropescraper_stats.kurtosis,3)],
+        'skewness': [round(dbtropes_stats.skewness,3), round(tropescraper_stats.skewness,3)],
+        'variance': [round(dbtropes_stats.variance,3), round(tropescraper_stats.variance,3)]
     }, orient='index')
     dataframe.columns = [DBTROPES_DATE, TROPESCRAPER_DATE]
     display(Latex(dataframe.to_latex()))
@@ -112,27 +106,37 @@ def describe_tropes():
 
 def boxplot_tropes():
     values_concatenated = pd.DataFrame.from_dict({
-        DBTROPES_DATE: dbtropes_values,
-        TROPESCRAPER_DATE: tropescraper_values
+        DBTROPES_DATE: tropes_dbtropes_values,
+        TROPESCRAPER_DATE: tropes_tropescraper_values
     }, orient='index')
     values_concatenated.transpose().plot(kind='box', figsize=FIGURE_SIZE, logy=True)
 
 
 def frequencies_tropes():
-    dataframe = pd.DataFrame.from_dict({'values': dbtropes_values})
+    dataframe = pd.DataFrame.from_dict({'values': tropes_dbtropes_values})
     frequencies = pd.DataFrame([dataframe.iloc[:, 0].value_counts()]).transpose().reset_index()
-    ax = frequencies.plot.scatter(x='index', y='values', color='Blue', label=DBTROPES_DATE,
+    ax = frequencies.plot.scatter(x='Number of tropes by film', y='Number of films', color='Blue', label=DBTROPES_DATE,
                                   logy=True)
 
-    dataframe = pd.DataFrame.from_dict({'values': tropescraper_values})
+    dataframe = pd.DataFrame.from_dict({'values': tropes_tropescraper_values})
     frequencies = pd.DataFrame([dataframe.iloc[:, 0].value_counts()]).transpose().reset_index()
-    frequencies.plot.scatter(x='index', y='values', color='Orange', label=TROPESCRAPER_DATE,
-                             ax=ax, logy=True)
+    frequencies.plot.scatter(x='Number of tropes by film', y='Number of films', color='Orange', label=TROPESCRAPER_DATE,
+                             ax=ax, logy=True, logx=True)
 
+
+
+
+dbtropes_dataset_count_by_trope = {trope: len(dbtropes_dataset_reversed[trope])
+                                   for trope in dbtropes_dataset_reversed.keys()}
+tropescraper_dataset_count_by_trope = {trope: len(tropescraper_dataset_reversed[trope])
+                                       for trope in tropescraper_dataset_reversed.keys()}
+
+films_dbtropes_values = list(dbtropes_dataset_count_by_trope.values())
+films_tropescraper_values = list(tropescraper_dataset_count_by_trope.values())
 
 def describe_films():
-    dbtropes_stats = stats.describe(dbtropes_values)
-    tropescraper_stats = stats.describe(tropescraper_values)
+    dbtropes_stats = stats.describe(films_dbtropes_values)
+    tropescraper_stats = stats.describe(films_tropescraper_values)
     dataframe = pd.DataFrame.from_dict({
         'min': [dbtropes_stats.minmax[0], tropescraper_stats.minmax[0]],
         'max': [dbtropes_stats.minmax[1], tropescraper_stats.minmax[1]],
@@ -148,19 +152,19 @@ def describe_films():
 
 def boxplot_films():
     values_concatenated = pd.DataFrame.from_dict({
-        DBTROPES_DATE: dbtropes_values,
-        TROPESCRAPER_DATE: tropescraper_values
+        DBTROPES_DATE: films_dbtropes_values,
+        TROPESCRAPER_DATE: films_tropescraper_values
     }, orient='index')
     values_concatenated.transpose().plot(kind='box', figsize=FIGURE_SIZE, logy=True)
 
 
 def frequencies_films():
-    dataframe = pd.DataFrame.from_dict({'values': dbtropes_values})
+    dataframe = pd.DataFrame.from_dict({'values': films_dbtropes_values})
     frequencies = pd.DataFrame([dataframe.iloc[:, 0].value_counts()]).transpose().reset_index()
     ax = frequencies.plot.scatter(x='index', y='values', color='Blue', label=DBTROPES_DATE,
                                   logy=True)
 
-    dataframe = pd.DataFrame.from_dict({'values': tropescraper_values})
+    dataframe = pd.DataFrame.from_dict({'values': films_tropescraper_values})
     frequencies = pd.DataFrame([dataframe.iloc[:, 0].value_counts()]).transpose().reset_index()
     frequencies.plot.scatter(x='index', y='values', color='Orange', label=TROPESCRAPER_DATE,
-                             ax=ax, logy=True)
+                             ax=ax, logy=True, logx=True)
