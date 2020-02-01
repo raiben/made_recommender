@@ -101,7 +101,7 @@ more tropes.
 
 \begin{figure}[htpb]
 \center
-<<echo=False,results="tex", width="10cm">>=
+<<echo=False,results="tex", width="12cm">>=
 describe_tropes()
 @
 \caption{Descriptive analysis comparison of trope occurrences by film in July 2016 vs November 2019}
@@ -114,7 +114,7 @@ that is reflected in a interquartile range displaced to the top and shorter.
 
 \begin{figure}[htpb]
 \center
-<<echo=False,fig=True, width="10cm", f_pos="h", f_size=(6,4)>>=
+<<echo=False,fig=True, width="10cm", f_pos="h", f_size=(9,2)>>=
 boxplot_tropes()
 @
 \caption{Boxplots comparison of trope occurrences by film in July 2016 vs November 2019}
@@ -122,47 +122,33 @@ boxplot_tropes()
 \end{figure}
 
 
-In figure \ref{fig:frequency_tropes_by_film}, we can observe the number of films that have a specific number of tropes.
-As we can observe, the new dataset has been displaced to the right with recpect to the number of tropes in the film,
-that means that films are better described. Previously, most of the films had just 1 trope and currently
+In figure~\ref{fig:frequency_tropes_by_film}, we can observe the number of films that have a specific number of tropes.
+As we can observe, the new dataset has been displaced to the right with respect to the number of tropes in the film,
+that means that films are better described. Previously, most of the films had just 1 trope and currently, most of them
+have between 10 and 100.
 
 \begin{figure}[htpb]
 \center
-<<echo=False,fig=True, width="\linewidth", f_pos="h", f_size=(16,9)>>=
+<<echo=False,fig=True, width="10cm", f_pos="h", f_size=(9,6)>>=
 frequencies_tropes()
 @
 \caption{Boxplots comparison of trope occurrences by film in July 2016 vs November 2019}
 \label{fig:frequency_tropes_by_film}
 \end{figure}
 
+When we compare the top films by number of tropes in July 2016 vs November 2019,
+as shown in figure~\ref{fig:top_films_by_number_of_tropes}, only 8 films our of 30 are shared in the list.
+It is interesting to point out that, although both lists have similar number of tropes in the highest values,
+the films almost double the number of tropes in the lower values of the newer dataset with respect top the old one.
 
-\subsection{Descriptive analysis of the films}
-
-Statistics
-\begin{center}
-<<echo=False,results="tex">>=
-describe_films()
+\begin{figure}[htpb]
+\center
+<<echo=False,results="tex", width="12cm">>=
+top_films_by_number_of_tropes(30)
 @
-\end{center}
-
-
-Boxplots
-
-<<echo=False,fig=True, width="\linewidth", f_pos="h", f_size=(16,9)>>=
-boxplot_films()
-@
-
-Trope frequencies
-
-<<echo=False,fig=True, width="\linewidth", f_pos="h", f_size=(16,9)>>=
-frequencies_films()
-@
-
-\subsection{Graph analysis}
-TODO
-
-\section{Summary of the data on 2019/10} \label{sec:data}
-
+\caption{Top films by number of tropes in July 2016 vs November 2019. Common elements are marked in \textbf{bold}}
+\label{fig:top_films_by_number_of_tropes}
+\end{figure}
 
 \section*{Acknowledgements}
 This work has been partially funded by projects DeepBio (TIN2017-85727-C4-2-P) and TEC2015-68752
