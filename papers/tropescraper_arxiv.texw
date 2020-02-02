@@ -90,10 +90,10 @@ the current dynamics of the TV Tropes community can affect future data.
 
 The relation between tropes and films can be studied from both perspectives.
 
-\subsection{Descriptive analysis of the the films}
+\subsection{Descriptive analysis of the films by the number of tropes}
 
-According to Figure~\ref{fig:decriptive_analysis_tropes_by_film}. The dataset in November 2019
-contains 12147 observations (films),
+According to Figure~\ref{fig:decriptive_analysis_tropes_by_film}, the dataset in November 2019
+contains 12147 films,
 and the average number of tropes by film is 54.242, but the film with more tropes in the dataset has 971 tropes.
 If we compare these values against the data in 2016, the number of films is almost the double,
 and the average number of tropes per film as well. In other words, the dataset has more films and the films contain
@@ -137,18 +137,103 @@ frequencies_tropes()
 \end{figure}
 
 When we compare the top films by number of tropes in July 2016 vs November 2019,
-as shown in figure~\ref{fig:top_films_by_number_of_tropes}, only 8 films our of 30 are shared in the list.
+as shown in figure~\ref{fig:top_films_by_number_of_tropes}, 17 films our of 50 are shared in the lists.
 It is interesting to point out that, although both lists have similar number of tropes in the highest values,
-the films almost double the number of tropes in the lower values of the newer dataset with respect top the old one.
+the top films of the new dataset almost double the number of tropes in the old one, in the lower values of the list.
 
 \begin{figure}[htpb]
 \center
 <<echo=False,results="tex", width="12cm">>=
-top_films_by_number_of_tropes(30)
+top_films_by_number_of_tropes(50)
 @
-\caption{Top films by number of tropes in July 2016 vs November 2019. Common elements are marked in \textbf{bold}}
+\caption{Top 50 films by number of tropes in July 2016 vs November 2019. Common elements are marked in blue.}
 \label{fig:top_films_by_number_of_tropes}
 \end{figure}
+
+
+
+
+
+
+
+
+\subsection{Descriptive analysis of the tropes by the number of films}
+
+According to Figure~\ref{fig:decriptive_analysis_films_by_trope}. The dataset in November 2019
+contains 26479 tropes,
+and the average number of films by trope is 24.883, but the trope with more films in the dataset has 3386 films.
+If we compare these values against the data in 2016, the number of tropes is 3/2 of the old dataset,
+but the average number of films per trope has tripled the old value.
+In other words, the dataset has more tropes (about half more) and, on average, the tropes are present in
+more films.
+
+\begin{figure}[htpb]
+\center
+<<echo=False,results="tex", width="12cm">>=
+describe_films()
+@
+\caption{Descriptive analysis comparison of trope occurrences by film in July 2016 vs November 2019}
+\label{fig:decriptive_analysis_films_by_trope}
+\end{figure}
+
+However, as we can observe in figure~\ref{fig:boxplot_films_by_trope}, a bigger average does not mean that tropes
+are more widely used among films. As we can observe, the interquartile range in 2019 for the use of tropes
+begins from 1 and is wider, in other words, we have a similar frequency but amplified with more tropes.
+
+\begin{figure}[htpb]
+\center
+<<echo=False,fig=True, width="10cm", f_pos="h", f_size=(9,2)>>=
+boxplot_films()
+@
+\caption{Boxplots comparison of trope occurrences by film in July 2016 vs November 2019}
+\label{fig:boxplot_films_by_trope}
+\end{figure}
+
+This effect is clearly visible in Figure~\ref{fig:frequency_films_by_trope}.
+Just one film per trope is still the most common frequency, and this effect has been
+amplified in the new dataset, showing less curvature for the new dataset.
+
+\begin{figure}[htpb]
+\center
+<<echo=False,fig=True, width="10cm", f_pos="h", f_size=(9,6)>>=
+frequencies_films()
+@
+\caption{Boxplots comparison of trope occurrences by film in July 2016 vs November 2019}
+\label{fig:frequency_films_by_trope}
+\end{figure}
+
+When we compare the top tropes by number of uses in films in July 2016 vs November 2019,
+as shown in figure~\ref{fig:top_tropes_by_number_of_films}, it looks completely different to the analogous analysis for films:
+in this case, there are no common tropes in the top lists for both datasets.
+Also, the difference between the top trope is huge, and the new top trope is used around 7 times more than the old top.
+
+\begin{figure}[htpb]
+\center
+<<echo=False,results="tex", width="12cm">>=
+top_tropes_by_number_of_films(50)
+@
+\caption{Top 50 films by number of tropes in July 2016 vs November 2019. Common elements are marked in blue.}
+\label{fig:top_tropes_by_number_of_films}
+\end{figure}
+
+\section{Conclusions}
+
+TV Tropes has grown from July 2016 to November 2019, in terms of films and tropes:
+in November 2019 there are almost twice the number of films and almost 3/2 of the tropes.
+However, the relations between films and tropes has not grown the same way.
+
+
+If we look at the films, there are more films, and in general, films are better described in terms of tropes.
+In 3 years, the top list has changed, but not drastically, and we can see that 1/3 of the films in the top 50 are still in the top 50,
+but, in general with twice the number of tropes. So, more films in the database and the existing films are better described.
+
+If we look at the tropes, things are different. Tropes are added in a lower proportion but are the ones mostly used since 2016,
+in other words, new tropes have been widely discovered in films, but not many old tropes have been newly found in the films.
+This is specially visible in the top 50, where no trope is shared at all. More than this, all the tropes in the top 50 in November 2019
+are present in more films than all the tropes in July 2016.
+
+We could say that old popular tropes haven't been explored as much as new tropes, but old popular films have still been reviewed a lot.
+
 
 \section*{Acknowledgements}
 This work has been partially funded by projects DeepBio (TIN2017-85727-C4-2-P) and TEC2015-68752
