@@ -114,7 +114,7 @@ def show_films(search_query, page=2, results=10):
 def test_recommender(context, neural_network_file):
     TropeRecommender.set_logger_file_id('trope_recommender')
 
-    executions = range(20,30) #range(15,20) #range(12, 15)  # range(11,12) #range(10,11) #range(0, 10)
+    executions = range(0,30)
     solution_length_alternatives = [30]
     max_evaluations_alternatives = [30000]
     mutation_probability_alternatives = [2 / 30, 1 / 30, 0.5 / 30]
@@ -122,15 +122,15 @@ def test_recommender(context, neural_network_file):
     population_size_alternatives = [50, 100, 200]
     no_better_results_during_evaluations_alternatives = [10000]
 
-    general_summary = u'logs/recommender_summary.log'
-    details_file_name = u'logs/recommender_details.log'
+    general_summary = u'logs/recommender_summary_seeds_ok.log'
+    details_file_name = u'logs/recommender_details_seeds_ok.log'
 
     list_of_parameters = [executions, solution_length_alternatives, max_evaluations_alternatives,
                           mutation_probability_alternatives, crossover_probability_alternatives,
                           population_size_alternatives, no_better_results_during_evaluations_alternatives]
     combinations = list(itertools.product(*list_of_parameters))
 
-    seed = 0
+    seed = 100
     combinations = [list(combination) for combination in combinations]
     for combination in combinations:
         combination.extend([seed, neural_network_file, general_summary, details_file_name])

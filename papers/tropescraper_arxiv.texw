@@ -21,17 +21,12 @@
 %\usepackage{palatino}
 
 <<echo=False>>=
-import pygraphviz as pgv
 import os
-
-def draw_graphviz(dot, filename):
-    G = pgv.AGraph()
-    G = G.from_string(dot)
-    G.layout(prog='dot')
-    if not os.path.isdir('figures'):
-        os.makedirs('figures')
-    G.draw(os.path.join('figures', filename))
+import sys
+sys.path.append(os.getcwd())
+from report_utils import *
 @
+
 
 \begin{document}
 
@@ -42,17 +37,16 @@ def draw_graphviz(dot, filename):
 \maketitle
 
 \begin{abstract}
-    The following technical report presents the free-software licensed library \textit{tropescraper},
-    a tool that automatically connects
-    to the wiki TVTropes and extracts the graph of films and tropes
-    to a standard-formatted output, up and running for scientific experiments.
-    It covers implementation details, input/outputs
-    and instructions on how to install the library via PyPI, how to use it and how to collaborate with the project.
-    The report also includes \textit{python code snippets} to manipulate the generated file
-    and pull out information from it making use of the libraries \textit{pandas} and \textit{matplotlib}.
-    As a practical example, the report uses them to compare how the data evolved
-    from July 2016, date of the latest official snapshot of \textit{DBTropes},
-    to November 2019, date of the latest extraction through tropescraper.
+    The following technical report describes and extracts useful information on
+    how tropes and films are related to each other, according to the data extracted from the wiki TV Tropes.
+    In order to do so, we generated a dataset through the tool TropeScraper (November 2019) and
+    compared it to the latest snapshot of DBTropes (July 2016), providing descriptive analysis,
+    studying the key differences and discussing the evolution of the wiki
+    in terms of number of tropes, number of films and relations.
+    The results show that the number of tropes and films doubled their size and their relations, ....
+    The dataset generated, the information extracted and the summaries provided are useful resources
+    for any research involving films and tropes and they can provide proper context and explanations
+    about the behaviour of models built on top of the dataset.
 \end{abstract}
 
 {\bf Keywords}: Tropes; TvTropes; tropescraper.
@@ -64,445 +58,181 @@ of tropes discovered in a generous amount film, actually, as large as possible,
 in a way that they can be efficiently processed and used in different experiments.
 
 \begin{enumerate}
-\item There is a wiki called \textit{TV Tropes} that describes thousands % how many
+\item There is a wiki called \textit{TV Tropes} that describes thousands
 films and tropes, and has a prolific community that feeds the data.
 \item A project called \textit{DBTropes} had the goal to extract n-tuples from TV Tropes so they can be automatically processed,
 including, among much other interesting information, the tropes and the films.
 \item DB Tropes was discontinued in 2016 and the latest snapshot of the dataset of n-tuples was built July 1st, 2016.
 \item Recent publications still need to make use of the tropes by film and the latest dataset available is from 2016;
 however, they would benefit from having updated information.
-\end{enumerate}
-
-To fulfil the need of having an updated corpus of films and tropes,
+\item To fulfil the need of having an updated corpus of films and tropes,
 in 2019 we developed a library called \textit{tropescraper} that:
-\begin{enumerate}
-\item can connect to the wiki TV Tropes,
-\item crawls through all the web pages of the films and extract their tropes,
-\item and returns a small dataset in a standard format.
-\end{enumerate}
-
-\section{About the report}
-
-The current report details how the library tropescraper is built, how to use it, how to install it,
-how to contribute to it, how to interpret the results and how they can be analyzed.
-The report uses the technology called \textit{pweave} that is able to execute python code snippets
-and generate graphs that are included into \LaTeX documents,
-so the code examples are actually being run at compilation time.
-
-The source of the report can be downloaded at
-\url{https://github.com/raiben/made_recommender/blob/master/papers/tropescraper_arxiv.texw}
-and can be re-run for further researches by the scientific community.
-
-\section{Design of tropescraper} \label{design}
-
-Tropescraper has been developed in python 3 because it allows fast-prototyping and offers facilities for
-web scraping. The resulting dataset accomplishes the \textit{JavaScript Object Notation}
-standards defined by the RFC 8259 (from now on, JSON),
-widespread, natively supported by the latest versions of Python or ECMAScript,
-and easily manageable in all modern languages.
-
-By definition, a scraper is a fragile piece of software because it relies in the structure of web pages
-that can change for many different reasons. For this reason,
-tropescraper is built with the aim of reusability, extensibility and maintainability,
-and some techniques and methodologies have been selected for its development:
-\textit{SOLID principles}, \textit{Clean Code}, \textit{Clean Architecture} and TDD.
-The Diagram in figure~\ref{fig:architecture} shows the components arranged according to
-Clean Architecture. Down below, some decisions are explained in detail:
-
-\begin{itemize}
-    \item the diagram shows three concentric circles that correspond to the Clean Architecture,
-    as proposed by Robert C. Martin. The inner circle includes interfaces, Data Transport Objects (entities)
-    and common utilities that are directly accessible by all the components, such as the ObjectFactory.
-    The second circle includes the only use case that has been implemented, called TVTropesScraper,
-    that implements the logic to extract the data and store it. The outer circle includes the connectors, adaptors,
-    facades and repositories, in other words, the so called \textit{details} that depend on \textit{third parties} and
-    can be easily replaceable. Finally, out of the circles, we can find main programs, tests, external services,
-    devices and UI.
-
-    \item The interaction is started from the terminal, that launches the command \textit{scrape\-tvtropes}.
-    This command maps interfaces to implementations,
-    so the \textit{use case} will be able to apply the \textit{Dependency Inversion} principle
-    through a \textit{Service Locator} called ObjectFactory.
-    By doing this, we can apply the \textit{Separation of Concerns} principle
-    and design \textit{Single Responsibility} classes
-    to perform the different actions that need to be done (scrape, cache, parse and store)
-    while easing the maintainability and flexibility.
-    The command also launches the use case that is the runnable class that orchestrates the business logic.
-
-    \item The use case called TVTropesScraper has access to the ObjectFactory and the interfaces of the adaptors,
-    so it can instantiate the implementations indirectly. It will use an instance of WebPageRetrieverInterface
-    to retrieve the information from a web page, an instance CacheInterface to store in the cache,
-    an instance of PageParserInterface to extract the information and an instance of TropesStoreInterface to build
-    the resulting dataset. The main sequence of this use case includes:
-
     \begin{enumerate}
-        \item Retrieving the categories catalog and cache it.
-        \item Parsing the catalog and scrape the categories.
-        \item Retrieving every category page and cache it.
-        \item Parsing every category page and scrape the film names.
-        \item Retrieving every film page and cache it.
-        \item Parsing every film page and scrape the trope names.
-        \item Store the dictionary of films and tropes.
+    \item can connect to the wiki TV Tropes,
+    \item crawls through all the web pages of the films and extract their tropes,
+    \item and returns a small dataset in a standard format.
     \end{enumerate}
-
-    \item WebPageRetriever connects to tvtropes.org and retrieves the page doing
-    pauses in between calls so that the service is not harmed.
-    \item FileCache stores every single page in the hard drive, as bzip2 with compression 9.
-    \item TVTropesParser use dom selectors to retrieve information from specific nodes in the HTML tree.
-    \item TropesStore saves the resulting dictionary of films and tropes as a compressed JSON.
-    \item The architecture can easily be extended with new adaptors that implement new features as required,
-    for example, volatile in-memory cache, threaded requests, different compression, adaptations to changes in the
-    web page structure, extraction of other items from TV Tropes, etc.
-\end{itemize}
-
-\begin{figure}
-\centering
-\includegraphics[width=\textwidth]{diagrams/tropescraper_architecture.pdf}
-\caption[Architecture]{Architecture of tvtropes\label{fig:architecture}}
-\end{figure}
-
-The different classes are detailed in the UML diagram in Figure~\ref{fig:classes}.
-
-<<echo=False>>=
-workflow = '''
-digraph "classes" {
-
-charset="utf-8"
-rankdir=BT
-ranksep=1;
-
-TVTropesScraper [label="{TVTropesScraper|cache_interface\lcache_path : NoneType\lfilms : NoneType, set\llatest_log_datetime : NoneType\llogger : NoneType\lobject_factory\lpage_parser_interface\lpage_retriever_interface\lparser\ltropes : NoneType, set\ltropes_by_film\lwait_time_between_calls_in_seconds : NoneType\l|export_to_json()\lget_info()\lget_tropes()\llog_summary()\l}", shape="record"];
-
-subgraph cluster_common{
-style="rounded";
-label="tropescraper.common";
-ObjectFactory [label="{ObjectFactory|DEFAULT_IMPLEMENTATION_MAP : dict\lMOCK_IMPLEMENTATION_MAP : dict\lT : T\l|clean_mocks()\lget_instance()\linstall_mock()\l}", shape="record"];
-}
-
-subgraph cluster_interfaces{
-style="rounded";
-label="tropescraper.interfaces";
-CacheInterface [label="{CacheInterface|\l|get()\lget_info()\lset()\l}", shape="record"];
-PageParserInterface [label="{PageParserInterface|\l|extract_categories()\lextract_films()\lextract_tropes()\lget_category_url()\lget_film_url()\lget_starting_url()\l}", shape="record"];
-WebPageRetrieverInterface [label="{WebPageRetrieverInterface|\l|retrieve()\l}", shape="record"];
-}
-
-subgraph cluster_adaptors{
-style="rounded";
-label="tropescraper.adaptors";
-FileCache [label="{FileCache|COMPRESSED_EXTENSION : str\lDEFAULT_CACHE_PATH : str\lDEFAULT_ENCODING : str\lEXTENSION : str\lcache_path : str\llogger : NoneType\l|get()\lget_info()\lset()\l}", shape="record"];
-TVTropesParser [label="{TVTropesParser|BASE_FILM_URL : str\lBASE_MAIN_URL : str\lFILM_RESOURCE : str\lLINK_ADDRESS_SELECTOR : str\lLINK_SELECTOR : str\lLINK_SELECTOR_INSIDE_ARTICLE : str\lMAIN_RESOURCE : str\lMAIN_SEARCH : str\l|extract_categories()\lextract_films()\lextract_tropes()\lget_category_url()\lget_film_url()\lget_starting_url()\l}", shape="record"];
-WebPageRetriever [label="{WebPageRetriever|DEFAULT_WAIT_TIME : float\llogger : NoneType\lwait_time_between_calls_in_seconds : float\l|retrieve()\l}", shape="record"];
-}
-
-subgraph cluster_tests{
-style="rounded";
-label="tropescraper.tests";
-FileCacheTestCase [label="{FileCacheTestCase|EXPECTED_CONTENT : str\lUNEXPECTED_CONTENT : str\lURL_KEY : str\lcache\ltemporal_directory_name : NoneType\l|setUp()\ltearDown()\ltest_get_when_key_found_then_returns_file_content()\ltest_get_when_key_not_found_then_returns_None()\ltest_set_when_key_does_not_exist_then_sets_content_in_new_file()\ltest_set_when_key_exists_then_file_content_updated()\l}", shape="record"];
-TVTropesParserTestCase [label="{TVTropesParserTestCase|SAMPLE_CATEGORY : str\lSAMPLE_FILM : str\lSAMPLE_TROPE : str\lparser\lretriever\l|setUp()\ltest_extract_categories_when_categories_page_retrieved_then_returns_the_tropes()\ltest_extract_categories_when_starting_page_retrieved_then_returns_categories()\ltest_extract_films_when_category_page_retrieved_then_returns_films()\l}", shape="record"];
-WebPageRetrieverTestCase [label="{WebPageRetrieverTestCase|\l|test_retrieve_when_called_then_returns_the_page()\l}", shape="record"];
-}
-
-FileCache -> CacheInterface [arrowhead="empty", arrowtail="none"];
-TVTropesParser -> PageParserInterface [arrowhead="empty", arrowtail="none"];
-WebPageRetriever -> WebPageRetrieverInterface [arrowhead="empty", arrowtail="none"];
-CacheInterface -> TVTropesScraper [arrowhead="diamond", arrowtail="none", fontcolor="green", label="", style="solid"];
-FileCacheTestCase -> FileCache [arrowhead="none", arrowtail="diamond", fontcolor="green", label="", style="solid"];
-ObjectFactory -> TVTropesScraper [arrowhead="diamond", arrowtail="none", fontcolor="green", label="", style="solid"];
-PageParserInterface -> TVTropesScraper [arrowhead="diamond", arrowtail="none", fontcolor="green", label="", style="solid"];
-TVTropesParserTestCase -> TVTropesParser [arrowhead="none", arrowtail="diamond", fontcolor="green", label="", style="solid"];
-TVTropesParserTestCase -> WebPageRetriever [arrowhead="none", arrowtail="diamond", fontcolor="green", label="", style="solid"];
-WebPageRetrieverInterface -> TVTropesScraper [arrowhead="diamond", arrowtail="none", fontcolor="green", label="", style="solid"];
-WebPageRetrieverTestCase -> WebPageRetriever [arrowhead="none", arrowtail="diamond", fontcolor="green", label="", style="solid"];
-}
-'''
-
-draw_graphviz(workflow, "modules_classes.pdf")
-@
-
-\begin{figure}
-\centering
-\includegraphics[width=\textwidth]{figures/modules_classes.pdf}
-\caption[Class Diagram]{UML Class Diagram\label{fig:classes}}
-\end{figure}
-
-% TODO Talk about tests and the python library ecosystem
-The tests are written in natural language and follow the FIRST principles.
-
-\section{Installation of tropescraper} \label{sec:installation}
-
-Attention: This tool uses python >= 3.6.
-
-If you want to use this tool, you don't need to download the sources
-or clone the repository. Just install the latest version through PyPi:
-
-\begin{minted}[mathescape, fontsize=\small, xleftmargin=0.5em]{console}
-pip install tropescraper
-\end{minted}
-
-This will create an executable called \textbf{scrape-tvtropes}.
-
-\section{Use of tropescraper} \label{sec:how_to_use}
-
-Try to execute
-\begin{minted}[mathescape, fontsize=\small, xleftmargin=0.5em]{console}
-scrape-tvtropes
-\end{minted}
-
-The script can take some hours to finish, but don't worry,
-it can be stopped at any moment because it relies in file cache, so
-it will not try to re-download the same page twice even in
-different executions.
-
-The script will create a folder in the same directory called \textbf{scraper\_cache}
-with thousand of small compressed files that are internally used as cache.
-
-\section{Description of the generated dataset} \label{sec:extraction}
-
-When the script finishes, it will generate a file called \textbf{tvtropes.json}
-with a JSON that contains all the films and the tropes found.
-The keys of the JSON file will be the identifiers of the films in TV Tropes, and the values
-will be lists of trope identifiers in TV Tropes. In both cases, identifiers will be  short camelCased versions of the
-name, that can include the year for disambiguation purposes.
-
-\begin{minted}[mathescape, fontsize=\small, xleftmargin=0.5em]{json}
-
-{
-  "<film_identifier>":[
-    "<trope_identifier>",
-    "<trope_identifier>"
-  ],
-  ...
-},
-\end{minted}
-
-\section{Analysis if the generated dataset} \label{sec:tools}
-
-Pre-conditions:
-\begin{enumerate}
-\item If you don't have access to the dbtropes file, please download it from:
-\url{http://skipforward.opendfki.de/wiki/DBTropes} and unzip it. Then copy the path.
-\item If you don't have access to the tropescraper-generated file, please run tropescraper and copy the path.
-\item Use the dbtropes\_dataset and tropescraper\_dataset as mappings from films to tropes:
-[film]->[trope\_1,...,trope\_n]
-\item Use the dbtropes\_dataset\_reversed and tropescraper\_dataset\_reversed as mappings from films to tropes:
-[trope]->[film\_1,...,film\_n]
 \end{enumerate}
 
-Data load:
+However, a basic statistical analysis shows that the data is incomplete, with distributions
+that points out to huge biases due to the popularity of the films and tropes.
+The detection of these biases is essential to build automatic learning models that work.
 
+Furthermore, before the existence of TropeScraper,
+the scientific researches are based on the dataset DBTropes (2016).
+It makes us wonder how much the information about films and tropes from TVTropes has changed since then.
+How much has it grown? How have the most used tropes changes since then? And the best described films in terms of tropes?
+How has the graph of connections between tropes and films evolved through time?
+The answers to these questions can be the key to improve some researches and predict how
+the current dynamics of the TV Tropes community can affect future data.
 
-<<>>=
-DBTROPES_GENERATED_FILE_PATH = '/Users/phd/Downloads/dbtropes/dbtropes-20160701.nt'
-TROPESCRAPER_GENERATED_FILE_PATH = '/Users/phd/workspace/made/tropescraper/bin/tvtropes.json'
+\section{Analysis of the generated dataset} \label{sec:tools}
 
-DBTROPES_DATE = '20160701'
-TROPESCRAPER_DATE = '20190915'
+The relation between tropes and films can be studied from both perspectives.
 
-BINS = 100
-FIGURE_SIZE = [12,5]
+\subsection{Descriptive analysis of the films by the number of tropes}
+
+According to Figure~\ref{fig:decriptive_analysis_tropes_by_film}, the dataset in November 2019
+contains 12147 films,
+and the average number of tropes by film is 54.242, but the film with more tropes in the dataset has 971 tropes.
+If we compare these values against the data in 2016, the number of films is almost the double,
+and the average number of tropes per film as well. In other words, the dataset has more films and the films contain
+more tropes.
+
+\begin{figure}[htpb]
+\center
+<<echo=False,results="tex", width="12cm">>=
+describe_tropes()
 @
+\caption{Descriptive analysis comparison of trope occurrences by film in July 2016 vs November 2019}
+\label{fig:decriptive_analysis_tropes_by_film}
+\end{figure}
 
-Let's define a function to reverse the film -> tropes mapping
+The figure~\ref{fig:boxplot_tropes_by_film} shows the boxplots comparison of the two datasets. As we can see,
+TV Tropes tends to have a better description of the films in terms of tropes and less films with no tropes,
+that is reflected in a interquartile range displaced to the top and shorter.
 
-<<>>=
-def reverse_mapping(mapping):
-    reverse_map = {}
-    for key in mapping.keys():
-        for value in mapping[key]:
-            if value not in reverse_map:
-                reverse_map[value] = []
-            reverse_map[value].append(key)
-    return reverse_map
+\begin{figure}[htpb]
+\center
+<<echo=False,fig=True, width="10cm", f_pos="h", f_size=(9,2)>>=
+boxplot_tropes()
 @
+\caption{Boxplots comparison of trope occurrences by film in July 2016 vs November 2019}
+\label{fig:boxplot_tropes_by_film}
+\end{figure}
 
-Load the dbtropes dataset from the n-tuples file:
 
-<<>>=
-import re
+In figure~\ref{fig:frequency_tropes_by_film}, we can observe the number of films that have a specific number of tropes.
+As we can observe, the new dataset has been displaced to the right with respect to the number of tropes in the film,
+that means that films are better described. Previously, most of the films had just 1 trope and currently, most of them
+have between 10 and 100.
 
-template = '^<http://dbtropes.org/resource/Film/([^>]+)> ' \
-           + '<http://skipforward.net/skipforward/resource/seeder/skipinions/hasFeature> ' \
-           + '<http://dbtropes.org/resource/Main/([^/]+)/[^>/]+>.*$'
-dbtropes_dataset = {}
-dbtropes_films = set()
-dbtropes_tropes = set()
-
-with open(DBTROPES_GENERATED_FILE_PATH, 'r') as bdtropes_file:
-    line = bdtropes_file.readline()
-    counter = 1
-    while line:
-        matches = re.match(template, line)
-        if matches:
-            film = matches.group(1)
-            dbtropes_films.add(film)
-
-            trope = matches.group(2)
-            dbtropes_tropes.add(trope)
-
-            if film not in dbtropes_dataset:
-                dbtropes_dataset[film] = set()
-
-            dbtropes_dataset[film].add(trope)
-
-        line = bdtropes_file.readline()
-        counter += 1
-
-dbtropes_dataset_reversed = reverse_mapping(dbtropes_dataset)
-
-print(f'Summary:\n - Lines = {counter-1:,}\n - Films count = {len(dbtropes_films):,}\n'
-      f' - Tropes count = {len(dbtropes_tropes):,}')
+\begin{figure}[htpb]
+\center
+<<echo=False,fig=True, width="10cm", f_pos="h", f_size=(9,6)>>=
+frequencies_tropes()
 @
+\caption{Boxplots comparison of trope occurrences by film in July 2016 vs November 2019}
+\label{fig:frequency_tropes_by_film}
+\end{figure}
 
-Load the tropescraper dataset:
+When we compare the top films by number of tropes in July 2016 vs November 2019,
+as shown in figure~\ref{fig:top_films_by_number_of_tropes}, 17 films our of 50 are shared in the lists.
+It is interesting to point out that, although both lists have similar number of tropes in the highest values,
+the top films of the new dataset almost double the number of tropes in the old one, in the lower values of the list.
 
-<<>>=
-import json
-
-tropescraper_films = set()
-tropescraper_tropes = set()
-
-with open(TROPESCRAPER_GENERATED_FILE_PATH, 'r') as tropescraper_file:
-    tropescraper_dataset = json.load(tropescraper_file)
-
-tropescraper_films = set(dbtropes_dataset.keys())
-for key in tropescraper_films:
-    tropescraper_tropes.update(dbtropes_dataset[key])
-
-tropescraper_dataset_reversed = reverse_mapping(tropescraper_dataset)
-
-print(f'Summary:\n - Films count = {len(tropescraper_films):,}\n'
-      f' - Tropes count = {len(tropescraper_tropes):,}')
+\begin{figure}[htpb]
+\center
+<<echo=False,results="tex", width="12cm">>=
+top_films_by_number_of_tropes(50)
 @
+\caption{Top 50 films by number of tropes in July 2016 vs November 2019. Common elements are marked in blue.}
+\label{fig:top_films_by_number_of_tropes}
+\end{figure}
 
-\subsection{Descriptive analysis of the tropes}
 
-Pre-calculations:
 
-<<>>=
-import matplotlib.pyplot as plt
-from IPython.display import display, Latex
-from scipy import stats
-import pandas as pd
 
-dbtropes_dataset_count_by_film = {film:len(dbtropes_dataset[film])
-                                  for film in dbtropes_dataset.keys()}
-tropescraper_dataset_count_by_film = {film:len(tropescraper_dataset[film])
-                                      for film in tropescraper_dataset.keys()}
 
-what = 'tropes'
-dbtropes_values = list(dbtropes_dataset_count_by_film.values())
-tropescraper_values = list(tropescraper_dataset_count_by_film.values())
+
+
+
+\subsection{Descriptive analysis of the tropes by the number of films}
+
+According to Figure~\ref{fig:decriptive_analysis_films_by_trope}. The dataset in November 2019
+contains 26479 tropes,
+and the average number of films by trope is 24.883, but the trope with more films in the dataset has 3386 films.
+If we compare these values against the data in 2016, the number of tropes is 3/2 of the old dataset,
+but the average number of films per trope has tripled the old value.
+In other words, the dataset has more tropes (about half more) and, on average, the tropes are present in
+more films.
+
+\begin{figure}[htpb]
+\center
+<<echo=False,results="tex", width="12cm">>=
+describe_films()
 @
+\caption{Descriptive analysis comparison of trope occurrences by film in July 2016 vs November 2019}
+\label{fig:decriptive_analysis_films_by_trope}
+\end{figure}
 
-Statistics
+However, as we can observe in figure~\ref{fig:boxplot_films_by_trope}, a bigger average does not mean that tropes
+are more widely used among films. As we can observe, the interquartile range in 2019 for the use of tropes
+begins from 1 and is wider, in other words, we have a similar frequency but amplified with more tropes.
 
-<<results="tex">>=
-dbtropes_stats = stats.describe(dbtropes_values)
-tropescraper_stats = stats.describe(tropescraper_values)
-dataframe = pd.DataFrame.from_dict({
-    'min':[dbtropes_stats.minmax[0],tropescraper_stats.minmax[0]],
-    'max':[dbtropes_stats.minmax[1], tropescraper_stats.minmax[1]],
-    'nobs':[dbtropes_stats.nobs, tropescraper_stats.nobs],
-    'mean':[dbtropes_stats.mean, tropescraper_stats.mean],
-    'kurtosis':[dbtropes_stats.kurtosis, tropescraper_stats.kurtosis],
-    'skewness':[dbtropes_stats.skewness, tropescraper_stats.skewness],
-    'variance':[dbtropes_stats.variance, tropescraper_stats.variance]
-}, orient='index')
-dataframe.columns = [DBTROPES_DATE, TROPESCRAPER_DATE]
-display(Latex(dataframe.to_latex()))
+\begin{figure}[htpb]
+\center
+<<echo=False,fig=True, width="10cm", f_pos="h", f_size=(9,2)>>=
+boxplot_films()
 @
+\caption{Boxplots comparison of trope occurrences by film in July 2016 vs November 2019}
+\label{fig:boxplot_films_by_trope}
+\end{figure}
 
-Boxplots
+This effect is clearly visible in Figure~\ref{fig:frequency_films_by_trope}.
+Just one film per trope is still the most common frequency, and this effect has been
+amplified in the new dataset, showing less curvature for the new dataset.
 
-<<fig=True, width="\linewidth", f_pos="h", f_size=(16,9)>>=
-values_concatenated = pd.DataFrame.from_dict({
-    DBTROPES_DATE: dbtropes_values,
-    TROPESCRAPER_DATE: tropescraper_values
-}, orient='index')
-values_concatenated.transpose().plot(kind='box', figsize=FIGURE_SIZE, logy=True)
+\begin{figure}[htpb]
+\center
+<<echo=False,fig=True, width="10cm", f_pos="h", f_size=(9,6)>>=
+frequencies_films()
 @
+\caption{Boxplots comparison of trope occurrences by film in July 2016 vs November 2019}
+\label{fig:frequency_films_by_trope}
+\end{figure}
 
-Trope frequencies
+When we compare the top tropes by number of uses in films in July 2016 vs November 2019,
+as shown in figure~\ref{fig:top_tropes_by_number_of_films}, it looks completely different to the analogous analysis for films:
+in this case, there are no common tropes in the top lists for both datasets.
+Also, the difference between the top trope is huge, and the new top trope is used around 7 times more than the old top.
 
-<<fig=True, width="\linewidth", f_pos="h", f_size=(16,9)>>=
-dataframe = pd.DataFrame.from_dict({'values':dbtropes_values})
-frequencies = pd.DataFrame([dataframe.iloc[:,0].value_counts()]).transpose().reset_index()
-ax = frequencies.plot.scatter(x='index', y='values', color='Blue', label=DBTROPES_DATE,
-                              logy=True)
-
-dataframe = pd.DataFrame.from_dict({'values':tropescraper_values})
-frequencies = pd.DataFrame([dataframe.iloc[:,0].value_counts()]).transpose().reset_index()
-frequencies.plot.scatter(x='index', y='values', color='Orange', label=TROPESCRAPER_DATE,
-                         ax=ax, logy=True)
+\begin{figure}[htpb]
+\center
+<<echo=False,results="tex", width="12cm">>=
+top_tropes_by_number_of_films(50)
 @
+\caption{Top 50 films by number of tropes in July 2016 vs November 2019. Common elements are marked in blue.}
+\label{fig:top_tropes_by_number_of_films}
+\end{figure}
 
-\subsection{Descriptive analysis of the films}
+\section{Conclusions}
 
-Pre-calculations:
+TV Tropes has grown from July 2016 to November 2019, in terms of films and tropes:
+in November 2019 there are almost twice the number of films and almost 3/2 of the tropes.
+However, the relations between films and tropes has not grown the same way.
 
-<<>>=
-import matplotlib.pyplot as plt
-from IPython.display import display, Latex
-from scipy import stats
-import pandas as pd
 
-dbtropes_dataset_count_by_trope = {trope:len(dbtropes_dataset_reversed[trope])
-                                   for trope in dbtropes_dataset_reversed.keys()}
-tropescraper_dataset_count_by_trope = {trope:len(tropescraper_dataset_reversed[trope])
-                                      for trope in tropescraper_dataset_reversed.keys()}
+If we look at the films, there are more films, and in general, films are better described in terms of tropes.
+In 3 years, the top list has changed, but not drastically, and we can see that 1/3 of the films in the top 50 are still in the top 50,
+but, in general with twice the number of tropes. So, more films in the database and the existing films are better described.
 
-what = 'films'
-dbtropes_values = list(dbtropes_dataset_count_by_trope.values())
-tropescraper_values = list(tropescraper_dataset_count_by_trope.values())
-@
+If we look at the tropes, things are different. Tropes are added in a lower proportion but are the ones mostly used since 2016,
+in other words, new tropes have been widely discovered in films, but not many old tropes have been newly found in the films.
+This is specially visible in the top 50, where no trope is shared at all. More than this, all the tropes in the top 50 in November 2019
+are present in more films than all the tropes in July 2016.
 
-Statistics
-
-<<results="tex">>=
-dbtropes_stats = stats.describe(dbtropes_values)
-tropescraper_stats = stats.describe(tropescraper_values)
-dataframe = pd.DataFrame.from_dict({
-    'min':[dbtropes_stats.minmax[0],tropescraper_stats.minmax[0]],
-    'max':[dbtropes_stats.minmax[1], tropescraper_stats.minmax[1]],
-    'nobs':[dbtropes_stats.nobs, tropescraper_stats.nobs],
-    'mean':[dbtropes_stats.mean, tropescraper_stats.mean],
-    'kurtosis':[dbtropes_stats.kurtosis, tropescraper_stats.kurtosis],
-    'skewness':[dbtropes_stats.skewness, tropescraper_stats.skewness],
-    'variance':[dbtropes_stats.variance, tropescraper_stats.variance]
-}, orient='index')
-dataframe.columns = [DBTROPES_DATE, TROPESCRAPER_DATE]
-display(Latex(dataframe.to_latex()))
-@
-
-Boxplots
-
-<<fig=True, width="\linewidth", f_pos="h", f_size=(16,9)>>=
-values_concatenated = pd.DataFrame.from_dict({
-    DBTROPES_DATE: dbtropes_values,
-    TROPESCRAPER_DATE: tropescraper_values
-}, orient='index')
-values_concatenated.transpose().plot(kind='box', figsize=FIGURE_SIZE, logy=True)
-@
-
-Trope frequencies
-
-<<fig=True, width="\linewidth", f_pos="h", f_size=(16,9)>>=
-dataframe = pd.DataFrame.from_dict({'values':dbtropes_values})
-frequencies = pd.DataFrame([dataframe.iloc[:,0].value_counts()]).transpose().reset_index()
-ax = frequencies.plot.scatter(x='index', y='values', color='Blue', label=DBTROPES_DATE,
-                              logy=True)
-
-dataframe = pd.DataFrame.from_dict({'values':tropescraper_values})
-frequencies = pd.DataFrame([dataframe.iloc[:,0].value_counts()]).transpose().reset_index()
-frequencies.plot.scatter(x='index', y='values', color='Orange', label=TROPESCRAPER_DATE,
-                         ax=ax, logy=True)
-@
-
-\subsection{Graph analysis}
-TODO
-
-\section{Summary of the data on 2019/10} \label{sec:data}
+We could say that old popular tropes haven't been explored as much as new tropes, but old popular films have still been reviewed a lot.
 
 
 \section*{Acknowledgements}
