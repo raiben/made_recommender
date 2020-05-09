@@ -56,10 +56,13 @@ in this report use scraped information to statistically describe
 \section{Motivations} \label{sec:problem}
 
 Researches on story generation can benefit from having a recent \textit{corpus}
-of tropes discovered in a generous amount film, actually, as large as possible,
-in a way that they can be efficiently processed and used in different experiments.
+of tropes discovered in a generous amount film, % Rewrite, does not make sense of films? in films? - JJ
+ actually, % Currently? - JJ
+ as large as possible,
+in a way that they can be efficiently processed and used in different experiments. % for doing what? - JJ
+% Also: say briefly what's a trope - JJ
 
-\begin{enumerate}
+\begin{enumerate} % Not clear what you're enumerating here. If it's simply a set of arguments, you need to narrate them - JJ
 \item There is a wiki called \textit{TV Tropes} that describes thousands
 films and tropes, and has a prolific community that feeds the data.
 \item A project called \textit{DBTropes} had the goal to extract n-tuples from TV Tropes so they can be automatically processed,
@@ -68,7 +71,8 @@ including, among much other interesting information, the tropes and the films.
 \item Recent publications still need to make use of the tropes by film and the latest dataset available is from 2016;
 however, they would benefit from having updated information.
 \item To fulfil the need of having an updated corpus of films and tropes,
-in 2019 we developed a library called \textit{tropescraper} that:
+in 2019 we developed a library called \textit{tropescraper} %link - JJ
+ that:
     \begin{enumerate}
     \item can connect to the wiki TV Tropes,
     \item crawls through all the web pages of the films and extract their tropes,
@@ -78,7 +82,8 @@ in 2019 we developed a library called \textit{tropescraper} that:
 
 However, a basic statistical analysis shows that the data is incomplete, with distributions
 that points out to huge biases due to the popularity of the films and tropes.
-The detection of these biases is essential to build automatic learning models that work.
+The detection of these biases is essential to build automatic learning models that work. % be more precise here
+% Also, instead of "that work" I'd say "that can be explained". And use the example of number of tropes for old movies - JJ
 
 Furthermore, before the existence of TropeScraper,
 the scientific researches are based on the dataset DBTropes (2016).
@@ -96,10 +101,10 @@ The relation between tropes and films can be studied from both perspectives.
 
 According to Figure~\ref{fig:decriptive_analysis_tropes_by_film}, the dataset in November 2019
 contains 12147 films,
-and the average number of tropes by film is 54.242, but the film with more tropes in the dataset has 971 tropes.
+and the average number of tropes by film is 54.242, but the film with the most tropes in the dataset has 971.
 If we compare these values against the data in 2016, the number of films is almost the double,
 and the average number of tropes per film as well. In other words, the dataset has more films and the films contain
-more tropes.
+more tropes. % This means that... - JJ
 
 \begin{figure}[htpb]
 \center
@@ -163,10 +168,10 @@ top_films_by_number_of_tropes(50)
 
 According to Figure~\ref{fig:decriptive_analysis_films_by_trope}. The dataset in November 2019
 contains 26479 tropes,
-and the average number of films by trope is 24.883, but the trope with more films in the dataset has 3386 films.
+and the average number of films by trope is 24.883, but the trope that appear in the most films in the dataset has 3386 films.
 If we compare these values against the data in 2016, the number of tropes is 3/2 of the old dataset,
-but the average number of films per trope has tripled the old value.
-In other words, the dataset has more tropes (about half more) and, on average, the tropes are present in
+but the average number of films where a trope appears has tripled the old value.
+In other words, the dataset has more tropes (about 50\% more) and, on average, the tropes are present in
 more films.
 
 \begin{figure}[htpb]
@@ -193,6 +198,7 @@ boxplot_films()
 
 This effect is clearly visible in Figure~\ref{fig:frequency_films_by_trope}.
 Just one film per trope is still the most common frequency, and this effect has been
+% But the difference between that and the second is bigger? The "fat tail" effect is clearer? - JJ
 amplified in the new dataset, showing less curvature for the new dataset.
 
 \begin{figure}[htpb]
@@ -235,7 +241,7 @@ This is specially visible in the top 50, where no trope is shared at all. More t
 are present in more films than all the tropes in July 2016.
 
 We could say that old popular tropes haven't been explored as much as new tropes, but old popular films have still been reviewed a lot.
-
+% What does it say about the bias? How's this interesting for machine learning with this? - JJ
 
 \section*{Acknowledgements}
 This work has been partially funded by projects DeepBio (TIN2017-85727-C4-2-P) and TEC2015-68752
