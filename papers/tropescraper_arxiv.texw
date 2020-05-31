@@ -173,19 +173,19 @@ frequencies_tropes()
 \label{fig:frequency_tropes_by_film}
 \end{figure}
 
-The films with more tropes (Table~\ref{fig:top_films_by_number_of_tropes})
+The films with more tropes (Table~\ref{tab:top_films_by_number_of_tropes})
 are adventure/action films franchises, such as James Bond, The Avengers and Star Wars.
 If we compare The films in 2020 and 2016, we can observe that, in general, the top ones remain.
 As a rule, the films that were previously in the top have multiplied the number of tropes up to 10x.
 
-\begin{figure}[htpb]
+\begin{table}[htpb]
 \center
 <<echo=False,results="tex", width="12cm">>=
 top_films_by_number_of_tropes(50)
 @
 \caption{Comparative top fifty films by the number of tropes between July 2016 and April 2019. *Common elements are marked in blue.}
-\label{fig:top_films_by_number_of_tropes}
-\end{figure}
+\label{tab:top_films_by_number_of_tropes}
+\end{table}
 
 In some cases, the films have changed the name from 2016 to avoid ambigüity
 (TheAvengers becomes TheAvengers2012, StarTrek becomes StarTrek2009, AlienS becomes Aliens,
@@ -209,10 +209,10 @@ Finally, TV Tropes also includes films that are not released yet but are already
 this is the case of AvengersInfinityWar, that already had the tropes LoadsAndLoadsOfCharacters
 and GrandFinale in 2016.
 
-\subsection{Analysis of the number of films that the tropes appear in}
+\subsection{Analysis of the number of films where the tropes appear}
 
 The descriptive analysis of the tropes regarding the films they appear
-in (Table~\ref{fig:decriptive_analysis_films_by_trope})
+in (Table~\ref{tab:decriptive_analysis_films_by_trope})
 reveals a growth of the number of tropes by 110.38\%.
 The average number of films that every trope appears in also grows by 259.95\%.
 While there are tropes that only exist in a single film, every trope is used on average by 28 films.
@@ -220,14 +220,14 @@ The comparative boxplots (Figure~\ref{fig:boxplot_films_by_trope}) shows a more 
 interquartile range, and a shift to the top,
 that corresponds to stretching the histogram from 2016 and a longer tail.
 
-\begin{figure}[htpb]
+\begin{table}[htpb]
 \center
 <<echo=False,results="tex", width="12cm">>=
 describe_films()
 @
 \caption{Comparative descriptive analysis of trope occurrences by film between July 2016 and April 2019}
-\label{fig:decriptive_analysis_films_by_trope}
-\end{figure}
+\label{tab:decriptive_analysis_films_by_trope}
+\end{table}
 
 \begin{figure}[htpb]
 \center
@@ -256,23 +256,23 @@ frequencies_films()
 However, having a distribution that resembles the one in 2016
 does not necessarily mean that TV Tropes has not suffered many changes.
 Although the top films have not changed a lot since 2016, the top tropes have,
-keeping only three out of fifty (Table~\ref{fig:top_tropes_by_number_of_films}).
+keeping only three out of fifty (Table~\ref{tab:top_tropes_by_number_of_films}).
 The tropes have evolved so much since 2016 that 43 out of the top fifty in 2020
 did not even exist in 2016.
 
-\begin{figure}[htpb]
+\begin{table}[htpb]
 \center
 <<echo=False,results="tex", width="12cm">>=
 top_tropes_by_number_of_films(50)
 @
 \caption{Comparative top fifty films by the number of tropes between July 2016 and April 2019. *Common elements are marked in blue.}
-\label{fig:top_tropes_by_number_of_films}
-\end{figure}
+\label{tab:top_tropes_by_number_of_films}
+\end{table}
 
 The first question that comes into our minds is if the scraper is working fine.
 In order to answer this question, we analyse the top tropes from 2016
 and try to trace the reasons why they are not so popular in 2020.
-Table~\ref{fig:old_top_tropes_and_increment} shows
+Table~\ref{tab:old_top_tropes_and_increment} shows
 the comparative ranking of the top tropes between 2016 and their position in 2020.
 According to it, the vast majority of tropes have incremented their appearance in films by a 200\%-300\%.
 Nevertheless, this is not enough for them to be in the top fifty,
@@ -282,14 +282,14 @@ removes HeyItsThatGuy and replace it by RetroactiveRecognition,
 replaces SpiritualLicensee by SpiritualAdaptation (although the old trope still appears in some films)
 and removes ThreeDMovie.
 
-\begin{figure}[htpb]
+\begin{table}[htpb]
 \center
 <<echo=False,results="tex", width="12cm">>=
 old_top_tropes_and_increment(50)
 @
 \caption{Top fifty films by the number of tropes in July 2016 and their increment of tropes in April 2020.}
-\label{fig:old_top_tropes_and_increment}
-\end{figure}
+\label{tab:old_top_tropes_and_increment}
+\end{table}
 
 \section{Conclusions}
 
