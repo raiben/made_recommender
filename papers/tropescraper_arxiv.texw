@@ -10,17 +10,7 @@
 \usepackage{microtype}      % microtypography
 \usepackage{lipsum}		% Can be removed after putting your text content
 \usepackage{graphicx}
-\usepackage{minted, xcolor}
-\usepackage{bookmark}
-\usepackage{natbib}
-\usemintedstyle{native}
-\definecolor{bg}{HTML}{282828}
-\setminted[python]{xleftmargin=0em, bgcolor=bg}
-\setminted[console]{xleftmargin=0em, bgcolor=bg}
-\setminted[json]{xleftmargin=0em, bgcolor=bg}
-%\usepackage{graphicx} % Includegraphics
-%usepackage{fancyvrb, color, graphicx, hyperref, amsmath, url}
-%\usepackage{palatino}
+\usepackage{xcolor}
 
 <<echo=False>>=
 import os
