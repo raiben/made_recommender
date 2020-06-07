@@ -11,6 +11,8 @@
 \usepackage{lipsum}		% Can be removed after putting your text content
 \usepackage{graphicx}
 \usepackage{minted, xcolor}
+\usepackage{bookmark}
+\usepackage{natbib}
 \usemintedstyle{native}
 \definecolor{bg}{HTML}{282828}
 \setminted[python]{xleftmargin=0em, bgcolor=bg}
@@ -32,216 +34,306 @@ from report_utils import *
 
 \title{Tropes in films: an initial analysis}
 
-\author{Rubén Héctor García-Ortega\thanks{Badger Maps, Granada} \and Pablo García-Sánchez\thanks{Department of Computer Science and Engineering, University of C\'adiz} \and JJ Merelo\thanks{University of Granada}}
-% Change Fergu's address - JJ
+\author{Rubén Héctor García-Ortega\thanks{Department of Computer Architecture and Technology, University of Granada} \and Pablo García-Sánchez\thanks{Department of Languages and Computer Systems, University of Granada} \and JJ Merelo\thanks{Department of Computer Architecture and Technology, University of Granada}}
+
 \maketitle
 
 \begin{abstract}
-TVTropes is a wiki that describes common tropes and which ones are used in which films. After releasing the TropeScraper Python module that extracts data from this site,
-in this report use scraped information to statistically describe
-    how tropes and films are related to each other and how this relations evolve in time.
-    In order to do so, we generated a dataset through the tool TropeScraper in November 2019 and
-    compared it to the latest snapshot of DBTropes, a dataset covering the same site and published in July 2019, providing descriptive analysis,
-    studying the key differences between them and discussing the evolution of the wiki
-    in terms of number of tropes, number of films and relations, to shed some light on how prevailing tropes evolve,
-    which ones become more popular or fade away, and in general how a set of tropes represents a film and might be a key to its success.
-    The results show that the number of tropes and films doubled their size and their relations, .... % Missing something here - JJ
-    The dataset generated, the information extracted and the summaries provided are useful resources
-    for any research involving films and tropes and they can provide proper context and explanations
-    about the behaviour of models built on top of the dataset, including generation of new content or its use in machine learning.
+    TVTropes is a wiki that describes tropes and which ones are used in which artistic work.
+    We are mostly interested in films, so
+    after releasing the TropeScraper Python module that extracts data from this site,
+    in this report we use scraped information
+    to describe statistically how tropes and films are related to each other
+    and how these relations evolve in time.
+    In order to do so, we generated a dataset through the tool TropeScraper in April 2020.
+    We have compared it to the latest snapshot of DB Tropes,
+    a dataset covering the same site and published in July 2016,
+    providing descriptive analysis, studying the fundamental differences
+    and addressing the evolution of the wiki in terms of the number of tropes,
+    the number of films and connections.
+    The results show that the number of tropes and films doubled their value and quadrupled their relations,
+    and films are, at large, better described in terms of tropes.
+    However, while the types of films with the most tropes has not changed significantly in years,
+    the list of most popular tropes has.
+    This outcome can help on shedding some light on how popular tropes evolve,
+    which ones become more popular or fade away, and in general how a set of tropes represents a film and
+    might be a key to its success.
+    The dataset generated, the information extracted, and the summaries provided
+    are useful resources for any research involving films and tropes.
+    They can provide proper context and explanations about the behaviour
+    of models built on top of the dataset, including the generation of new content or its use in machine learning.
 \end{abstract}
 
-{\bf Keywords}: Tropes; TvTropes; tropescraper.
+{\textbf{Keywords} }: Tropes; TvTropes; tropescraper.
 
 \section{Motivations} \label{sec:problem}
 
-Researches on story generation can benefit from having a recent \textit{corpus}
-of tropes discovered in a generous amount film, % Rewrite, does not make sense of films? in films? - JJ
- actually, % Currently? - JJ
- as large as possible,
-in a way that they can be efficiently processed and used in different experiments. % for doing what? - JJ
-% Also: say briefly what's a trope - JJ
+TV Tropes~\cite{tvtropes} is an outstanding source of knowledge because it describes thousands of tropes
+and relates them to artistic works, providing examples with a broad context in terms of the characters,
+places and actions.
+These relations, once extracted and processed, have shown to be very valuable in the field of
+Artificial Intelligence, in both content generation and quality prediction, as in ~\cite{doi:10.1111/exsy.12525}.
 
-\begin{enumerate} % Not clear what you're enumerating here. If it's simply a set of arguments, you need to narrate them - JJ
-\item There is a wiki called \textit{TV Tropes} that describes thousands
-films and tropes, and has a prolific community that feeds the data.
-\item A project called \textit{DBTropes} had the goal to extract n-tuples from TV Tropes so they can be automatically processed,
-including, among much other interesting information, the tropes and the films.
-\item DB Tropes was discontinued in 2016 and the latest snapshot of the dataset of n-tuples was built July 1st, 2016.
-\item Recent publications still need to make use of the tropes by film and the latest dataset available is from 2016;
-however, they would benefit from having updated information.
-\item To fulfil the need of having an updated corpus of films and tropes,
-in 2019 we developed a library called \textit{tropescraper} %link - JJ
- that:
-    \begin{enumerate}
-    \item can connect to the wiki TV Tropes,
-    \item crawls through all the web pages of the films and extract their tropes,
-    \item and returns a small dataset in a standard format.
-    \end{enumerate}
-\end{enumerate}
+TV Tropes is a non-structured wiki-style database, and most researchers access to its data
+through a structured n-tuple-based database called DB Tropes~\cite{DBTropes32:online}.
+Nevertheless, BDTropes was unattended in July 2016, and the prolific community of TV Tropes
+has doubled the number of films and their tropes since then.
+For this reason, in order to allow the researchers to use the films and tropes from TV Tropes,
+we implemented a scraper called TropeScraper~\cite{tropescr46:online} and licensed it as free software,
+so it becomes part of the Python ecosystem.
+This new tool, which takes days to download the whole database, has allowed us, and now you,
+to make a more up-to-date analysis of the tropes used in films. The rest of the paper will be devoted to this.
 
-However, a basic statistical analysis shows that the data is incomplete, with distributions
-that points out to huge biases due to the popularity of the films and tropes.
-The detection of these biases is essential to build automatic learning models that work. % be more precise here
-% Also, instead of "that work" I'd say "that can be explained". And use the example of number of tropes for old movies - JJ
+Although the quantity of the information extracted is promising, doubling the number of films and tropes in TV Tropes,
+an exploratory statistical analysis shows that the data is still incomplete, with distributions
+that point out to huge biases due to the popularity of the films and tropes.
+The detection of these biases is essential to explain the outcomes of future automatic learning models
+build on top of the dataset, for example, according to~\cite{doi:10.1111/exsy.12525}
+the number of tropes in TV Tropes is proportional to the popularity of a movie and inversely proportional to its age.
 
-Furthermore, before the existence of TropeScraper,
-the scientific researches are based on the dataset DBTropes (2016).
-It makes us wonder how much the information about films and tropes from TVTropes has changed since then.
-How much has it grown? How have the most used tropes changes since then? And the best described films in terms of tropes?
-How has the graph of connections between tropes and films evolved through time?
-The answers to these questions can be the key to improve some researches and predict how
-the current dynamics of the TV Tropes community can affect future data.
+In the following report, we evaluate the dataset of films and tropes from TV Tropes as extracted April 2020,
+because knowing their absolute numbers, frequencies and the most relevant ones can be critical
+in different stages of future researches in automatic authoring tools,
+from data wrangling to technique selection, configuration and outcome interpretation.
+As a secondary goal, we compare and analyse how TV Tropes has evolved from July 2016 to April 2020
+in order to detect general trends that have emerged which could help on the prediction of TV Tropes
+in some years away.
+Finally, since TV Tropes is an unstructured wiki and we have to follow different heuristics
+to crawl the pages correctly, we also assess the quality of the scraping process in this report,
+considering possible inconsistencies and improvements based on the results.
 
-\section{Analysis of the generated dataset} \label{sec:tools}
+We divide the rest of the report as follows:
+Section~\ref{sec:acquisition} explains the data acquisition phase.
+The analysis in Sections~\ref{sec:analysys1} and~\ref{sec:analysys2} includes the two perspectives of
+the relation between films and tropes; in other words, how many tropes appear in each movie and vice versa.
+The conclusion in Section~\ref{sec:conclusions} highlights and summarises the outcomes.
 
-The relation between tropes and films can be studied from both perspectives.
+\section{Notes on data Acquisition} \label{sec:acquisition}
 
-\subsection{Descriptive analysis of the films by the number of tropes}
+It is important to remark that we have improved the original scraper that we used in~ref{doi:10.1111/exsy.12525}.
+The first stable version of the scraper (v1.0.2) crawled through the film pages and scraped the tropes for every film.
+The data seemed to correlate with the data from 2016.
+However, the analysis of the top tropes showed missing information because
+it was not considering tropes that were very common in 2020.
+After studying the situation, we discovered
+that counting the tropes listed in the film pages was not enough;
+the trope pages also include the list of films that they belong to,
+and this information complements the previous one, increasing the relations between films and tropes.
+Finally, some massively used tropes divide their occurrences into wiki pages
+that are in the same level of hierarchy than films and tropes,
+although semantically they are at the trope level.
+For these reasons, we evolved the scraper to find the relations from the film's perspective,
+from the trope's perspective and also, considering pagination,
+providing a more solid dataset that is very aligned to the data in 2016
+and the changes stated inside TV Tropes since then.
+We published it as version v1.1.0.
+As a side effect, its scraping time passed from a couple of hours to days,
+because it included ten times more pages to process.
+% TODO if I have time, give numbers about the new numbers (films, tropes, connections)
 
-According to Figure~\ref{fig:decriptive_analysis_tropes_by_film}, the dataset in November 2019
-contains 12147 films,
-and the average number of tropes by film is 54.242, but the film with the most tropes in the dataset has 971.
-If we compare these values against the data in 2016, the number of films is almost the double,
-and the average number of tropes per film as well. In other words, the dataset has more films and the films contain
-more tropes. % This means that... - JJ
+\section{Analysis of the number of tropes used in the films} \label{sec:analysys1}
 
-\begin{figure}[htpb]
+The descriptive analysis of the films regarding their tropes (Table~\ref{tab:decriptive_analysis_tropes_by_film})
+reveals the growth of the number of films by 99.6\%.
+The average number of tropes per film has also grown by 279.38\%.
+In other words, the dataset doubles the number of films (2x) and quadruples the number of tropes by film (4x).
+It is interesting to point out that the scraper has been able to find five movies without tropes.
+However, in all the cases, we could manually check and confirm that the films do not have a page in TV Tropes,
+so they are listed in the categories by mistake.
+
+The increase of the frequency is visible through the comparative boxplots (Figure~\ref{fig:boxplot_tropes_by_film}),
+where a reduced interquartile range shows that
+there are fewer differences among the number of tropes in 50\% of the films,
+and moved to the top, that shows how the average number of tropes per film has grown.
+
+\begin{table}[htpb]
 \center
 <<echo=False,results="tex", width="12cm">>=
 describe_tropes()
 @
-\caption{Descriptive analysis comparison of trope occurrences by film in July 2016 vs November 2019}
-\label{fig:decriptive_analysis_tropes_by_film}
-\end{figure}
-
-The figure~\ref{fig:boxplot_tropes_by_film} shows the boxplots comparison of the two datasets. As we can see,
-TV Tropes tends to have a better description of the films in terms of tropes and less films with no tropes,
-that is reflected in a interquartile range displaced to the top and shorter.
+\caption{Comparative Descriptive analysis of trope occurrences by film between July 2016 and April 2019}
+\label{tab:decriptive_analysis_tropes_by_film}
+\end{table}
 
 \begin{figure}[htpb]
 \center
 <<echo=False,fig=True, width="10cm", f_pos="h", f_size=(9,2)>>=
 boxplot_tropes()
 @
-\caption{Boxplots comparison of trope occurrences by film in July 2016 vs November 2019}
+\caption{Comparative boxplots of trope occurrences by film between July 2016 and April 2019}
 \label{fig:boxplot_tropes_by_film}
 \end{figure}
 
-
-In figure~\ref{fig:frequency_tropes_by_film}, we can observe the number of films that have a specific number of tropes.
-As we can observe, the new dataset has been displaced to the right with respect to the number of tropes in the film,
-that means that films are better described. Previously, most of the films had just 1 trope and currently, most of them
-have between 10 and 100.
+If we represent the number of tropes per film concerning the number
+of movies (Figure~\ref{fig:frequency_tropes_by_film}),
+we can observe a clear trend: the number of films with just one trope is high,
+and the number of films decreases as the number of tropes increases, reaching the minimum in 4 tropes.
+Then, the value reaches a maximum value close to 20 tropes and decreases again
+following a long-tail distribution.
 
 \begin{figure}[htpb]
 \center
 <<echo=False,fig=True, width="10cm", f_pos="h", f_size=(9,6)>>=
 frequencies_tropes()
 @
-\caption{Boxplots comparison of trope occurrences by film in July 2016 vs November 2019}
+\caption{Comparative boxplots of film occurrences by tropes between July 2016 and April 2019}
 \label{fig:frequency_tropes_by_film}
 \end{figure}
 
-When we compare the top films by number of tropes in July 2016 vs November 2019,
-as shown in figure~\ref{fig:top_films_by_number_of_tropes}, 17 films our of 50 are shared in the lists.
-It is interesting to point out that, although both lists have similar number of tropes in the highest values,
-the top films of the new dataset almost double the number of tropes in the old one, in the lower values of the list.
+The films with more tropes (Table~\ref{tab:top_films_by_number_of_tropes})
+are adventure/action film franchises, such as James Bond, The Avengers and Star Wars.
+If we compare the films in 2020 and 2016, we can observe that, in general, the top ones remain.
+As a rule, the films that were previously at the top have multiplied the number of tropes by up to 10.
 
-\begin{figure}[htpb]
+\begin{table}[htpb]
 \center
 <<echo=False,results="tex", width="12cm">>=
 top_films_by_number_of_tropes(50)
 @
-\caption{Top 50 films by number of tropes in July 2016 vs November 2019. Common elements are marked in blue.}
-\label{fig:top_films_by_number_of_tropes}
-\end{figure}
+\caption{Comparative top fifty films by the number of tropes between July 2016 and April 2019. *Common elements are marked in blue.}
+\label{tab:top_films_by_number_of_tropes}
+\end{table}
 
+In some cases, the films have changed the name from 2016 to avoid ambigüity
+(TheAvengers becomes TheAvengers2012, StarTrek becomes StarTrek2009, AlienS becomes Aliens,
+Batman becomes Batman1989, Xmen becomes XmenFilmSeries).
+As shown in the column "Increment", most of the films have around 100\%-300\%
+more tropes in 2020 than in 2016.
+In just some cases, some films have increased the number of tropes drastically,
+to cite the ones with an increment above 500\%: TheAvengers, ANewHope, ReturnOfTheJedi, RevengeOfTheSith,
+TheEmpireStrikesBack, ThePhantomMenace and AttackOfTheClones.
+It is interesting that 6 out of 7 films with such increment are from the Star Wars franchise,
+that, in 2016 (with Episode VI just released), only had two films in the top and, in 2020,
+with just four films more released by then, has seven.
 
+Thirty-four films out of the top fifty were already in the top list in 2016.
+The remaining set includes films that had just been released at that time
+and had a limited number of tropes (CaptainAmericaCivilWar, TheForceAwakens, XMenApocalyse,
+BatmanVSupermanDawnOfJustice).
+Also, films that were released but not included in TV Tropes yes (AvengersAgeOfUltron)
+and films not released at that time (AvengerEndGame, ThorRagnarok, BlackPanther2018, GuardiansOfTheGalaxyVol2).
+Finally, TV Tropes also includes films that are not released yet but are already fulfilling some meta-tropes;
+this is the case of AvengersInfinityWar, that already had the tropes LoadsAndLoadsOfCharacters
+and GrandFinale in 2016.
 
+\section{Analysis of the number of films where the tropes appear} \label{sec:analysys2}
 
+The descriptive analysis of the tropes and the films they appear
+in (Table~\ref{tab:decriptive_analysis_films_by_trope})
+reveals a growth of the number of tropes by 110.38\%.
+The average number of films that every trope appears in also grows by 259.95\%.
+While there are tropes that only exist in a single film, every trope is used on average by 28 films.
+The comparative boxplots (Figure~\ref{fig:boxplot_films_by_trope}) shows a more significant
+interquartile range, and a shift to the top,
+that corresponds to stretching the histogram from 2016 and a longer tail.
 
-
-
-
-\subsection{Descriptive analysis of the tropes by the number of films}
-
-According to Figure~\ref{fig:decriptive_analysis_films_by_trope}. The dataset in November 2019
-contains 26479 tropes,
-and the average number of films by trope is 24.883, but the trope that appear in the most films in the dataset has 3386 films.
-If we compare these values against the data in 2016, the number of tropes is 3/2 of the old dataset,
-but the average number of films where a trope appears has tripled the old value.
-In other words, the dataset has more tropes (about 50\% more) and, on average, the tropes are present in
-more films.
-
-\begin{figure}[htpb]
+\begin{table}[htpb]
 \center
 <<echo=False,results="tex", width="12cm">>=
 describe_films()
 @
-\caption{Descriptive analysis comparison of trope occurrences by film in July 2016 vs November 2019}
-\label{fig:decriptive_analysis_films_by_trope}
-\end{figure}
-
-However, as we can observe in figure~\ref{fig:boxplot_films_by_trope}, a bigger average does not mean that tropes
-are more widely used among films. As we can observe, the interquartile range in 2019 for the use of tropes
-begins from 1 and is wider, in other words, we have a similar frequency but amplified with more tropes.
+\caption{Comparative descriptive analysis of trope occurrences by film between July 2016 and April 2019}
+\label{tab:decriptive_analysis_films_by_trope}
+\end{table}
 
 \begin{figure}[htpb]
 \center
 <<echo=False,fig=True, width="10cm", f_pos="h", f_size=(9,2)>>=
 boxplot_films()
 @
-\caption{Boxplots comparison of trope occurrences by film in July 2016 vs November 2019}
+\caption{Comparative boxplots of trope occurrences by films between July 2016 and April 2019}
 \label{fig:boxplot_films_by_trope}
 \end{figure}
 
-This effect is clearly visible in Figure~\ref{fig:frequency_films_by_trope}.
-Just one film per trope is still the most common frequency, and this effect has been
-% But the difference between that and the second is bigger? The "fat tail" effect is clearer? - JJ
-amplified in the new dataset, showing less curvature for the new dataset.
+The representation of the number of films vs tropes (Figure~\ref{fig:frequency_films_by_trope})
+shows a distribution similar to 2016 but stretched and extended.
+The only main difference is that the number of films with a single trope
+is three times as high now as in 2016.
+In other words, we have more tropes, and in general, films have more tropes as well.
 
 \begin{figure}[htpb]
 \center
 <<echo=False,fig=True, width="10cm", f_pos="h", f_size=(9,6)>>=
 frequencies_films()
 @
-\caption{Boxplots comparison of trope occurrences by film in July 2016 vs November 2019}
+\caption{Comparative boxplots of trope occurrences by film between July 2016 and April 2019}
 \label{fig:frequency_films_by_trope}
 \end{figure}
 
-When we compare the top tropes by number of uses in films in July 2016 vs November 2019,
-as shown in figure~\ref{fig:top_tropes_by_number_of_films}, it looks completely different to the analogous analysis for films:
-in this case, there are no common tropes in the top lists for both datasets.
-Also, the difference between the top trope is huge, and the new top trope is used around 7 times more than the old top.
+However, having a distribution that resembles the one in 2016
+does not necessarily mean that TV Tropes has not suffered many changes.
+Although the top films have not changed a lot since 2016, the top tropes have,
+keeping only three out of fifty (Table~\ref{tab:top_tropes_by_number_of_films}).
+The tropes have evolved so much since 2016 that 43 out of the top fifty in 2020
+did not even exist in 2016.
 
-\begin{figure}[htpb]
+\begin{table}[htpb]
 \center
 <<echo=False,results="tex", width="12cm">>=
 top_tropes_by_number_of_films(50)
 @
-\caption{Top 50 films by number of tropes in July 2016 vs November 2019. Common elements are marked in blue.}
-\label{fig:top_tropes_by_number_of_films}
-\end{figure}
+\caption{Comparative top fifty films by the number of tropes between July 2016 and April 2019. *Common elements are marked in blue.}
+\label{tab:top_tropes_by_number_of_films}
+\end{table}
 
-\section{Conclusions}
+The first question that comes into our minds is if the scraper is working fine.
+In order to answer this question, we analyse the top tropes from 2016
+and try to trace the reasons why they are not so popular in 2020.
+Table~\ref{tab:old_top_tropes_and_increment} shows
+the comparative ranking of the top tropes between 2016 and their position in 2020.
+According to it, the vast majority of tropes have incremented their appearance in films by a 200\%-300\%.
+Nevertheless, this is not enough for them to be in the top fifty,
+although they mostly keep being in the top 1,300.
+There are four cases with a reduced use: TV Tropes avoids \textit{CultClassic} now because of its lack of universality,
+removes \textit{HeyItsThatGuy} and replaces it by \textit{RetroactiveRecognition},
+replaces \textit{SpiritualLicensee} by \textit{SpiritualAdaptation} (although the old trope still appears in some films)
+and removes \textit{ThreeDMovie}.
 
-TV Tropes has grown from July 2016 to November 2019, in terms of films and tropes:
-in November 2019 there are almost twice the number of films and almost 3/2 of the tropes.
-However, the relations between films and tropes has not grown the same way.
+\begin{table}[htpb]
+\center
+<<echo=False,results="tex", width="12cm">>=
+old_top_tropes_and_increment(50)
+@
+\caption{Top fifty films by the number of tropes in July 2016 and their increment of tropes in April 2020.}
+\label{tab:old_top_tropes_and_increment}
+\end{table}
 
+\section{Conclusions} \label{sec:conclusions}
 
-If we look at the films, there are more films, and in general, films are better described in terms of tropes.
-In 3 years, the top list has changed, but not drastically, and we can see that 1/3 of the films in the top 50 are still in the top 50,
-but, in general with twice the number of tropes. So, more films in the database and the existing films are better described.
+We extract the following outcomes from the previous analysis.
 
-If we look at the tropes, things are different. Tropes are added in a lower proportion but are the ones mostly used since 2016,
-in other words, new tropes have been widely discovered in films, but not many old tropes have been newly found in the films.
-This is specially visible in the top 50, where no trope is shared at all. More than this, all the tropes in the top 50 in November 2019
-are present in more films than all the tropes in July 2016.
+In terms of gross numbers, the number of films and tropes in 2020 doubles the number in 2016.
+It goes from 6,296 films to 12,567 and from 17,738 tropes to 37,317.
+The average number of relations between films and tropes in 2020 quadruples the number in 2016;
+in other words, films are better described in terms of tropes and tropes appear in more films.
+In absolute terms, the number of connections has increased by 657.23\%.
+Both distribution curves shift right (less positive skewness).
+However, while the interquartile range of tropes' distribution has reduced,
+the interquartile range of the films' distribution has increased.
 
-We could say that old popular tropes haven't been explored as much as new tropes, but old popular films have still been reviewed a lot.
-% What does it say about the bias? How's this interesting for machine learning with this? - JJ
+Regarding the films with more tropes in TV Tropes,
+only 32\% of the films in the top fifty have changed from 2016 to 2020,
+that is to say, in general, popular films in terms of tropes remain.
+The James Bond franchise is the artistic work with more tropes,
+with almost a third more than the following, The Lord of the rings,
+that overcomes the next by a few hundreds of tropes, The Avengers.
+It is imperative to hint how the franchise Star Wars boosted its popularity from 2016 to 2020, also.
+Regarding the most popular tropes, although the majority of them in 2016 are still relevant in 2020,
+the new top list if almost entirely replaced by tropes that did not exist in 2016.
+The most popular trope in 2020 is \textit{AmericanFilms}, followed by \textit{ShoutOut} and \textit{BigBad}.
+
+We discovered that TV Tropes adapts the name of the films to disambiguate second parts or remakes as they appear.
+They also include films that have not been premiered and extrapolate possible tropes from the existing information.
+
+We could detect errors in the wiki that lead to parsing inexisting film pages
+and incomplete information that made us evolve the scraper several times.
+The latest modifications made to tropescraper allows extracting the data correctly,
+with results that correlate to the ones from DB Tropes in 2016.
+However, due that the wiki is unstructured and maintained manually,
+it is crucial to keep a critic eye on the data extracted from it, especially the outliers,
+and always consider a data wrangling phase before using the data to build models in machine learning.
+It also points to specific, and network-based, dynamic of tropes and films.
+
 
 \section*{Acknowledgements}
 This work has been partially funded by projects DeepBio (TIN2017-85727-C4-2-P) and TEC2015-68752
