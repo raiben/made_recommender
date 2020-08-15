@@ -4,6 +4,8 @@ import difflib
 import io
 import json
 import re
+from collections import OrderedDict
+
 from common.base_script import BaseScript
 
 
@@ -64,7 +66,7 @@ class FilmMapper(BaseScript):
         self.tvtropes_films_file = tvtropes_films_file
         self.imdb_titles_file = imdb_titles_file
         self.imdb_ratings_file = imdb_ratings_file
-        self.target_dataset = target_dataset
+        self.target_dataset_without_extension = target_dataset.split('.')[0]
         self.remove_ambiguities = remove_ambiguities
 
         self.film_list = []
@@ -205,9 +207,38 @@ class FilmMapper(BaseScript):
         return [name for name in self.tvtropes_imdb_map if len(self.tvtropes_imdb_map[name]) >= occurrences]
 
     def _write_dataset(self):
+        films_matched = self._matches_equal(1)
+
+        self._info('Writing to a JSON file')
+        list_to_store = []
+        for film_name in films_matched:
+            film = self.tvtropes_imdb_map[film_name][0]
+            film_tropes = self.tropes_by_film[film_name]
+
+            film_dictionary = OrderedDict()
+            film_dictionary['id'] = film.id
+            film_dictionary['name'] = film_name
+            film_dictionary['title'] = film.title
+            film_dictionary['rating'] = film.rating
+            film_dictionary['votes'] = film.votes
+            film_dictionary['start_year'] = film.start_year
+            film_dictionary['tropes'] = sorted(list(film_tropes))
+            film_dictionary['genres'] = sorted(list(film.genres))
+            list_to_store.append(film_dictionary)
+
+        self.json_content = json.dumps(list_to_store)
+        self._add_to_summary('uncompressed_generated_json_file_size_bytes', len(self.json_content))
+        json_compressed_path = f'{self.target_dataset_without_extension}.json.bz2'
+        self.json_compressed_content = bz2.compress(self.json_content.encode('UTF-8'))
+        with open(json_compressed_path, 'wb') as compressed_file:
+            compressed_file.write(self.json_compressed_content)
+
+        self._add_to_summary('compressed_generated_json_file_path', json_compressed_path)
+        self._add_to_summary('compressed_generated_json_file_size_bytes', len(self.json_compressed_content))
+
+
         self._info('Writing to a CSV file')
         all_tropes_in_order = sorted(set([trope for tropes in self.tropes_by_film.values() for trope in tropes]))
-        films_matched = self._matches_equal(1)
         all_genres_in_order = sorted(set([genre for films in self.tvtropes_imdb_map.values()
                                           if len(films) for genre in films[0].genres]))
 
@@ -224,16 +255,15 @@ class FilmMapper(BaseScript):
                 self._info(f'{number_of_rows} rows written')
 
         self.uncompressed_content = output.getvalue()
-        self._add_to_summary('uncompressed_generated_file_path', self.target_dataset)
-        self._add_to_summary('uncompressed_generated_file_size_bytes', len(self.uncompressed_content))
+        self._add_to_summary('uncompressed_generated_csv_file_size_bytes', len(self.uncompressed_content))
 
-        compressed_path = f'{self.target_dataset}.bz2'
+        compressed_path = f'{self.target_dataset_without_extension}.csv.bz2'
         self.compressed_content = bz2.compress(self.uncompressed_content.encode('UTF-8'))
         with open(compressed_path, 'wb') as compressed_file:
             compressed_file.write(self.compressed_content)
 
-        self._add_to_summary('compressed_generated_file_path', compressed_path)
-        self._add_to_summary('compressed_generated_file_size_bytes', len(self.compressed_content))
+        self._add_to_summary('compressed_generated_csv_file_path', compressed_path)
+        self._add_to_summary('compressed_generated_csv_file_size_bytes', len(self.compressed_content))
 
 
     def get_header(self, tropes, genres):
