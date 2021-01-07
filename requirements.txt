@@ -2,7 +2,7 @@ cachetools
 inspyred==1.0.1
 invoke==1.0.0
 pygraphviz==1.5
-lxml==4.3.0
+lxml==4.6.2
 numpy==1.14.5
 Pweave==0.30.3
 tabulate==0.8.3
