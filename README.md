@@ -200,7 +200,7 @@ can query
 ## rating_evaluator
 
 Scripts to build artifacts from the datasets that are able to 
-evalate a set of tropes and return a predicted rating.
+evaluate a set of tropes and return a predicted rating.
 
 ## trope_recommender
 
