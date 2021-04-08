@@ -8,8 +8,8 @@ import pygraphviz as pgv
 from IPython.display import display, Latex
 from scipy import stats
 
-DBTROPES_GENERATED_FILE_PATH = '/Users/phd/Downloads/dbtropes/dbtropes-20160701.nt'
-TROPESCRAPER_GENERATED_FILE_PATH = '/Users/phd/workspace/made/tropescraper/bin/tvtropes.json'
+DBTROPES_GENERATED_FILE_PATH = '/home/jmerelo/Datos/DBTropes/dbtropes-20160701.nt'
+TROPESCRAPER_GENERATED_FILE_PATH = '/home/jmerelo/Datos/tvtropes.json'
 
 DBTROPES_DATE = 'Jul. 2016'
 TROPESCRAPER_DATE = 'April. 2020'
