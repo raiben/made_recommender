@@ -10,6 +10,7 @@ The project uses **python3** compliant code and the libraries
 listed in the [requirements.txt](requirements.txt) file.
 
 Are you using python3? You can run this command and check it:
+
 ```console
 python3 --version
 ```
@@ -24,6 +25,12 @@ To install the requirements, please use:
 pip install -r requirements.txt
 ``` 
 
+or
+
+```shell
+pip install inspyred cachetools invoke pweave
+```
+
 If you make changes and need to rebuild the requirements.txt, 
 do it  through ```pipreqs```.
 
@@ -35,7 +42,8 @@ pipreqs . --force
 You are ready to reproduce science. The different scripts and
 classes can be run from the command line through ```ìnvoke```.
 
-To get a list of commands and 
+To get a list of commands and
+
 ```console
 invoke --list
 ```
