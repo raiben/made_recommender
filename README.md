@@ -28,7 +28,7 @@ pip install -r requirements.txt
 or
 
 ```shell
-pip install inspyred cachetools invoke pweave pygraphviz reportutil
+pip install inspyred cachetools invoke pweave pygraphviz matplotlib
 ```
 
 If you make changes and need to rebuild the requirements.txt, 

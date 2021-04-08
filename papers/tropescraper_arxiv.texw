@@ -100,7 +100,7 @@ The conclusion in Section~\ref{sec:conclusions} highlights and summarises the ou
 
 \section{Notes on data Acquisition} \label{sec:acquisition}
 
-It is important to remark that we have improved the original scraper that we used in ~\ref{doi:10.1111/exsy.12525}.
+It is important to remark that we have improved the original scraper that we used in ~\cite{doi:10.1111/exsy.12525}.
 The first stable version of the scraper (v1.0.2) crawled through the film pages and scraped  tropes found in every film.
 The data seemed to correlate with DBTropes; however, the analysis of the top tropes showed missing information because
 it was not considering tropes that were very common in 2020.

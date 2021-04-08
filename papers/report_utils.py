@@ -9,7 +9,7 @@ from IPython.display import display, Latex
 from scipy import stats
 
 DBTROPES_GENERATED_FILE_PATH = '/home/jmerelo/Datos/DBTropes/dbtropes-20160701.nt'
-TROPESCRAPER_GENERATED_FILE_PATH = '/home/jmerelo/Datos/tvtropes.json'
+TROPESCRAPER_GENERATED_FILE_PATH = '/home/jmerelo/Code/Python/tropescraper/tvtropes_20200302.json'
 
 DBTROPES_DATE = 'Jul. 2016'
 TROPESCRAPER_DATE = 'April. 2020'
